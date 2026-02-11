@@ -5,6 +5,7 @@ import {
   useContext,
   useReducer,
   useRef,
+  useState,
   useCallback,
   type ReactNode,
 } from "react";
@@ -70,7 +71,7 @@ function appReducer(state: AppState, action: AppAction): AppState {
   }
 }
 
-const initialState: AppState = {
+const defaultState: AppState = {
   view: "home",
   currentMoodSlug: null,
   currentExperienceCode: null,
@@ -85,7 +86,9 @@ interface AppContextValue {
   mapRef: React.RefObject<mapboxgl.Map | null>;
   geojsonRef: React.RefObject<GeoJSONCollection | null>;
   detailCache: React.RefObject<Map<string, ExperienceDetail>>;
+  mapReady: boolean;
   setGeojson: (data: GeoJSONCollection) => void;
+  setMapReady: () => void;
 }
 
 const AppContext = createContext<AppContextValue | null>(null);
@@ -94,18 +97,25 @@ export function AppProvider({
   children,
   destination,
   experiences,
+  initialState,
 }: {
   children: ReactNode;
   destination: Destination;
   experiences: ExperienceListItem[];
+  initialState?: AppState;
 }) {
-  const [state, dispatch] = useReducer(appReducer, initialState);
+  const [state, dispatch] = useReducer(appReducer, initialState ?? defaultState);
+  const [mapReady, setMapReadyState] = useState(false);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const geojsonRef = useRef<GeoJSONCollection | null>(null);
   const detailCache = useRef<Map<string, ExperienceDetail>>(new Map());
 
   const setGeojson = useCallback((data: GeoJSONCollection) => {
     geojsonRef.current = data;
+  }, []);
+
+  const setMapReady = useCallback(() => {
+    setMapReadyState(true);
   }, []);
 
   return (
@@ -118,7 +128,9 @@ export function AppProvider({
         mapRef,
         geojsonRef,
         detailCache,
+        mapReady,
         setGeojson,
+        setMapReady,
       }}
     >
       {children}

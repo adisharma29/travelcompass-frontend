@@ -17,7 +17,7 @@ mapboxgl.accessToken = MAPBOX_TOKEN;
 export function MapContainer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const initialized = useRef(false);
-  const { destination, mapRef, setGeojson } = useApp();
+  const { state, destination, mapRef, setGeojson, setMapReady } = useApp();
   const { permissionDenied, handlePermissionDenied, dismiss } = useGeolocation();
 
   useEffect(() => {
@@ -49,21 +49,23 @@ export function MapContainer() {
         tileSize: 512,
         maxzoom: 14,
       });
-      map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
-
-      // Initial fitBounds to destination area
-      map.fitBounds(
-        [
-          [77.168, 31.097],
-          [77.188, 31.108],
-        ],
-        {
-          padding: getMapPadding(),
-          duration: 0,
-          pitch: 45,
-          bearing: -15,
-        }
-      );
+      // Only set terrain + home bounds if starting on home view.
+      // For mood/experience deep links, useMapActions handles the map state.
+      if (state.view === "home") {
+        map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
+        map.fitBounds(
+          [
+            [77.168, 31.097],
+            [77.188, 31.108],
+          ],
+          {
+            padding: getMapPadding(),
+            duration: 0,
+            pitch: 45,
+            bearing: -15,
+          }
+        );
+      }
 
       // Geolocation control
       const geoCtrl = new mapboxgl.GeolocateControl({
@@ -83,6 +85,7 @@ export function MapContainer() {
         .then((data) => {
           setGeojson(data);
           addAllLayers(map, data);
+          setMapReady();
         })
         .catch((err) => console.error("GeoJSON load error:", err));
     });

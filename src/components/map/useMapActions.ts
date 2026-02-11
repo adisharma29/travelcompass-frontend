@@ -20,7 +20,7 @@ import { fetchNearbyPlaces } from "@/lib/api";
 import type { NearbyPlace } from "@/lib/types";
 
 export function useMapActions() {
-  const { state, dispatch, destination, experiences, mapRef, geojsonRef } = useApp();
+  const { state, dispatch, destination, experiences, mapRef, geojsonRef, mapReady } = useApp();
   const prevView = useRef(state.view);
   const prevMood = useRef(state.currentMoodSlug);
   const prevExp = useRef(state.currentExperienceCode);
@@ -29,7 +29,7 @@ export function useMapActions() {
 
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !mapReady) return;
 
     const geojson = geojsonRef.current;
     const view = state.view;
@@ -271,12 +271,13 @@ export function useMapActions() {
     destination.moods,
     experiences,
     dispatch,
+    mapReady,
   ]);
 
   // ── NEARBY PLACES ON MAP ──
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !map.isStyleLoaded()) return;
+    if (!map || !mapReady) return;
 
     // Only show nearby when in experience view
     if (state.view !== "experience" || !state.currentExperienceCode) {
@@ -311,6 +312,7 @@ export function useMapActions() {
     state.currentExperienceCode,
     state.nearbyVisible,
     mapRef,
+    mapReady,
     destination.slug,
   ]);
 }

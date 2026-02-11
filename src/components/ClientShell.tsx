@@ -5,7 +5,7 @@ import { MapContainer } from "@/components/map/MapContainer";
 import { BottomSheet } from "@/components/sheet/BottomSheet";
 import { TabBar } from "@/components/shared/TabBar";
 import { useHashRouter } from "@/hooks/useHashRouter";
-import type { Destination, ExperienceListItem } from "@/lib/types";
+import type { Destination, ExperienceListItem, AppState } from "@/lib/types";
 
 function AppShell() {
   useHashRouter();
@@ -22,12 +22,14 @@ function AppShell() {
 export function ClientShell({
   destination,
   experiences,
+  initialState,
 }: {
   destination: Destination;
   experiences: ExperienceListItem[];
+  initialState: AppState;
 }) {
   return (
-    <AppProvider destination={destination} experiences={experiences}>
+    <AppProvider destination={destination} experiences={experiences} initialState={initialState}>
       <AppShell />
     </AppProvider>
   );

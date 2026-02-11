@@ -17,7 +17,10 @@ const dmSerif = DM_Serif_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Field Guide",
+  title: {
+    template: "%s | Field Guide",
+    default: "Field Guide",
+  },
   description: "Not places to see — ways to spend time.",
 };
 
