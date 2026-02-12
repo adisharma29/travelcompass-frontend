@@ -50,11 +50,29 @@ The legacy `@cloudflare/next-on-pages` is deprecated. The current approach uses 
 - **Mapbox GL JS bundle is large** — may push against worker size limits
 - **Vendor lock-in** to Cloudflare's runtime model
 
+### Build Test Results (Tested Feb 2026)
+
+The OpenNext Cloudflare adapter (`@opennextjs/cloudflare@1.16.4`) was tested against this project:
+
+- **Build: PASSED** — `opennextjs-cloudflare build` completed successfully with Next.js 16.1.6
+- **Worker bundle size: 9,058 KiB (~8.8 MiB)** uncompressed / **2,135 KiB (~2.1 MiB)** gzip
+- **Static assets: 2.5 MiB** (served free and unlimited)
+- **Server handler: 4.4 MiB** (bundled into the worker)
+
+#### Size Limit Impact
+
+| Tier | Limit | Fits? |
+|------|-------|-------|
+| Free (3 MiB) | 3 MiB uncompressed | **NO — 8.8 MiB exceeds 3 MiB** |
+| Paid ($5/mo, 10 MiB) | 10 MiB uncompressed | **YES — 8.8 MiB fits within 10 MiB** |
+
+> **The free tier will NOT work for this project.** The worker bundle at 8.8 MiB far exceeds the 3 MiB free-tier limit. The $5/month paid plan (10 MiB limit) is required, and the bundle is close to that limit too — future growth could push it over.
+
 ### Verdict
 
-Cloudflare is the **cheapest option with the best global performance** if your app fits within the constraints. The main risk is compatibility — the OpenNext adapter works for most Next.js features but edge cases exist. **The 3 MiB free-tier size limit is a real concern** given this project uses Mapbox GL (large client library), though client-side JS is served as static assets (free and unlimited on Cloudflare) and only the server-side bundle counts toward the worker size limit.
+Cloudflare Workers **works but requires the $5/month paid plan** due to worker size limits. The build compiles cleanly, but the 8.8 MiB bundle size rules out the free tier and leaves only ~1.2 MiB headroom on the paid tier. This makes Cloudflare less attractive compared to a Hetzner VPS (~€3.49/month) which has no such constraints.
 
-**Recommendation: Strong candidate. Test the OpenNext adapter first to validate compatibility before committing.**
+**Recommendation: Viable at $5/month, but the tight size margin is a concern for long-term growth. Not recommended as the primary choice.**
 
 ---
 
@@ -197,7 +215,7 @@ Install [Coolify](https://coolify.io) (open-source, free) on a cheap VPS. Coolif
 
 | | Cloudflare Workers | Vercel Free | Railway | Fly.io | Hetzner + Coolify |
 |--|-------------------|-------------|---------|--------|-------------------|
-| **Monthly cost** | $0–5 | $0 (non-commercial) | ~$5 | ~$5 | ~€3.49 |
+| **Monthly cost** | $5 (free tier too small) | $0 (non-commercial) | ~$5 | ~$5 | ~€3.49 |
 | **Commercial use** | Yes | No (free tier) | Yes | Yes | Yes |
 | **Your Docker works** | No (needs adapter) | No (managed) | Yes | Yes | Yes |
 | **Global edge** | Yes | Yes | No | Optional | No (add CF CDN) |
@@ -209,30 +227,28 @@ Install [Coolify](https://coolify.io) (open-source, free) on a cheap VPS. Coolif
 
 ---
 
-## Recommendations (Ranked by Cost)
+## Recommendations (Updated After Testing)
 
 ### 1. Best Overall for Low Cost: **Hetzner CX23 + Coolify + Cloudflare CDN**
-- **~€3.49/month** (~$3.75 USD)
+- **~€3.49/month** (~$3.75 USD) — cheapest option
 - Your Docker setup works with zero changes
 - Coolify handles deploys, SSL, monitoring
-- Put Cloudflare free tier in front for CDN + DDoS protection
+- Put Cloudflare free CDN in front for caching + DDoS protection
 - 20TB traffic included — no egress surprises
 - Can host your Django backend on the same VPS later
+- **No bundle size limits or runtime constraints**
 
-### 2. Best Managed Option: **Cloudflare Workers (Free Tier)**
-- **$0/month** if under 100k requests/day
-- Test with OpenNext adapter first — if it works, this is unbeatable
-- Zero egress, global edge, built-in security
-- Upgrade to $5/month paid for 10M requests when needed
-
-### 3. Best Balance of DX and Cost: **Railway**
+### 2. Best Balance of DX and Cost: **Railway**
 - **~$5/month** usage-based
 - Docker works immediately, GitHub auto-deploy
-- Simple and predictable
+- Simple and predictable, no operational overhead
 
-### Action Items
+### 3. Cloudflare Workers ($5/month paid plan required)
+- Build succeeds but **worker bundle is 8.8 MiB — exceeds 3 MiB free tier**
+- Requires $5/month paid plan (10 MiB limit), with only 1.2 MiB headroom
+- Zero egress, global edge, built-in security
+- **Risk:** bundle growth could exceed the 10 MiB paid tier limit over time
 
-1. **Test Cloudflare compatibility first** — run `npx @opennextjs/cloudflare` on your build to see if it works without issues
-2. **If Cloudflare works** — deploy there (free) with Cloudflare CDN
-3. **If Cloudflare has issues** — go with Hetzner + Coolify for the cheapest reliable option
-4. **If you want zero ops** — use Railway at ~$5/month
+### Final Recommendation
+
+**Go with Hetzner + Coolify** at €3.49/month. It's the cheapest, has no artificial limits, your Docker setup works unmodified, and you can host additional services on the same VPS. Use Cloudflare's **free** CDN/DNS tier in front for global caching and DDoS protection — this gives you the best of both worlds.
