@@ -25,7 +25,8 @@ export function addAllLayers(map: mapboxgl.Map, data: GeoJSONCollection) {
     if (e.features && e.features.length > 0) {
       const name = e.features[0].properties?.name;
       if (name) {
-        map.fire("route-click", { experienceName: name } as unknown as mapboxgl.EventData);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        map.fire("route-click", { experienceName: name } as any);
       }
     }
   });

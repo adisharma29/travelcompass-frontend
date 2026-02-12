@@ -13,6 +13,15 @@
   --color-zone-outline: #A07040;
   --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: "DM Serif Display", serif;
+
+  /* Site (WP) tokens */
+  --color-wp-bg-light: #FFF4E8;
+  --color-wp-accent: #C9B29D;
+  --color-wp-accent-dark: #A08B7A;
+  --color-wp-orange: #BA6000;
+  --color-wp-gray: #868282;
+  --font-brinnan: var(--font-brinnan), sans-serif;
+  --font-biorhyme: var(--font-biorhyme), serif;
 }
 
 /* ========================================
