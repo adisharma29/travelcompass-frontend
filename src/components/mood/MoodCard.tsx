@@ -11,11 +11,11 @@ interface MoodCardProps {
 export function MoodCard({ mood, onClick }: MoodCardProps) {
   return (
     <button
-      className="flex items-center gap-3.5 rounded-[14px] py-3 px-3.5 cursor-pointer transition-[transform,box-shadow] duration-200 border-none tap-highlight-none hover:translate-y-[-2px] hover:shadow-[0_4px_16px_rgba(67,68,49,0.12)] active:scale-[0.98] w-full text-left"
-      style={{ background: `${mood.color}40` }}
+      className="flex items-center gap-3.5 rounded-[14px] py-3 px-3.5 md:p-5 cursor-pointer transition-[transform,box-shadow] duration-200 border-none tap-highlight-none hover:translate-y-[-2px] hover:shadow-[0_4px_16px_rgba(67,68,49,0.12)] active:scale-[0.98] w-full text-left"
+      style={{ background: mood.card_background || `${mood.color}40` }}
       onClick={onClick}
     >
-      <div className="w-14 h-14 rounded-[10px] overflow-hidden shrink-0">
+      <div className="w-14 h-14 md:w-[100px] md:h-[100px] rounded-[10px] overflow-hidden shrink-0">
         {mood.illustration && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -29,7 +29,7 @@ export function MoodCard({ mood, onClick }: MoodCardProps) {
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-[15px] font-semibold text-text-dark mb-0.5 leading-tight">
+        <div className="text-[15px] md:text-base font-semibold text-text-dark mb-0.5 leading-tight">
           {mood.name}
         </div>
         <div className="text-[13px] text-text leading-normal">

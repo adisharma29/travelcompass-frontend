@@ -18,7 +18,13 @@ interface ElevationChartProps {
 export function ElevationChart({ experienceName }: ElevationChartProps) {
   const { mapRef, geojsonRef } = useApp();
   const [data, setData] = useState<ElevationData | null>(null);
-  const [color, setColor] = useState("#1D4ED8");
+
+  // Derive color from geojson during render (not in effect) to avoid lint warning
+  const geojsonData = geojsonRef.current;
+  const colorFeature = geojsonData?.features.find(
+    (f) => f.properties.name === experienceName && f.geometry.type === "LineString"
+  );
+  const color = colorFeature?.properties.color || "#1D4ED8";
 
   useEffect(() => {
     const map = mapRef.current;
@@ -29,10 +35,6 @@ export function ElevationChart({ experienceName }: ElevationChartProps) {
       (f) => f.properties.name === experienceName && f.geometry.type === "LineString"
     );
     if (!feature) return;
-
-    // Set color from feature
-    const expColor = feature.properties.color || "#1D4ED8";
-    setColor(expColor);
 
     const coords = feature.geometry.coordinates as number[][];
 

@@ -53,18 +53,21 @@ export function MapContainer() {
       // For mood/experience deep links, useMapActions handles the map state.
       if (state.view === "home") {
         map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
-        map.fitBounds(
-          [
-            [77.168, 31.097],
-            [77.188, 31.108],
-          ],
-          {
-            padding: getMapPadding(),
-            duration: 0,
-            pitch: 45,
-            bearing: -15,
-          }
-        );
+        if (destination.bounds_sw_lng != null && destination.bounds_sw_lat != null &&
+            destination.bounds_ne_lng != null && destination.bounds_ne_lat != null) {
+          map.fitBounds(
+            [
+              [destination.bounds_sw_lng, destination.bounds_sw_lat],
+              [destination.bounds_ne_lng, destination.bounds_ne_lat],
+            ],
+            {
+              padding: getMapPadding(),
+              duration: 0,
+              pitch: destination.default_pitch || 45,
+              bearing: destination.default_bearing || -15,
+            }
+          );
+        }
       }
 
       // Geolocation control

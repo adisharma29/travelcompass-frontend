@@ -56,18 +56,21 @@ export function useMapActions() {
         map.setTerrain({ source: "mapbox-dem", exaggeration: 1.5 });
       }
 
-      map.fitBounds(
-        [
-          [77.168, 31.097],
-          [77.188, 31.108],
-        ],
-        {
-          padding: getMapPadding(),
-          pitch: 45,
-          bearing: -15,
-          duration: 800,
-        }
-      );
+      if (destination.bounds_sw_lng != null && destination.bounds_sw_lat != null &&
+          destination.bounds_ne_lng != null && destination.bounds_ne_lat != null) {
+        map.fitBounds(
+          [
+            [destination.bounds_sw_lng, destination.bounds_sw_lat],
+            [destination.bounds_ne_lng, destination.bounds_ne_lat],
+          ],
+          {
+            padding: getMapPadding(),
+            pitch: destination.default_pitch || 45,
+            bearing: destination.default_bearing || -15,
+            duration: 800,
+          }
+        );
+      }
     }
 
     // ── MOOD VIEW ──
@@ -232,7 +235,7 @@ export function useMapActions() {
           ? (pointFeat.geometry.coordinates as [number, number])
           : null;
 
-        if (coord && coord[0] && coord[1]) {
+        if (coord && coord[0] != null && coord[1] != null) {
           map.flyTo({
             center: coord,
             zoom: 16,
@@ -315,4 +318,24 @@ export function useMapActions() {
     mapReady,
     destination.slug,
   ]);
+
+  // ── ROUTE CLICK → OPEN EXPERIENCE ──
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !mapReady) return;
+
+    function onRouteClick(e: mapboxgl.MapboxEvent & { experienceName?: string }) {
+      const name = e.experienceName;
+      if (!name) return;
+      const exp = experiences.find((ex) => ex.name === name);
+      if (exp) {
+        dispatch({ type: "OPEN_EXPERIENCE", experienceCode: exp.code });
+      }
+    }
+
+    map.on("route-click", onRouteClick as (e: mapboxgl.MapboxEvent) => void);
+    return () => {
+      map.off("route-click", onRouteClick as (e: mapboxgl.MapboxEvent) => void);
+    };
+  }, [mapRef, mapReady, experiences, dispatch]);
 }

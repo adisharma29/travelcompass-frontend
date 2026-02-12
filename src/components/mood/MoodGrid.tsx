@@ -10,7 +10,7 @@ export function MoodGrid() {
   const specialMoods = destination.moods.filter((m) => m.is_special);
 
   return (
-    <div className="flex flex-col gap-2.5">
+    <div className="flex flex-col gap-2.5 md:gap-4">
       {regularMoods.map((mood) => (
         <MoodCard
           key={mood.slug}

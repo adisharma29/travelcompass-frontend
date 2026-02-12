@@ -32,7 +32,10 @@ export function ExperienceView() {
   );
 
   useEffect(() => {
-    if (!expCode) return;
+    if (!expCode) {
+      setDetail(null);
+      return;
+    }
 
     // Check cache
     const cached = detailCache.current.get(expCode);
@@ -41,14 +44,25 @@ export function ExperienceView() {
       return;
     }
 
+    // Clear stale detail from previous experience
+    setDetail(null);
     setLoading(true);
+    let stale = false;
+
     fetchExperienceDetail(destination.slug, expCode)
       .then((d) => {
+        if (stale) return;
         detailCache.current.set(expCode, d);
         setDetail(d);
       })
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .catch((err) => {
+        if (!stale) console.error(err);
+      })
+      .finally(() => {
+        if (!stale) setLoading(false);
+      });
+
+    return () => { stale = true; };
   }, [expCode, destination.slug, detailCache]);
 
   if (!expListItem) return null;
