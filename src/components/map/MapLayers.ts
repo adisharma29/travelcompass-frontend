@@ -20,12 +20,12 @@ export function addAllLayers(map: mapboxgl.Map, data: GeoJSONCollection) {
   addHighlightLayers(map);
   addMarkerLayers(map);
 
-  // Route click handler
+  // Route click handler — fires custom event consumed by useMapActions
   map.on("click", "routes-line", (e) => {
     if (e.features && e.features.length > 0) {
       const name = e.features[0].properties?.name;
       if (name) {
-        map.fire("route-click", { experienceName: name });
+        map.fire("route-click", { experienceName: name } as unknown as mapboxgl.EventData);
       }
     }
   });

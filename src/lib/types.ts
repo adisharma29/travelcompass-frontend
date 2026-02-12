@@ -7,6 +7,7 @@ export interface Mood {
   tip: string;
   support_line: string;
   color: string;
+  card_background: string;
   illustration: string | null;
   is_special: boolean;
   sort_order: number;
@@ -24,6 +25,10 @@ export interface Destination {
   default_pitch: number;
   default_bearing: number;
   mapbox_style: string;
+  bounds_sw_lng: number | null;
+  bounds_sw_lat: number | null;
+  bounds_ne_lng: number | null;
+  bounds_ne_lat: number | null;
   background_color: string;
   text_color: string;
   moods: Mood[];

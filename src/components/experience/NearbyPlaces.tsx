@@ -13,13 +13,27 @@ export function NearbyPlaces() {
   const expCode = state.currentExperienceCode;
 
   useEffect(() => {
-    if (!expCode) return;
+    if (!expCode) {
+      setPlaces([]);
+      return;
+    }
 
+    setPlaces([]);
     setLoading(true);
+    let stale = false;
+
     fetchNearbyPlaces(destination.slug, expCode)
-      .then(setPlaces)
-      .catch(console.error)
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (!stale) setPlaces(data);
+      })
+      .catch((err) => {
+        if (!stale) console.error(err);
+      })
+      .finally(() => {
+        if (!stale) setLoading(false);
+      });
+
+    return () => { stale = true; };
   }, [expCode, destination.slug]);
 
   if (loading || places.length === 0) return null;
@@ -71,7 +85,7 @@ function NearbyItem({
     <button
       className="flex items-center gap-2.5 py-2 border-b border-text/8 last:border-b-0 cursor-pointer tap-highlight-none active:opacity-70 w-full text-left"
       onClick={() => {
-        if (place.lat && place.lng) {
+        if (place.lat != null && place.lng != null) {
           window.open(
             `https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lng}&query_place_id=${place.google_place_id}`,
             "_blank",
