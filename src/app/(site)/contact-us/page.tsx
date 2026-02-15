@@ -30,7 +30,7 @@ export default function ContactPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
         <div className="absolute inset-0 flex items-center justify-center">
-          <h1 className="font-[family-name:var(--font-brinnan)] text-[28px] md:text-[40px] font-bold text-white tracking-[3px] uppercase">
+          <h1 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-white tracking-[4px] uppercase">
             Contact Us
           </h1>
         </div>
@@ -40,10 +40,10 @@ export default function ContactPage() {
       <section className="px-5 md:px-10 py-12 md:py-20 max-w-[1400px] mx-auto">
         <div className="max-w-[700px] mx-auto space-y-8">
           <div>
-            <h2 className="font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
+            <h2 className="font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
               Refuje Experiences Private Limited
             </h2>
-            <address className="not-italic font-[family-name:var(--font-brinnan)] text-[15px] text-[#7C7B55] leading-relaxed tracking-[0.5px]">
+            <address className="not-italic font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] text-[#434431] leading-relaxed tracking-[1px]">
               G+1 Rear Unit, Chauhan Enclave, Apple Garden,
               <br />
               Near SSB training centre, Kasumpti,
@@ -53,40 +53,46 @@ export default function ContactPage() {
           </div>
 
           <div>
-            <h2 className="font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
+            <h2 className="font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
               Phone
             </h2>
             <a
               href="tel:+917807740707"
-              className="font-[family-name:var(--font-brinnan)] text-[15px] text-[#A56014] hover:text-[#BA6000] tracking-[0.5px]"
+              className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] text-[#A56014] hover:text-[#BA6000] tracking-[1px] block"
             >
-              +91-7807740707
+              +91-780-774-0707
+            </a>
+            <a
+              href="tel:+917728897593"
+              className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] text-[#A56014] hover:text-[#BA6000] tracking-[1px] block"
+            >
+              +91-772-889-7593
             </a>
           </div>
 
           <div>
-            <h2 className="font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
+            <h2 className="font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
               Email
             </h2>
             <a
               href="mailto:myrefuje@gmail.com"
-              className="font-[family-name:var(--font-brinnan)] text-[15px] text-[#A56014] hover:text-[#BA6000] tracking-[0.5px]"
+              className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] text-[#A56014] hover:text-[#BA6000] tracking-[1px]"
             >
               myrefuje@gmail.com
             </a>
           </div>
 
           <div>
-            <h2 className="font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
+            <h2 className="font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
               Hours
             </h2>
-            <p className="font-[family-name:var(--font-brinnan)] text-[15px] text-[#7C7B55] tracking-[0.5px]">
+            <p className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] text-[#434431] tracking-[1px]">
               Monday &ndash; Sunday, 9:00 AM &ndash; 5:00 PM IST
             </p>
           </div>
 
           <div>
-            <h2 className="font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
+            <h2 className="font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#434431] tracking-[2px] uppercase mb-3">
               Social
             </h2>
             <div className="flex gap-4">
@@ -94,7 +100,7 @@ export default function ContactPage() {
                 href="https://instagram.com/refuje.travel"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-[family-name:var(--font-brinnan)] text-[14px] text-[#A56014] hover:text-[#BA6000] tracking-[0.5px]"
+                className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] text-[#A56014] hover:text-[#BA6000] tracking-[1px]"
               >
                 Instagram
               </a>
@@ -102,7 +108,7 @@ export default function ContactPage() {
                 href="https://www.youtube.com/@RefujeOfficial"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-[family-name:var(--font-brinnan)] text-[14px] text-[#A56014] hover:text-[#BA6000] tracking-[0.5px]"
+                className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] text-[#A56014] hover:text-[#BA6000] tracking-[1px]"
               >
                 YouTube
               </a>
@@ -110,7 +116,7 @@ export default function ContactPage() {
                 href="https://wa.me/917807740707"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="font-[family-name:var(--font-brinnan)] text-[14px] text-[#A56014] hover:text-[#BA6000] tracking-[0.5px]"
+                className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] text-[#A56014] hover:text-[#BA6000] tracking-[1px]"
               >
                 WhatsApp
               </a>

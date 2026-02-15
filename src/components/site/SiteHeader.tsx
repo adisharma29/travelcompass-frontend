@@ -40,7 +40,7 @@ export function SiteHeader() {
     <>
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
-          scrolled ? "bg-[#FFF4E8]/95 backdrop-blur-sm" : "bg-transparent"
+          scrolled ? "bg-[#FFE9CF]/95 backdrop-blur-sm" : "bg-transparent"
         }`}
       >
         <div className="mx-auto flex items-center justify-between px-5 py-4 md:px-10 md:py-5 max-w-[1400px]">
@@ -70,7 +70,7 @@ export function SiteHeader() {
           {/* Book button (right) */}
           <Link
             href="/experiences"
-            className="font-[family-name:var(--font-brinnan)] text-[13px] md:text-[14px] font-bold text-white bg-[#32373c] px-5 py-2 md:px-6 md:py-2.5 hover:bg-[#1a1a1a] transition-colors tracking-[1px]"
+            className="font-[family-name:var(--font-biorhyme)] text-[14px] md:text-[16px] font-bold text-white bg-[#BA6000] px-5 py-2 md:px-6 md:py-2.5 hover:bg-[#A05000] transition-colors tracking-[1px] uppercase"
           >
             Book
           </Link>
@@ -87,7 +87,7 @@ export function SiteHeader() {
 
       {/* Flyout menu (slides from left) */}
       <nav
-        className={`fixed top-0 left-0 z-[70] h-full w-[320px] md:w-[500px] bg-[#FFF4E8] transform transition-transform duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 z-[70] h-full w-[320px] md:w-[500px] bg-[#434431] transform transition-transform duration-300 ease-in-out ${
           open ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -98,7 +98,7 @@ export function SiteHeader() {
           aria-label="Close menu"
         >
           <svg
-            className="w-6 h-6 text-[#434431]"
+            className="w-6 h-6 text-[#FFE9CF]"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -115,7 +115,7 @@ export function SiteHeader() {
               key={link.href}
               href={link.href}
               onClick={() => setOpen(false)}
-              className="block py-5 md:py-6 font-[family-name:var(--font-brinnan)] text-[16px] md:text-[18px] font-normal text-[#434431] tracking-[2px] border-b border-[#C9B29D]/30 hover:text-[#A56014] transition-colors"
+              className="block py-5 md:py-6 font-[family-name:var(--font-brinnan)] text-[20px] md:text-[24px] font-normal text-white tracking-[1px] uppercase border-b border-[#FFE9CF]/15 hover:text-[#C9B29D] transition-colors"
             >
               {link.label}
             </Link>

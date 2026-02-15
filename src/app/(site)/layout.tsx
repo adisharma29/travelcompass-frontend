@@ -6,7 +6,7 @@ import { BackToTopButton } from "@/components/site/BackToTopButton";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#FFF4E8] text-[#434431]">
+    <div className="min-h-screen bg-[#FFE9CF] text-[#434431]">
       <ReadingProgressBar />
       <SiteHeader />
       <main>{children}</main>

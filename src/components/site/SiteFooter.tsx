@@ -18,7 +18,7 @@ const policyLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-[#434431] text-[#FFE9CF] px-5 py-12 md:px-10 md:py-16">
+    <footer className="bg-[#434431] text-[#FFF4E8] px-5 py-12 md:px-10 md:py-16">
       <div className="max-w-[1400px] mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
           {/* Logo + social */}
@@ -35,7 +35,7 @@ export function SiteFooter() {
                 href="https://instagram.com/refuje.travel"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#FFE9CF] hover:text-[#C9B29D] transition-colors"
+                className="text-[#FFF4E8] hover:text-white transition-colors"
                 aria-label="Instagram"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -46,7 +46,7 @@ export function SiteFooter() {
                 href="https://www.youtube.com/@RefujeOfficial"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-[#FFE9CF] hover:text-[#C9B29D] transition-colors"
+                className="text-[#FFF4E8] hover:text-white transition-colors"
                 aria-label="YouTube"
               >
                 <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -58,7 +58,7 @@ export function SiteFooter() {
 
           {/* Quick links */}
           <div>
-            <h3 className="font-[family-name:var(--font-brinnan)] text-[14px] font-bold tracking-[2px] uppercase mb-4">
+            <h3 className="font-[family-name:var(--font-brinnan)] text-[20px] md:text-[28px] font-bold tracking-[1px] uppercase mb-4">
               Quick Links
             </h3>
             <ul className="space-y-2.5">
@@ -66,7 +66,7 @@ export function SiteFooter() {
                 <li key={link.href}>
                   <Link
                     href={link.href}
-                    className="font-[family-name:var(--font-brinnan)] text-[13px] text-[#FFE9CF]/80 hover:text-[#FFE9CF] transition-colors tracking-[0.5px]"
+                    className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[20px] text-white hover:text-white/80 transition-colors tracking-[1px]"
                   >
                     {link.label}
                   </Link>
@@ -77,22 +77,22 @@ export function SiteFooter() {
 
           {/* Contact + policies */}
           <div>
-            <h3 className="font-[family-name:var(--font-brinnan)] text-[14px] font-bold tracking-[2px] uppercase mb-4">
+            <h3 className="font-[family-name:var(--font-brinnan)] text-[20px] md:text-[28px] font-bold tracking-[1px] uppercase mb-4">
               Contact
             </h3>
-            <address className="not-italic font-[family-name:var(--font-brinnan)] text-[13px] text-[#FFE9CF]/80 leading-relaxed tracking-[0.5px] mb-6">
+            <address className="not-italic font-[family-name:var(--font-brinnan)] text-[16px] md:text-[20px] text-[#FFF4E8] leading-relaxed tracking-[1px] mb-6">
               G+1 Rear Unit, Chauhan Enclave, Apple Garden,
               <br />
               Near SSB training centre, Kasumpti,
               <br />
               Shimla, HP 171002
             </address>
-            <p className="font-[family-name:var(--font-brinnan)] text-[13px] text-[#FFE9CF]/80 tracking-[0.5px]">
-              <a href="tel:+917807740707" className="hover:text-[#FFE9CF]">
+            <p className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[20px] text-[#FFF4E8] tracking-[1px]">
+              <a href="tel:+917807740707" className="hover:text-white">
                 +91-7807740707
               </a>
             </p>
-            <p className="font-[family-name:var(--font-brinnan)] text-[13px] text-[#FFE9CF]/80 tracking-[0.5px] mt-1">
+            <p className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[20px] text-[#FFF4E8] tracking-[1px] mt-1">
               <a href="mailto:myrefuje@gmail.com" className="hover:text-[#FFE9CF]">
                 myrefuje@gmail.com
               </a>
@@ -103,7 +103,7 @@ export function SiteFooter() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="font-[family-name:var(--font-brinnan)] text-[11px] text-[#FFE9CF]/60 hover:text-[#FFE9CF] transition-colors tracking-[0.5px]"
+                  className="font-[family-name:var(--font-brinnan)] text-[13px] md:text-[16px] text-white hover:text-white/80 transition-colors tracking-[1px]"
                 >
                   {link.label}
                 </Link>
@@ -112,8 +112,8 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 pt-6 border-t border-[#FFE9CF]/10 text-center">
-          <p className="font-[family-name:var(--font-brinnan)] text-[11px] text-[#FFE9CF]/40 tracking-[1px]">
+        <div className="mt-10 pt-6 border-t border-[#FFF4E8]/10 text-center">
+          <p className="font-[family-name:var(--font-brinnan)] text-[13px] md:text-[16px] text-[#FFF4E8] tracking-[1px]">
             &copy; {new Date().getFullYear()} Refuje Experiences Private Limited. All rights
             reserved.
           </p>

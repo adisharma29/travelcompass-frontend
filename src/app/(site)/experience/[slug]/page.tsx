@@ -71,7 +71,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
           </h1>
           <a
             href="#book"
-            className="inline-block mt-4 font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-[#434431] bg-[#FFE9CF] px-8 py-3 rounded-sm hover:bg-white transition-colors tracking-[1px]"
+            className="inline-block mt-4 font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-white bg-[#BA6000] px-8 py-3 rounded-sm hover:bg-[#A05000] transition-colors tracking-[1px]"
           >
             Book Now
           </a>
@@ -263,7 +263,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {exp.testimonials.map((t, i) => (
-                <div key={i} className="bg-white rounded-[15px] p-6 border border-[#C9B29D]/20">
+                <div key={i} className="bg-white p-6 border border-[#C9B29D]/20">
                   <div className="flex items-center gap-3 mb-4">
                     <Image
                       src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/icons/google-g.png"
@@ -301,7 +301,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
               <Link
                 key={rel.slug}
                 href={`/experience/${rel.slug}`}
-                className="group block rounded-[15px] overflow-hidden bg-[#FFF4E8] border border-[#C9B29D]/20"
+                className="group block overflow-hidden bg-[#FFF4E8] border border-[#C9B29D]/20"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
                   <Image
@@ -344,7 +344,7 @@ export default async function ExperienceDetailPage({ params }: Props) {
             href={`https://wa.me/917807740707?text=Hi, I'd like to book ${exp.title}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-block font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-[#434431] bg-[#FFE9CF] px-8 py-3 rounded-sm hover:bg-white transition-colors tracking-[1px]"
+            className="inline-block font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-white bg-[#BA6000] px-8 py-3 rounded-sm hover:bg-[#A05000] transition-colors tracking-[1px]"
           >
             Book via WhatsApp
           </a>

@@ -18,7 +18,7 @@ export function ExperienceGallery({ images, title }: ExperienceGalleryProps) {
           <button
             key={i}
             onClick={() => setLightboxIndex(i)}
-            className="relative shrink-0 w-[250px] md:w-[350px] aspect-[3/2] rounded-[10px] overflow-hidden"
+            className="relative shrink-0 w-[250px] md:w-[350px] aspect-[3/2] overflow-hidden"
           >
             <Image
               src={src}

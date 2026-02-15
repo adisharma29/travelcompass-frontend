@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { ExperienceCard } from "@/components/site/ExperienceCard";
+import { ExperienceGrid } from "@/components/site/ExperienceGrid";
 
 export const metadata: Metadata = {
   title: "Experiences | Slow Travel in the Himalayas",
@@ -18,6 +18,7 @@ const experiences = [
     description:
       "Experience Holi in Sangla Valley as a multi-day, community-led celebration. Walk village processions, witness Phag Mela, and stay rooted in local tradition.",
     image: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/sangla-holi.jpg",
+    types: ["culture", "local-life", "slowchill"],
   },
   {
     slug: "the-calm-circuit",
@@ -28,6 +29,7 @@ const experiences = [
     description:
       "Ease into the calmness of the mountains on this gentle forest loop on premium pedal assisted mountain e-bikes.",
     image: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/calm-circuit.png",
+    types: ["cycling", "photography", "ridingdriving"],
   },
   {
     slug: "ride-into-the-stillness",
@@ -38,6 +40,7 @@ const experiences = [
     description:
       "Supported 50 KM out and back through Shimla\u2019s peaceful mountain villages, ancient Deodar forests, and authentic rural landscapes.",
     image: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/ride-into-stillness.png",
+    types: ["cycling", "ridingdriving", "wildlife"],
   },
   {
     slug: "brunch-in-apple-orchard",
@@ -48,6 +51,7 @@ const experiences = [
     description:
       "Drift into an unhurried orchard morning. Wander among apple trees, savour a chef-curated Himachali brunch made with seasonal produce, sip slow brews, and linger on hammocks and rugs \u2014 no rush, just dappled light and mountain air.",
     image: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/slow-brunch.jpg",
+    types: ["culinary", "culture", "local-life", "photography", "slowchill", "solace"],
   },
   {
     slug: "sundowner-in-apple-orchard",
@@ -58,30 +62,15 @@ const experiences = [
     description:
       "An exclusive golden-hour gathering in our private apple orchard \u2014 part tasting, part reflection, part pure calm. Limited seats, open skies, and the warmth of a mountain fire.",
     image: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/sundowner.jpg",
+    types: ["culinary", "culture", "local-life", "photography", "slowchill", "solace"],
   },
-];
-
-const filters = [
-  "All",
-  "Camping",
-  "Culinary Culture",
-  "Cycling",
-  "Expeditions",
-  "Hiking",
-  "Local Life",
-  "Photography",
-  "Riding & Driving",
-  "Slow & Chill",
-  "Solace",
-  "Stargazing",
-  "Wildlife",
 ];
 
 export default function ExperiencesPage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative h-[40vh] md:h-[60vh] overflow-hidden">
+      <section className="relative h-dvh overflow-hidden">
         {/* Desktop hero image */}
         <Image
           src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/hero.jpg"
@@ -99,41 +88,21 @@ export default function ExperiencesPage() {
           className="md:hidden object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        <div className="absolute bottom-12 left-0 right-0 px-5 md:px-10 max-w-[1400px] mx-auto">
-          <h1 className="font-[family-name:var(--font-biorhyme)] text-[30px] md:text-[46px] font-bold text-white tracking-[2px] uppercase">
+        <div className="absolute inset-x-0 bottom-[18px] flex flex-col items-center">
+          <h1 className="font-[family-name:var(--font-biorhyme)] text-[30px] md:text-[42px] font-bold text-white tracking-[1px] uppercase text-center">
             Offbeat Experiences
             <br />
             and Activities
           </h1>
+          <a href="#experiences" className="mt-12 text-white" aria-label="Scroll to experiences">
+            <svg className="w-[30px] h-[30px]" fill="currentColor" viewBox="0 0 448 512" xmlns="http://www.w3.org/2000/svg">
+              <path d="M207.029 381.476L12.686 187.132c-9.373-9.373-9.373-24.569 0-33.941l22.667-22.667c9.357-9.357 24.522-9.375 33.901-.04L224 284.505l154.745-154.021c9.379-9.335 24.544-9.317 33.901.04l22.667 22.667c9.373 9.373 9.373 24.569 0 33.941L240.971 381.476c-9.373 9.372-24.569 9.372-33.942 0z" />
+            </svg>
+          </a>
         </div>
       </section>
 
-      {/* Filters */}
-      <section className="px-5 md:px-10 py-6 max-w-[1400px] mx-auto">
-        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {filters.map((f) => (
-            <button
-              key={f}
-              className={`shrink-0 font-[family-name:var(--font-brinnan)] text-[12px] tracking-[1px] px-4 py-2 rounded-full border transition-colors ${
-                f === "All"
-                  ? "bg-[#BA6000] text-white border-[#BA6000]"
-                  : "bg-transparent text-[#434431] border-[#C9B29D] hover:bg-[#C9B29D]/30"
-              }`}
-            >
-              {f}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Experience Grid */}
-      <section className="px-5 md:px-10 py-8 md:py-16 max-w-[1400px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {experiences.map((exp) => (
-            <ExperienceCard key={exp.slug} {...exp} />
-          ))}
-        </div>
-      </section>
+      <ExperienceGrid experiences={experiences} />
     </>
   );
 }
