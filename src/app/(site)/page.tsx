@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ExperienceCard } from "@/components/site/ExperienceCard";
 import { ImageGallery } from "@/components/site/ImageGallery";
 import { TestimonialsCarousel } from "@/components/site/TestimonialsCarousel";
+import { LazyVideo } from "@/components/site/LazyVideo";
 
 export const metadata: Metadata = {
   title: "Refuje | Luxe Offbeat Travel Experiences",
@@ -136,7 +137,10 @@ export default function HomePage() {
           loop
           muted
           playsInline
+          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.jpg"
+          preload="auto"
           className="hidden md:block absolute inset-0 w-full h-full object-cover"
+          {...{ fetchPriority: "high" }}
         >
           <source
             src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-desktop.mp4"
@@ -149,7 +153,10 @@ export default function HomePage() {
           loop
           muted
           playsInline
+          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.jpg"
+          preload="auto"
           className="md:hidden absolute inset-0 w-full h-full object-cover"
+          {...{ fetchPriority: "high" }}
         >
           <source
             src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-mobile.mp4"
@@ -157,7 +164,7 @@ export default function HomePage() {
           />
         </video>
         {/* Scroll-down chevron */}
-        <a href="#intro" className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors animate-bounce">
+        <a href="#intro" aria-label="Scroll to introduction" className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors animate-bounce">
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path d="M19 9l-7 7-7-7" />
           </svg>
@@ -240,7 +247,7 @@ export default function HomePage() {
         <div className="text-center mt-8">
           <Link
             href="/experiences"
-            className="inline-block font-[family-name:var(--font-brinnan)] text-[12px] md:text-[22px] font-bold text-[#FFE9CF] bg-[#BA6000] px-6 py-2.5 md:px-8 md:py-3 hover:bg-[#A05000] transition-colors tracking-[1px] uppercase"
+            className="inline-block font-[family-name:var(--font-brinnan)] text-[12px] md:text-[22px] font-bold text-white bg-[#9E5200] px-6 py-2.5 md:px-8 md:py-3 hover:bg-[#874600] transition-colors tracking-[1px] uppercase"
           >
             Explore All Experiences
           </Link>
@@ -259,38 +266,20 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Video Section */}
+      {/* Video Section — lazy-loaded to avoid downloading ~6MB below the fold */}
       <section className="relative w-full overflow-hidden">
         {/* Desktop video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
-          controls
+        <LazyVideo
+          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/midpage.mp4"
           className="hidden md:block w-full"
-          controlsList="nodownload"
-        >
-          <source
-            src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/midpage.mp4"
-            type="video/mp4"
-          />
-        </video>
-        {/* Mobile video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
           controls
+        />
+        {/* Mobile video */}
+        <LazyVideo
+          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/midpage.mp4"
           className="md:hidden w-full"
-          controlsList="nodownload"
-        >
-          <source
-            src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/midpage.mp4"
-            type="video/mp4"
-          />
-        </video>
+          controls
+        />
       </section>
 
       {/* The Refuje Way */}

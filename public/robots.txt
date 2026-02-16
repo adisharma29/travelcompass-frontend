@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://refuje.adisharma29.workers.dev/sitemap.xml

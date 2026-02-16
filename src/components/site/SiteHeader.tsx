@@ -70,7 +70,7 @@ export function SiteHeader() {
           {/* Book button (right) */}
           <Link
             href="/experiences"
-            className="font-[family-name:var(--font-biorhyme)] text-[14px] md:text-[16px] font-bold text-white bg-[#BA6000] px-5 py-2 md:px-6 md:py-2.5 hover:bg-[#A05000] transition-colors tracking-[1px] uppercase"
+            className="font-[family-name:var(--font-biorhyme)] text-[14px] md:text-[16px] font-bold text-white bg-[#A85600] px-5 py-2 md:px-6 md:py-2.5 hover:bg-[#8F4900] transition-colors tracking-[1px] uppercase"
           >
             Book
           </Link>
