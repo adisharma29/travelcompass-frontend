@@ -56,7 +56,7 @@ export function ExperienceCard({
               {description}
             </p>
           </div>
-          <span className="inline-block w-fit font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-white bg-[#BA6000] px-5 py-2 hover:bg-[#A05000] transition-colors tracking-[1px] uppercase">
+          <span className="inline-block w-fit font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-white bg-[#A85600] px-5 py-2 hover:bg-[#8F4900] transition-colors tracking-[1px] uppercase">
             View More
           </span>
         </div>

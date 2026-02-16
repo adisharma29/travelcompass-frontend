@@ -37,7 +37,7 @@ export function TestimonialsCarousel({ testimonials }: TestimonialsCarouselProps
             </svg>
           ))}
         </div>
-        <p className="font-[family-name:var(--font-brinnan)] text-[12px] text-[#7C7B55] tracking-[0.5px]">
+        <p className="font-[family-name:var(--font-brinnan)] text-[12px] text-[#6B6A48] tracking-[0.5px]">
           5 Google reviews
         </p>
       </div>
@@ -89,7 +89,7 @@ export function TestimonialsCarousel({ testimonials }: TestimonialsCarouselProps
             <p className="font-[family-name:var(--font-brinnan)] text-[13px] text-[#434431] leading-relaxed tracking-[0.5px] flex-1 line-clamp-4">
               {t.text}
             </p>
-            <button className="mt-2 font-[family-name:var(--font-brinnan)] text-[12px] text-[#7C7B55] hover:text-[#434431] tracking-[0.5px] text-left">
+            <button className="mt-2 font-[family-name:var(--font-brinnan)] text-[12px] text-[#6B6A48] hover:text-[#434431] tracking-[0.5px] text-left">
               Read more
             </button>
           </div>
