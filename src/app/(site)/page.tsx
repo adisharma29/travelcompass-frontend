@@ -129,6 +129,26 @@ const ethosItems = [
 export default function HomePage() {
   return (
     <>
+      {/* Preload hero poster images for fast LCP */}
+      <link
+        rel="preconnect"
+        href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev"
+      />
+      <link
+        rel="preload"
+        as="image"
+        type="image/webp"
+        href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.webp"
+        media="(max-width: 767px)"
+      />
+      <link
+        rel="preload"
+        as="image"
+        type="image/webp"
+        href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
+        media="(min-width: 768px)"
+      />
+
       {/* Hero with background video */}
       <section className="relative h-[70vh] md:h-[85vh] overflow-hidden">
         {/* Desktop video */}
@@ -137,7 +157,7 @@ export default function HomePage() {
           loop
           muted
           playsInline
-          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.jpg"
+          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
           preload="auto"
           className="hidden md:block absolute inset-0 w-full h-full object-cover"
           {...{ fetchPriority: "high" }}
@@ -153,7 +173,7 @@ export default function HomePage() {
           loop
           muted
           playsInline
-          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.jpg"
+          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.webp"
           preload="auto"
           className="md:hidden absolute inset-0 w-full h-full object-cover"
           {...{ fetchPriority: "high" }}
@@ -296,7 +316,7 @@ export default function HomePage() {
               <div
                 key={item.title}
                 className={`${
-                  i % 2 === 0 ? "bg-[#7C7B55]" : "bg-[#434431]"
+                  i % 2 === 0 ? "bg-[#5E5D40]" : "bg-[#434431]"
                 } rounded-[60px] py-10 px-5 text-center flex flex-col items-center`}
               >
                 <Image
