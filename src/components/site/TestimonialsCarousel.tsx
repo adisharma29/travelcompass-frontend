@@ -1,112 +1,206 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 
 interface Testimonial {
   text: string;
   author: string;
-  location: string;
+  initial?: string;
 }
 
 interface TestimonialsCarouselProps {
   testimonials: Testimonial[];
 }
 
+const GOOGLE_ICON_URL = "https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png";
+
+function StarsWithVerified({ mobile = false }: { mobile?: boolean }) {
+  const starClass = mobile ? "h-3.5 w-3.5" : "h-5 w-5";
+  const checkClass = mobile ? "h-3.5 w-3.5" : "h-4 w-4";
+  return (
+    <div className="mt-3 flex items-center gap-0.5 text-[#e0ac39]">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <svg key={i} className={starClass} fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+        </svg>
+      ))}
+      <svg className={`ml-1 text-[#4285f4] ${checkClass}`} fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2Zm4.53 7.97-5.1 5.1a1 1 0 0 1-1.42 0L7.47 12.5a1 1 0 0 1 1.41-1.41l1.84 1.83 4.39-4.39a1 1 0 0 1 1.42 1.44Z" />
+      </svg>
+    </div>
+  );
+}
+
+function avatarFor(author: string) {
+  return `https://i.pravatar.cc/120?u=${encodeURIComponent(author.toLowerCase())}`;
+}
+
 export function TestimonialsCarousel({ testimonials }: TestimonialsCarouselProps) {
   const [startIndex, setStartIndex] = useState(0);
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const [expanded, setExpanded] = useState<Record<number, boolean>>({});
+
+  if (testimonials.length === 0) return null;
+
   const visibleCount = 3;
   const maxStart = Math.max(0, testimonials.length - visibleCount);
+  const mobileMax = Math.max(0, testimonials.length - 1);
 
-  const prev = () => setStartIndex((i) => Math.max(0, i - 1));
-  const next = () => setStartIndex((i) => Math.min(maxStart, i + 1));
+  const prevDesktop = () => setStartIndex((i) => (i <= 0 ? maxStart : i - 1));
+  const nextDesktop = () => setStartIndex((i) => (i >= maxStart ? 0 : i + 1));
+  const prevMobile = () => setMobileIndex((i) => (i <= 0 ? mobileMax : i - 1));
+  const nextMobile = () => setMobileIndex((i) => (i >= mobileMax ? 0 : i + 1));
+  const toggleExpand = (idx: number) => setExpanded((prev) => ({ ...prev, [idx]: !prev[idx] }));
+  const desktopPreviewLimit = 165;
+  const mobilePreviewLimit = 110;
 
-  const visible = testimonials.slice(startIndex, startIndex + visibleCount);
+  const visibleDesktop = testimonials.slice(startIndex, startIndex + visibleCount);
+  const visibleMobile = testimonials[mobileIndex];
+  const mobileExpanded = Boolean(expanded[mobileIndex]);
+  const mobileHasOverflow = visibleMobile.text.length > mobilePreviewLimit;
+  const mobileDisplayText =
+    !mobileExpanded && mobileHasOverflow
+      ? `${visibleMobile.text.slice(0, mobilePreviewLimit).trimEnd()}...`
+      : visibleMobile.text;
 
   return (
-    <div className="flex items-center gap-6 md:gap-10">
-      {/* Brand badge - left side */}
-      <div className="hidden md:flex flex-col items-center shrink-0 w-[120px]">
-        <p className="font-[family-name:var(--font-brinnan)] text-[16px] font-bold text-[#434431] mb-1">
-          Refuje
-        </p>
-        <div className="flex gap-0.5 mb-1">
-          {[...Array(5)].map((_, i) => (
-            <svg key={i} className="w-4 h-4 text-[#F4B400]" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-            </svg>
-          ))}
-        </div>
-        <p className="font-[family-name:var(--font-brinnan)] text-[12px] text-[#7C7B55] tracking-[0.5px]">
-          5 Google reviews
-        </p>
-      </div>
+    <>
+      <div className="hidden items-center gap-6 md:flex md:gap-8">
+        <aside className="w-[220px] shrink-0">
+          <p className="font-[family-name:var(--font-biorhyme)] text-[30px] leading-[1.1] text-[#4a4c3a]">
+            From Our Guests
+          </p>
+          <p className="mt-2 font-[family-name:var(--font-brinnan)] text-[14px] leading-[1.5] text-[#67684f]">
+            Real stories from travelers who explored with Refuje.
+          </p>
+        </aside>
 
-      {/* Left arrow */}
-      <button
-        onClick={prev}
-        disabled={startIndex === 0}
-        className="shrink-0 w-9 h-9 rounded-full border border-[#C9B29D]/40 flex items-center justify-center text-[#434431] hover:bg-[#434431] hover:text-white transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#434431]"
-        aria-label="Previous testimonials"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
+        <button
+          onClick={prevDesktop}
+          className="h-14 w-14 shrink-0 rounded-full border border-[#e2d6c6] text-[#b8ad9a] transition-colors hover:bg-[#434431] hover:text-white"
+          aria-label="Previous testimonials"
+        >
+          <svg className="mx-auto h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="m15 18-6-6 6-6" />
+          </svg>
+        </button>
 
-      {/* Cards */}
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-4">
-        {visible.map((t, i) => (
-          <div
-            key={startIndex + i}
-            className="bg-white p-5 shadow-sm flex flex-col"
-          >
-            <div className="flex items-center justify-between mb-3">
-              <div className="flex items-center gap-2.5">
-                {/* Avatar placeholder */}
-                <div className="w-9 h-9 rounded-full bg-[#C9B29D]/30 flex items-center justify-center text-[#434431] font-[family-name:var(--font-brinnan)] text-[14px] font-bold">
-                  {t.author[0]}
-                </div>
-                <p className="font-[family-name:var(--font-brinnan)] text-[13px] font-bold text-[#434431] tracking-[0.5px]">
-                  {t.author} {t.location ? ` ` : ""}
-                </p>
+        <div className="grid flex-1 grid-cols-3 gap-4">
+          {visibleDesktop.map((testimonial, i) => {
+            const absoluteIndex = startIndex + i;
+            const isExpanded = Boolean(expanded[absoluteIndex]);
+            const hasOverflow = testimonial.text.length > desktopPreviewLimit;
+            const displayText =
+              !isExpanded && hasOverflow
+                ? `${testimonial.text.slice(0, desktopPreviewLimit).trimEnd()}...`
+                : testimonial.text;
+
+            return (
+              <article
+                key={`${absoluteIndex}-${testimonial.author}`}
+                className="flex min-h-[335px] flex-col rounded-[18px] bg-[#ececef] px-6 py-6 shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
+              >
+              <div className="grid grid-cols-[auto_1fr_auto] items-start gap-3">
+                <img
+                  src={avatarFor(testimonial.author)}
+                  alt={testimonial.author}
+                  className="h-12 w-12 rounded-full border border-[#cfcac1] object-cover"
+                  loading="lazy"
+                />
+                <h3 className="min-w-0 font-[family-name:var(--font-brinnan)] text-[16px] font-semibold leading-[1.3] text-[#2f3127]">
+                  {testimonial.author}
+                </h3>
+                <img src={GOOGLE_ICON_URL} alt="Google" className="h-7 w-7 shrink-0" loading="lazy" />
               </div>
-              <Image
-                src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/icons/google-g.png"
-                alt="Google"
-                width={20}
-                height={20}
-              />
-            </div>
-            {/* Stars */}
-            <div className="flex gap-0.5 mb-3">
-              {[...Array(5)].map((_, j) => (
-                <svg key={j} className="w-3.5 h-3.5 text-[#F4B400]" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
-                </svg>
-              ))}
-            </div>
-            <p className="font-[family-name:var(--font-brinnan)] text-[13px] text-[#434431] leading-relaxed tracking-[0.5px] flex-1 line-clamp-4">
-              {t.text}
-            </p>
-            <button className="mt-2 font-[family-name:var(--font-brinnan)] text-[12px] text-[#7C7B55] hover:text-[#434431] tracking-[0.5px] text-left">
-              Read more
-            </button>
-          </div>
-        ))}
+
+              <StarsWithVerified />
+
+              <p className="mt-4 whitespace-pre-line font-[family-name:var(--font-brinnan)] text-[12px] leading-[1.55] text-[#2f3127]">
+                {displayText}
+              </p>
+
+              {hasOverflow && (
+                <button
+                  type="button"
+                  onClick={() => toggleExpand(absoluteIndex)}
+                  className="mt-auto pt-4 text-left font-[family-name:var(--font-brinnan)] text-[12px] text-[#2f3127] underline underline-offset-2"
+                >
+                  {isExpanded ? "Hide" : "Read more"}
+                </button>
+              )}
+              </article>
+            );
+          })}
+        </div>
+
+        <button
+          onClick={nextDesktop}
+          className="h-14 w-14 shrink-0 rounded-full border border-[#e2d6c6] text-[#a9a08f] transition-colors hover:bg-[#434431] hover:text-white"
+          aria-label="Next testimonials"
+        >
+          <svg className="mx-auto h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="m9 6 6 6-6 6" />
+          </svg>
+        </button>
       </div>
 
-      {/* Right arrow */}
-      <button
-        onClick={next}
-        disabled={startIndex >= maxStart}
-        className="shrink-0 w-9 h-9 rounded-full border border-[#C9B29D]/40 flex items-center justify-center text-[#434431] hover:bg-[#434431] hover:text-white transition-colors disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-[#434431]"
-        aria-label="Next testimonials"
-      >
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-          <path d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
+      <div className="md:hidden">
+        <article className="flex h-[274px] flex-col rounded-[16px] bg-[#ececef] px-4 py-4 shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
+          <div className="grid grid-cols-[auto_1fr_auto] items-start gap-3">
+            <img
+              src={avatarFor(visibleMobile.author)}
+              alt={visibleMobile.author}
+              className="h-10 w-10 rounded-full border border-[#cfcac1] object-cover"
+              loading="lazy"
+            />
+            <h3 className="min-w-0 font-[family-name:var(--font-brinnan)] text-[14px] font-semibold leading-[1.3] text-[#2f3127]">
+              {visibleMobile.author}
+            </h3>
+            <img src={GOOGLE_ICON_URL} alt="Google" className="h-6 w-6 shrink-0" loading="lazy" />
+          </div>
+
+          <StarsWithVerified mobile />
+
+          <p className="mt-3 whitespace-pre-line font-[family-name:var(--font-brinnan)] text-[14px] leading-[1.5] text-[#2f3127]">
+            {mobileDisplayText}
+          </p>
+
+          {mobileHasOverflow && (
+            <button
+              type="button"
+              onClick={() => toggleExpand(mobileIndex)}
+              className="mt-auto pt-3 text-left font-[family-name:var(--font-brinnan)] text-[13px] text-[#2f3127] underline underline-offset-2"
+            >
+              {mobileExpanded ? "Hide" : "Read more"}
+            </button>
+          )}
+        </article>
+
+        <div className="mt-3 flex items-center justify-center gap-3">
+          <button
+            onClick={prevMobile}
+            className="h-9 w-9 rounded-full border border-[#e2d6c6] text-[#b8ad9a] transition-colors hover:bg-[#434431] hover:text-white"
+            aria-label="Previous testimonial"
+          >
+            <svg className="mx-auto h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m15 18-6-6 6-6" />
+            </svg>
+          </button>
+          <div className="font-[family-name:var(--font-brinnan)] text-[12px] text-[#7f8067]">
+            {mobileIndex + 1} / {testimonials.length}
+          </div>
+          <button
+            onClick={nextMobile}
+            className="h-9 w-9 rounded-full border border-[#e2d6c6] text-[#a9a08f] transition-colors hover:bg-[#434431] hover:text-white"
+            aria-label="Next testimonial"
+          >
+            <svg className="mx-auto h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="m9 6 6 6-6 6" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </>
   );
 }

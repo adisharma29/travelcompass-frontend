@@ -8,202 +8,251 @@ export const metadata: Metadata = {
     "At Refuje, we craft authentic, sustainable travel experiences that reconnect you with the simple, forgotten joys of life.",
 };
 
-const team = [
+const teamMembers = [
   {
     name: "Rajesh Thakur",
-    alias: "The Bold Monk",
-    image: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/about/team-rajesh.webp",
-    badge: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/about/badge-rajesh.png",
-    bio: "Kullu\u2013Shimla kid turned Himalayan fixer. Rajesh spent years building hostels and homestays with local families, chefs, and curious travelers\u2014stays that felt personal, not packaged. He believes tourism should humanize, not extract. Now he\u2019s building Refuje to help people rediscover wonder in outdoors.",
+    role: "The Bold Monk",
+    image:
+      "https://i0.wp.com/refuje.com/wp-content/uploads/2025/11/471ea7e5-6a8f-4726-a9e5-7144556aaaab.webp?resize=300%2C300&ssl=1",
+    bio: "Kullu-Shimla kid turned Himalayan fixer. Rajesh spent years building hostels and homestays with local families, chefs, and curious travelers - stays that felt personal, not packaged. He believes tourism should humanize, not extract. Now he is building Refuje to help people rediscover wonder in outdoors.",
   },
   {
     name: "Ajay Negi",
-    alias: "The OG Local",
-    image: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/about/team-ajay.webp",
-    badge: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/about/badge-ajay.png",
-    bio: "Kinnauri boy who came back home after IIM Calcutta! Ajay spent his early years co-creating with village partners\u2014proof that \u2018local\u2019 is the experience and building across Himachal and Ladakh. Belief system: locals first, always. In Refuje, he\u2019s building a platform with local communities for shared growth.",
+    role: "The OG Local",
+    image:
+      "https://i0.wp.com/refuje.com/wp-content/uploads/2025/11/395c1209-c0f9-4692-9599-187d5e2e8c87.webp?resize=300%2C300&ssl=1",
+    bio: "Kinnauri boy who came back home after IIM Calcutta. Ajay spent his early years co-creating with village partners - proof that local is the experience - and building across Himachal and Ladakh. Belief system: locals first, always. In Refuje, he is building a platform with local communities for shared growth.",
   },
-];
+] as const;
 
 export default function AboutPage() {
   return (
     <>
-      {/* Hero */}
-      <section className="relative h-[50vh] md:h-[70vh] overflow-hidden">
+      <section className="relative overflow-hidden bg-black">
+        <div className="relative h-[360px] md:h-[560px]">
+          <Image
+            src="https://i0.wp.com/refuje.com/wp-content/uploads/2025/11/DSCF1071-2.jpg?fit=2048%2C1365&ssl=1"
+            alt="About Refuje"
+            fill
+            priority
+            unoptimized
+            className="hidden object-cover md:block"
+            sizes="100vw"
+          />
+          <Image
+            src="https://i0.wp.com/refuje.com/wp-content/uploads/2025/11/DSCF1071-2-1-e1763404418831.jpg?fit=890%2C1280&ssl=1"
+            alt="About Refuje"
+            fill
+            priority
+            unoptimized
+            className="object-cover md:hidden"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-black/45" />
+          <div className="absolute inset-x-0 bottom-6 flex flex-col items-center px-4 text-center md:bottom-10">
+            <h1 className="font-[family-name:var(--font-biorhyme)] text-[30px] uppercase tracking-[0.08em] text-[#f6ebda] md:text-[62px] md:tracking-[0.1em]">
+              About Us
+            </h1>
+            <svg
+              className="mt-3 h-5 w-5 text-[#f6ebda] md:mt-4 md:h-6 md:w-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+              aria-hidden="true"
+            >
+              <path d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#efe7dd] px-5 py-9 text-center md:px-10 md:py-16">
+        <div className="mx-auto max-w-[980px]">
+          <h2 className="font-[family-name:var(--font-biorhyme)] text-[18px] leading-[1.55] text-[#434431] md:text-[31px] md:leading-[1.35]">
+            At Refuje, we craft authentic, sustainable travel experiences that reconnect you
+            with the simple, forgotten joys of life.
+          </h2>
+          <p className="mx-auto mt-4 max-w-[860px] font-[family-name:var(--font-brinnan)] text-[11px] leading-[1.7] text-[#5a5b45] md:mt-5 md:text-[14px] md:leading-[1.75]">
+            Our curated, unhurried journeys blend nature, adventure, culture, and
+            mindfulness - offering a &quot;Refuje&quot; from everyday life and nurturing a deeper
+            sense of wonder and connection.
+          </p>
+          <Link
+            href="/life-at-refuje"
+            className="mt-6 inline-flex items-center justify-center bg-[#b26214] px-5 py-2 font-[family-name:var(--font-brinnan)] text-[10px] uppercase tracking-[0.12em] text-[#f8e9d5] transition-colors hover:bg-[#9a530f] md:mt-7 md:px-8 md:py-2.5 md:text-[11px]"
+          >
+            Life @Refuje
+          </Link>
+        </div>
+      </section>
+
+      <section className="bg-[#efe7dd]">
+        <div className="grid md:grid-cols-2">
+          <div className="relative h-[260px] md:h-[520px]">
+            <Image
+              src="https://i0.wp.com/refuje.com/wp-content/uploads/2025/11/refuje-10.jpg?fit=1536%2C2048&ssl=1"
+              alt="Vision"
+              fill
+              unoptimized
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
+          <div className="flex items-center justify-center bg-[#c9b29d] px-8 py-12 text-center md:px-16">
+            <div className="max-w-[420px]">
+              <h3 className="font-[family-name:var(--font-biorhyme)] text-[34px] uppercase tracking-[0.06em] text-[#f4e7d6] md:text-[55px]">
+                Vision
+              </h3>
+              <div className="mx-auto mt-3 h-px w-20 bg-[#ece0d2]/80 md:mt-4" />
+              <p className="mt-4 font-[family-name:var(--font-brinnan)] text-[11px] leading-[1.75] text-[#5f4e3f] md:text-[13px] md:leading-[1.8]">
+                Revolutionizing the great Indian outdoors by fostering a vibrant,
+                responsible community of outdoors lovers and local wardens.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid md:grid-cols-2">
+          <div className="flex items-center justify-center bg-[#c9b29d] px-8 py-12 text-center md:order-1 md:px-16">
+            <div className="max-w-[430px]">
+              <h3 className="font-[family-name:var(--font-biorhyme)] text-[34px] uppercase tracking-[0.06em] text-[#f4e7d6] md:text-[55px]">
+                Mission
+              </h3>
+              <div className="mx-auto mt-3 h-px w-20 bg-[#ece0d2]/80 md:mt-4" />
+              <p className="mt-4 font-[family-name:var(--font-brinnan)] text-[11px] leading-[1.75] text-[#5f4e3f] md:text-[13px] md:leading-[1.8]">
+                To empower local communities by co-creating authentic, sustainable, and
+                world-class travel experiences in India. From adventure and cultural
+                immersion to wellness and pure fun, we aim to redefine travel through
+                meaningful connections, and unforgettable journeys.
+              </p>
+            </div>
+          </div>
+          <div className="relative h-[260px] md:order-2 md:h-[520px]">
+            <Image
+              src="https://i0.wp.com/refuje.com/wp-content/uploads/2025/11/refuje-15-e1763402452377.jpg?fit=1310%2C1310&ssl=1"
+              alt="Mission"
+              fill
+              unoptimized
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 50vw"
+            />
+          </div>
+        </div>
+      </section>
+
+      <section className="relative h-[170px] overflow-hidden md:h-[260px]">
         <Image
-          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/about/hero.jpg"
-          alt="About Refuje"
+          src="https://i0.wp.com/refuje.com/wp-content/uploads/2025/11/XT051752.jpg?fit=2048%2C1152&ssl=1"
+          alt="Mountain landscape"
           fill
-          priority
+          unoptimized
           className="object-cover"
+          sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-        <div className="absolute bottom-12 left-0 right-0 px-5 md:px-10 max-w-[1400px] mx-auto">
-          <p className="font-[family-name:var(--font-brinnan)] text-[14px] text-white/70 tracking-[2px] uppercase mb-3">
-            About Us
-          </p>
-          <h1 className="font-[family-name:var(--font-biorhyme)] text-[30px] md:text-[40px] font-bold text-white leading-tight max-w-[700px]">
-            Crafting authentic, sustainable travel experiences
-          </h1>
-          <p className="mt-3 font-[family-name:var(--font-brinnan)] text-[18px] md:text-[24px] text-white/80 tracking-[2px] uppercase">
-            Who We Are
+        <div className="absolute inset-0 bg-[#2e3d53]/45" />
+        <div className="absolute inset-0 flex items-center justify-center px-6 text-center">
+          <p className="max-w-[780px] font-[family-name:var(--font-biorhyme)] text-[15px] italic leading-[1.45] text-[#f6ebda] md:text-[29px]">
+            &ldquo;The real voyage of discovery consists not in seeking new landscapes, but in
+            having new eyes&rdquo;
           </p>
         </div>
       </section>
 
-      {/* Tagline */}
-      <section className="px-5 md:px-10 py-12 md:py-20 max-w-[1400px] mx-auto text-center">
-        <h2 className="font-[family-name:var(--font-biorhyme)] text-[18px] md:text-[22px] text-[#434431] leading-relaxed max-w-[700px] mx-auto font-extrabold tracking-[1px]">
-          At Refuje, we craft authentic, sustainable travel experiences that reconnect you with the
-          simple, forgotten joys of life.
-        </h2>
-        <hr className="w-16 border-t-2 border-[#C9B29D] mx-auto my-6" />
-        <p className="font-[family-name:var(--font-brinnan)] text-[14px] md:text-[16px] text-[#434431] leading-relaxed max-w-[700px] mx-auto tracking-[1px]">
-          Our curated, unhurried journeys blend nature, adventure,
-          culture, and mindfulness &mdash; offering a &lsquo;Refuje&rsquo; from everyday life and
-          nurturing a deeper sense of wonder and connection.
-        </p>
-        <Link
-          href="/life-at-refuje"
-          className="inline-block mt-6 font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#FFE9CF] bg-[#BA6000] px-8 py-3 rounded-sm hover:bg-[#A05000] transition-colors tracking-[1px] uppercase"
-        >
-          Life @Refuje
-        </Link>
-      </section>
-
-      {/* Vision & Mission - Alternating full-width rows */}
-      <section className="px-5 md:px-10 py-12 md:py-20 max-w-[1400px] mx-auto space-y-16">
-        {/* Vision */}
-        <div className="flex flex-col md:flex-row items-center gap-8 md:gap-12">
-          <div className="flex-1">
-            <h2 className="font-[family-name:var(--font-biorhyme)] text-[36px] md:text-[48px] font-bold text-[#434431] tracking-[2px] uppercase mb-4">
-              Vision
-            </h2>
-            <hr className="w-12 border-t-2 border-[#C9B29D] mb-4" />
-            <p className="font-[family-name:var(--font-brinnan)] text-[14px] md:text-[16px] text-[#434431] leading-relaxed tracking-[1px]">
-              Revolutionizing the great Indian outdoors by fostering a vibrant, responsible community
-              of outdoors lovers and local wardens.
-            </p>
-          </div>
-          <div className="relative w-full md:w-[480px] aspect-[4/3] overflow-hidden shrink-0">
-            <Image
-              src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/about/tent-stars.jpg"
-              alt="Camping under stars"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 480px"
-            />
-          </div>
-        </div>
-
-        {/* Mission */}
-        <div className="flex flex-col md:flex-row-reverse items-center gap-8 md:gap-12">
-          <div className="flex-1">
-            <h2 className="font-[family-name:var(--font-biorhyme)] text-[36px] md:text-[48px] font-bold text-[#434431] tracking-[2px] uppercase mb-4">
-              Mission
-            </h2>
-            <hr className="w-12 border-t-2 border-[#C9B29D] mb-4" />
-            <p className="font-[family-name:var(--font-brinnan)] text-[14px] md:text-[16px] text-[#434431] leading-relaxed tracking-[1px]">
-              To empower local communities by co-creating authentic, sustainable, and world-class
-              travel experiences in India. From adventure and cultural immersion to wellness and pure
-              fun, we aim to redefine travel through meaningful connections, and unforgettable
-              journeys.
-            </p>
-          </div>
-          <div className="relative w-full md:w-[480px] aspect-[4/3] overflow-hidden shrink-0">
-            <Image
-              src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/about/mossy-tree.jpg"
-              alt="Nature connection"
-              fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 480px"
-            />
-          </div>
-        </div>
-      </section>
-
-      {/* Team - Cream background */}
-      <section className="bg-[#FFE9CF] px-5 md:px-10 py-12 md:py-20">
-        <div className="max-w-[1400px] mx-auto">
-          <h2 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#434431] tracking-[2px] uppercase text-center mb-3">
+      <section className="bg-[#efe7dd] px-5 py-10 md:px-10 md:py-16">
+        <div className="mx-auto max-w-[980px] text-center">
+          <h2 className="font-[family-name:var(--font-biorhyme)] text-[27px] uppercase tracking-[0.08em] text-[#434431] md:text-[44px]">
             Meet Our Team
           </h2>
-          <div className="font-[family-name:var(--font-brinnan)] text-[14px] md:text-[16px] text-[#434431] text-center max-w-[600px] mx-auto mb-12 tracking-[1px] leading-relaxed space-y-4">
+          <div className="mx-auto mt-3 max-w-[900px] space-y-3 font-[family-name:var(--font-brinnan)] text-[11px] leading-[1.75] text-[#5e5f45] md:mt-5 md:text-[13px] md:leading-[1.85]">
             <p>
-              We&apos;re a bunch of travel enthusiasts who&apos;ve spent years exploring the globe
+              We are a bunch of travel enthusiasts who have spent years exploring the globe
               and boardrooms alike. Some locals while others city rats, we share a love for
               adventure, nature, and all the thrills and spills that come with it.
             </p>
             <p>
-              After dominating the youth travel scene in India for over a decade, we decided to join
-              forces again and shake things up with Refuje. Our mission? To bring ridiculously cool,
-              world-class travel experiences to our beloved India.
+              After dominating the youth travel scene in India for over a decade, we decided
+              to join forces again and shake things up with Refuje. Our mission? To bring
+              ridiculously cool, world-class travel experiences to our beloved India.
             </p>
             <p>
-              We want to make travel sustainable, professional, fun, and empowering for everyone
-              involved&mdash;locals and travelers alike. So, join us on this wild adventure and
-              let&apos;s change the face of travel together!
+              We want to make travel sustainable, professional, fun, and empowering for
+              everyone involved - locals and travelers alike. So, join us on this wild
+              adventure and let us change the face of travel together.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-[900px] mx-auto">
-            {team.map((member) => (
-              <div key={member.name} className="bg-[#434431] p-6 text-center">
-                <div className="relative w-[120px] h-[120px] mx-auto mb-4 rounded-full overflow-hidden">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    fill
-                    className="object-cover"
-                    sizes="120px"
-                  />
+
+          <div className="mx-auto mt-12 grid max-w-[920px] gap-12 md:grid-cols-2 md:gap-10">
+            {teamMembers.map((member) => (
+              <article
+                key={member.name}
+                className="relative bg-[#7b8056] px-5 pb-7 pt-[84px] text-center md:px-8 md:pb-10 md:pt-[96px]"
+              >
+                <div className="absolute left-1/2 top-0 h-[114px] w-[114px] -translate-x-1/2 -translate-y-1/2 md:h-[134px] md:w-[134px]">
+                  <div className="absolute inset-0 rounded-full bg-[#be7228]" />
+                  <div className="absolute inset-[8px] overflow-hidden rounded-full border-[4px] border-[#f1e6d8]">
+                    <Image
+                      src={member.image}
+                      alt={member.name}
+                      fill
+                      unoptimized
+                      className="object-cover"
+                      sizes="140px"
+                    />
+                  </div>
                 </div>
+
                 <Image
-                  src={member.badge}
+                  src="https://i0.wp.com/refuje.com/wp-content/uploads/2025/07/shoe.png?fit=97%2C97&ssl=1"
                   alt=""
-                  width={40}
-                  height={40}
-                  className="mx-auto mb-3"
+                  aria-hidden="true"
+                  width={38}
+                  height={30}
+                  unoptimized
+                  className="absolute right-5 top-5 opacity-90 md:right-7 md:top-6"
                 />
-                <h3 className="font-[family-name:var(--font-biorhyme)] text-[20px] md:text-[24px] font-bold text-[#FFF4E8] tracking-[0.6px]">
+
+                <h3 className="font-[family-name:var(--font-biorhyme)] text-[29px] uppercase tracking-[0.02em] text-[#f6ebda] md:text-[36px]">
                   {member.name}
                 </h3>
-                <p className="font-[family-name:var(--font-brinnan)] text-[10px] text-[#FFF4E8] tracking-[2px] mb-3">
-                  &ldquo;{member.alias}&rdquo;
+                <p className="mt-1 font-[family-name:var(--font-brinnan)] text-[10px] uppercase tracking-[0.11em] text-[#ebe0d2] md:text-[11px]">
+                  {member.role}
                 </p>
-                <p className="font-[family-name:var(--font-brinnan)] text-[11px] text-[#FFF4E8] leading-relaxed tracking-[0.5px]">
+                <p className="mx-auto mt-4 max-w-[340px] font-[family-name:var(--font-brinnan)] text-[11px] leading-[1.75] text-[#ece4d8] md:text-[12px] md:leading-[1.85]">
                   {member.bio}
                 </p>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="px-5 md:px-10 py-12 md:py-20 text-center max-w-[1400px] mx-auto">
-        <h2 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#434431] mb-3">
-          Join Our Journey
-        </h2>
-        <p className="font-[family-name:var(--font-brinnan)] text-[24px] md:text-[32px] font-bold text-[#434431] mb-4">
-          Become part of our story
-        </p>
-        <hr className="w-16 border-t-2 border-[#C9B29D] mx-auto mb-6" />
-        <p className="font-[family-name:var(--font-brinnan)] text-[14px] md:text-[16px] text-[#434431] max-w-[600px] mx-auto mb-8 leading-relaxed tracking-[1px]">
-          The Refuje family is always growing. Whether you&apos;re an experienced mountain guide with
-          local knowledge, a sustainability champion, or simply someone whose heart beats faster at
-          the thought of meaningful adventure, we invite you to explore how your unique gifts might
-          contribute to our mission. Discover current opportunities, partnership possibilities, and
-          ways to support our community initiatives &mdash; because the most beautiful paths are
-          those we walk together.
-        </p>
-        <a
-          href="https://form.typeform.com/to/ejBRMwW6"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-block font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#FFE9CF] bg-[#BA6000] px-8 py-3 rounded-sm hover:bg-[#A05000] transition-colors tracking-[1px] uppercase"
-        >
-          Email Us
-        </a>
+      <section className="bg-[#efe7dd] px-5 pb-14 pt-4 text-center md:px-10 md:pb-20 md:pt-8">
+        <div className="mx-auto max-w-[940px]">
+          <h2 className="font-[family-name:var(--font-biorhyme)] text-[27px] uppercase tracking-[0.08em] text-[#434431] md:text-[44px]">
+            Join Our Journey
+          </h2>
+          <p className="mt-2 font-[family-name:var(--font-biorhyme)] text-[15px] italic text-[#545641] md:text-[22px]">
+            Become part of our story
+          </p>
+          <div className="mx-auto mt-4 h-px w-24 bg-[#bda995]" />
+          <p className="mx-auto mt-5 max-w-[860px] font-[family-name:var(--font-brinnan)] text-[11px] leading-[1.75] text-[#5e5f45] md:text-[13px] md:leading-[1.85]">
+            The Refuje family is always growing. Whether you are an experienced mountain
+            guide with local knowledge, a sustainability champion, or simply someone whose
+            heart beats faster at the thought of meaningful adventure, we invite you to
+            explore how your unique gifts might contribute to our mission. Discover current
+            opportunities, partnership possibilities, and ways to support our community
+            initiatives - because the most beautiful paths are those we walk together.
+          </p>
+          <a
+            href="https://form.typeform.com/to/ejBRMwW6"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-7 inline-flex items-center justify-center bg-[#b26214] px-6 py-2 font-[family-name:var(--font-brinnan)] text-[10px] uppercase tracking-[0.12em] text-[#f8e9d5] transition-colors hover:bg-[#9a530f] md:px-9 md:py-2.5 md:text-[11px]"
+          >
+            Email Us
+          </a>
+        </div>
       </section>
     </>
   );

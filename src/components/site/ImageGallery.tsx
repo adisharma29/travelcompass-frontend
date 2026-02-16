@@ -16,7 +16,7 @@ export function ImageGallery() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   return (
-    <div className="max-w-[1000px] mx-auto">
+    <div className="w-full">
       {/* Main image */}
       <div className="relative w-full aspect-[16/9] overflow-hidden">
         <Image
