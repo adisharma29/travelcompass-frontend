@@ -151,39 +151,16 @@ export default function HomePage() {
 
       {/* Hero with background video */}
       <section className="relative h-[70vh] md:h-[85vh] overflow-hidden">
-        {/* Poster image for instant LCP — painted immediately, video covers it once loaded */}
-        <picture>
-          <source
-            media="(min-width: 768px)"
-            srcSet="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
-            type="image/webp"
-          />
-          <source
-            media="(min-width: 768px)"
-            srcSet="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.jpg"
-            type="image/jpeg"
-          />
-          <source
-            srcSet="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.webp"
-            type="image/webp"
-          />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.jpg"
-            alt="Refuje hero"
-            {...{ fetchPriority: "high" }}
-            decoding="sync"
-            className="absolute inset-0 w-full h-full object-cover"
-          />
-        </picture>
-        {/* Desktop video — overlays poster once loaded */}
+        {/* Desktop video */}
         <video
           autoPlay
           loop
           muted
           playsInline
+          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
           preload="auto"
           className="hidden md:block absolute inset-0 w-full h-full object-cover"
+          {...{ fetchPriority: "high" }}
         >
           <source
             src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-desktop.mp4"
@@ -196,8 +173,10 @@ export default function HomePage() {
           loop
           muted
           playsInline
+          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.webp"
           preload="auto"
           className="md:hidden absolute inset-0 w-full h-full object-cover"
+          {...{ fetchPriority: "high" }}
         >
           <source
             src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-mobile.mp4"
