@@ -5,6 +5,7 @@ import { ExperienceCard } from "@/components/site/ExperienceCard";
 import { ImageGallery } from "@/components/site/ImageGallery";
 import { TestimonialsCarousel } from "@/components/site/TestimonialsCarousel";
 import { LazyVideo } from "@/components/site/LazyVideo";
+import { HeroVideo } from "@/components/site/HeroVideo";
 
 export const metadata: Metadata = {
   title: "Refuje | Luxe Offbeat Travel Experiences",
@@ -149,40 +150,20 @@ export default function HomePage() {
         media="(min-width: 768px)"
       />
 
-      {/* Hero with background video */}
+      {/* Hero with background video — src deferred to let poster paint as LCP */}
       <section className="relative h-[70vh] md:h-[85vh] overflow-hidden">
         {/* Desktop video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
+        <HeroVideo
+          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-desktop.mp4"
           poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
-          preload="auto"
           className="hidden md:block absolute inset-0 w-full h-full object-cover"
-          {...{ fetchPriority: "high" }}
-        >
-          <source
-            src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-desktop.mp4"
-            type="video/mp4"
-          />
-        </video>
+        />
         {/* Mobile video */}
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
+        <HeroVideo
+          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-mobile.mp4"
           poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.webp"
-          preload="auto"
           className="md:hidden absolute inset-0 w-full h-full object-cover"
-          {...{ fetchPriority: "high" }}
-        >
-          <source
-            src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-mobile.mp4"
-            type="video/mp4"
-          />
-        </video>
+        />
         {/* Scroll-down chevron */}
         <a href="#intro" aria-label="Scroll to introduction" className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors animate-bounce">
           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
