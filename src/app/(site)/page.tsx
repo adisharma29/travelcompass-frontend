@@ -90,17 +90,17 @@ const testimonials = [
   {
     author: "Divya Tharangzak",
     initial: "D",
-    text: "Telangi Kanda is a beautiful, calm and serene place - perfect to unwind and escape the noise of everyday life. It is peaceful, relaxing and truly refreshing.\n\nIf you want to relax and recharge, then this experience is absolutely for you.",
+    text: "Telangi kanda is a beautiful, calm and serene place - perfect to unwind and escape the noise of everyday life. It's peaceful, relaxing and truly refreshing.\n\nIf you want to relax and recharge, then this experience is absolutely for you.",
   },
   {
     author: "Ishikha Agarwal",
     initial: "I",
-    text: "We visited Telangi Kanda and the scenery was breathtaking. The sundowner was remarkable. Highly recommend for peaceful mountain time with loved ones.",
+    text: "We visited Telangi Kanda and breathtaking scenery and a serene atmosphere make this mountainous destination a must-visit. The snow-capped peaks create a stunning backdrop for nature lovers and photographers alike. The tranquility of the surroundings is perfect for those seeking a peaceful escape from city life. They also gave us binoculars, allowing us to gaze at the mountains. The sundowner was remarkable. Highly recommend for people who want to spend quality and peaceful time with their loved ones.",
   },
   {
     author: "Chander S. Chauhan",
     initial: "C",
-    text: "At 55, I recently did a cycling activity with Refuje and it was wonderful. Beautiful route, comfortable pace, and great support from the team.",
+    text: "I'm 55 years old and recently did a cycling activity with Refuje, and it was an absolutely amazing experience. The staff was extremely professional, friendly, and supportive throughout. The electric pedal-assist cycles made the ride smooth and effortless, and I was able to enjoy the entire route comfortably and confidently. Everything was perfectly organized, and I truly had a delightful time. Highly recommended!",
   },
 ];
 
@@ -118,12 +118,12 @@ const ethosItems = [
   {
     icon: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/icons/growth.png",
     title: "Go Local",
-    description: "Don\u2019t just visit\u2014contribute. Respect culture. Share space.",
+    description: "Don't just visit-contribute. Respect culture. Share space.",
   },
   {
     icon: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/icons/starry-sky.png",
-    title: "Comfort Is Overrated",
-    description: "We do scratched knees and starry skies.",
+    title: "Stay A Little Wild",
+    description: "Great stories begin with a little adventure.",
   },
 ];
 
@@ -234,7 +234,7 @@ export default async function HomePage() {
         href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
       />
 
-      <section className="relative h-[100svh] md:h-[1024px] overflow-hidden bg-[#2f3032]">
+      <section className="relative h-[100svh] overflow-hidden bg-[#2f3032]">
         <HeroVideo
           src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-desktop.mp4"
           poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
@@ -255,11 +255,11 @@ export default async function HomePage() {
       <section id="intro" className="bg-[#efe7dd] px-5 py-10 text-center md:px-10 md:py-20">
         <div className="mx-auto max-w-[1272px]">
           <h1 className="font-[family-name:var(--font-biorhyme)] text-[26px] font-bold uppercase tracking-[0.1em] text-[#434431] md:text-[38px] md:tracking-[0.08em]">
-            Himalayan Soul Journeys
+            Luxury Offbeat Travel
           </h1>
           <p className="mx-auto mt-4 max-w-[980px] font-[family-name:var(--font-brinnan)] text-[14px] leading-[1.6] tracking-[0.01em] text-[#5e5f45] md:text-[21px]">
-            Discover authentic, slow experiences in the Indian Himalayas through mindful adventures
-            that reconnect you with nature and yourself.
+            Discover authentic experiences and activities in the Himalayas through mindful
+            adventures that reconnect you with nature and yourself.
           </p>
           <Link
             href="/about-us"
@@ -276,9 +276,9 @@ export default async function HomePage() {
             Experiences
           </h2>
           <p className="mx-auto mt-3 max-w-[1020px] text-center font-[family-name:var(--font-brinnan)] text-[13px] leading-[1.55] tracking-[0.01em] text-[#5e5f45] md:mt-6 md:text-[20px]">
-            Lie beneath skies, pluck fresh apples, discover silk route tales from locals, or meander
-            through mountain countryside on e-bike and rediscover simple joys in the Himalayan
-            wilderness.
+            Lie beneath starlit skies, taste local food, pluck fresh apples, discover silk
+            route tales from locals, or meander through mountain countryside on an ebike to
+            rediscover simple joys in the wilderness.
           </p>
           <div className="mt-4 text-center md:mt-8">
             <Link
@@ -441,6 +441,12 @@ export default async function HomePage() {
             ))}
           </div>
         </div>
+      </section>
+
+      <section className="bg-[#efe7dd] px-5 pb-2 pt-8 text-center md:px-10 md:pb-4 md:pt-20">
+        <h2 className="font-[family-name:var(--font-biorhyme)] text-[20px] font-bold uppercase tracking-[0.12em] text-[#434431] md:text-[40px] md:tracking-[0.08em]">
+          Video Gallery
+        </h2>
       </section>
 
       <section className="relative h-[257px] overflow-hidden bg-[#4d4e53] md:h-[600px]">

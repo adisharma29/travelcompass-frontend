@@ -5,11 +5,11 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 
 const navLinks = [
-  { href: "/", label: "Home" },
-  { href: "/experiences", label: "Experiences" },
-  { href: "/about-us", label: "About Us" },
-  { href: "/life-at-refuje", label: "Life At Refuje" },
-  { href: "/contact-us", label: "Contact Us" },
+  { href: "/", label: "Home", arrow: true },
+  { href: "/experiences", label: "Experiences", arrow: true },
+  { href: "/about-us", label: "About Us", arrow: true },
+  { href: "/life-at-refuje", label: "Life At Refuje", arrow: true },
+  { href: "/contact-us", label: "Contact Us", arrow: true },
 ];
 
 export function SiteHeader() {
@@ -92,33 +92,31 @@ export function SiteHeader() {
             priority
           />
           <Image
-            src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/life/hero.jpg"
+            src="https://i0.wp.com/refuje.com/wp-content/uploads/2025/11/DSCF1810.jpg?fit=2048%2C1365&ssl=1"
             alt="Menu background"
             fill
             className="hidden object-cover md:block"
             sizes="(min-width: 768px) 100vw, 0px"
+            unoptimized
             priority
           />
           <div className="absolute inset-0 bg-[#1f2318]/45 md:bg-[#1f2318]/30" />
         </div>
 
         <nav className="relative h-full w-[84vw] max-w-[330px] overflow-y-auto border-r border-[#a5a989]/26 bg-[rgba(134,138,104,0.62)] shadow-[12px_0_36px_rgba(17,20,14,0.45)] backdrop-blur-[2px] md:w-[31vw] md:max-w-[430px] md:bg-[rgba(134,138,104,0.78)]">
-          <div className="flex h-full flex-col pl-8 pr-6 pb-8 pt-6 md:px-12 md:pb-14 md:pt-10">
-            <div className="flex justify-end">
-              <button onClick={() => setOpen(false)} aria-label="Close menu" className="p-1.5">
-                <svg
-                  className="h-8 w-8 text-[#f3eadb] md:h-12 md:w-12"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2}
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
+          <div className="flex h-full flex-col pl-8 pr-6 pb-8 pt-8 md:px-12 md:pb-14 md:pt-10">
+            <div className="flex justify-center md:justify-start">
+              <Image
+                src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/footer-logo.png"
+                alt="Refuje"
+                width={164}
+                height={164}
+                className="h-auto w-[82px] opacity-90 md:w-[112px]"
+                priority
+              />
             </div>
 
-            <div className="mt-10 flex flex-col gap-14 md:mt-12 md:gap-9">
+            <div className="mt-12 flex flex-col gap-10 md:mt-12 md:gap-9">
               {navLinks.map((link) => (
                 <Link
                   key={`${link.href}-${link.label}`}
@@ -127,11 +125,27 @@ export function SiteHeader() {
                   className="group inline-flex w-fit items-center font-[family-name:var(--font-brinnan)] text-[14px] uppercase tracking-[0.035em] text-[#f5ebdb] transition-colors hover:text-white md:text-[28px]"
                 >
                   <span>{link.label}</span>
-                  <span className="ml-1.5 text-[16px] leading-none transition-transform duration-200 group-hover:translate-x-1 md:ml-3 md:text-[28px]">
-                    &gt;
-                  </span>
+                  {link.arrow ? (
+                    <span className="ml-1.5 text-[16px] leading-none transition-transform duration-200 group-hover:translate-x-1 md:ml-3 md:text-[28px]">
+                      &gt;
+                    </span>
+                  ) : null}
                 </Link>
               ))}
+            </div>
+
+            <div className="mt-auto">
+              <button onClick={() => setOpen(false)} aria-label="Close menu" className="p-1.5">
+                <svg
+                  className="h-10 w-10 text-[#f3eadb] md:h-12 md:w-12"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2}
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </div>
           </div>
         </nav>

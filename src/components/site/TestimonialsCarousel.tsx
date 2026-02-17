@@ -68,10 +68,17 @@ export function TestimonialsCarousel({ testimonials }: TestimonialsCarouselProps
       <div className="hidden items-center gap-6 md:flex md:gap-8">
         <aside className="w-[220px] shrink-0">
           <p className="font-[family-name:var(--font-biorhyme)] text-[30px] leading-[1.1] text-[#4a4c3a]">
-            From Our Guests
+            Refuje
           </p>
+          <div className="mt-2 flex items-center gap-0.5 text-[#e0ac39]">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <svg key={i} className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+              </svg>
+            ))}
+          </div>
           <p className="mt-2 font-[family-name:var(--font-brinnan)] text-[14px] leading-[1.5] text-[#67684f]">
-            Real stories from travelers who explored with Refuje.
+            5 Google reviews
           </p>
         </aside>
 

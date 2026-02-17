@@ -2,11 +2,11 @@ import Link from "next/link";
 import Image from "next/image";
 
 const quickLinks = [
-  { href: "/", label: "Home" },
   { href: "/experiences", label: "Experiences" },
   { href: "/about-us", label: "About Us" },
   { href: "/life-at-refuje", label: "Life at Refuje" },
   { href: "/contact-us", label: "Contact Us" },
+  { href: "https://refuje.com/press/", label: "Press" },
 ];
 
 const policyLinks = [
@@ -17,23 +17,29 @@ const policyLinks = [
 ];
 
 export function SiteFooter() {
+  const linkTextClass =
+    "font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] transition-colors hover:text-white md:text-[18px] md:leading-[1.5]";
+
   return (
     <footer className="bg-[#7f805d] px-5 py-12 text-[#fff2df] md:px-10 md:py-20">
       <div className="mx-auto max-w-[1272px]">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-16">
           <div className="relative">
-            <h3 className="mb-4 font-[family-name:var(--font-brinnan)] text-[22px] uppercase tracking-[0.08em] text-[#fff6ea] md:mb-5 md:font-[family-name:var(--font-biorhyme)] md:text-[32px] md:leading-[1.05] md:tracking-[0.06em]">
+            <h3 className="mb-4 font-[family-name:var(--font-brinnan)] text-[20px] uppercase tracking-[0.08em] text-[#fff6ea] md:mb-5 md:font-[family-name:var(--font-biorhyme)] md:text-[28px] md:leading-[1.05] md:tracking-[0.06em]">
               Quick Links
             </h3>
             <ul className="space-y-2.5 md:space-y-3">
               {quickLinks.map((link) => (
                 <li key={`${link.href}-${link.label}`}>
-                  <Link
-                    href={link.href}
-                    className="font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] transition-colors hover:text-white md:text-[19px] md:leading-[1.5]"
-                  >
-                    {link.label}
-                  </Link>
+                  {link.href.startsWith("http") ? (
+                    <a href={link.href} target="_blank" rel="noopener noreferrer" className={linkTextClass}>
+                      {link.label}
+                    </a>
+                  ) : (
+                    <Link href={link.href} className={linkTextClass}>
+                      {link.label}
+                    </Link>
+                  )}
                 </li>
               ))}
             </ul>
@@ -41,10 +47,7 @@ export function SiteFooter() {
             <ul className="mt-6 space-y-2.5 md:mt-8 md:space-y-3">
               {policyLinks.map((link) => (
                 <li key={`${link.href}-${link.label}`}>
-                  <Link
-                    href={link.href}
-                    className="font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] transition-colors hover:text-white md:text-[19px] md:leading-[1.5]"
-                  >
+                  <Link href={link.href} className={linkTextClass}>
                     {link.label}
                   </Link>
                 </li>
@@ -64,33 +67,30 @@ export function SiteFooter() {
           </div>
 
           <div className="order-3 md:order-none">
-            <h3 className="mb-4 font-[family-name:var(--font-brinnan)] text-[22px] uppercase tracking-[0.08em] text-[#fff6ea] md:mb-5 md:font-[family-name:var(--font-biorhyme)] md:text-[32px] md:leading-[1.05] md:tracking-[0.06em]">
+            <h3 className="mb-4 font-[family-name:var(--font-brinnan)] text-[20px] uppercase tracking-[0.08em] text-[#fff6ea] md:mb-5 md:font-[family-name:var(--font-biorhyme)] md:text-[28px] md:leading-[1.05] md:tracking-[0.06em]">
               Contact Us
             </h3>
-            <p className="mb-3 font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:mb-4 md:text-[18px] md:leading-[1.52]">
+            <p className="mb-3 font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:mb-4 md:text-[17px] md:leading-[1.52]">
               Refuje Experiences Private Limited
             </p>
-            <address className="mb-4 not-italic font-[family-name:var(--font-brinnan)] text-[14px] leading-[1.5] text-[#fff2df] md:mb-6 md:text-[18px] md:leading-[1.62]">
+            <address className="mb-4 not-italic font-[family-name:var(--font-brinnan)] text-[14px] leading-[1.5] text-[#fff2df] md:mb-6 md:text-[17px] md:leading-[1.62]">
               Address: G+1 Rear Unit, Chauhan Enclave, Apple Garden,
               <br />
               Near SSB training centre, Kasumpti,
               <br />
-              Shimla, HP
+              Shimla, HP 171002
             </address>
-            <p className="font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:text-[18px] md:leading-[1.52]">
+            <p className="font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:text-[17px] md:leading-[1.52]">
               Phone:{" "}
               <a href="tel:+917807740707" className="hover:text-white">
                 +91-7807740707
               </a>
             </p>
-            <p className="mt-1 font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:text-[18px] md:leading-[1.52]">
+            <p className="mt-1 font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:text-[17px] md:leading-[1.52]">
               Email:{" "}
               <a href="mailto:myrefuje@gmail.com" className="hover:text-[#FFE9CF]">
                 myrefuje@gmail.com
               </a>
-            </p>
-            <p className="mt-4 font-[family-name:var(--font-brinnan)] text-[13px] leading-[1.4] text-[#f7ecd9] md:mt-6 md:text-[16px] md:tracking-[0.01em]">
-              Refuje&copy;2026 All Rights Reserved
             </p>
           </div>
 
@@ -109,7 +109,7 @@ export function SiteFooter() {
               <p className="mb-2 font-[family-name:var(--font-brinnan)] text-[14px] uppercase tracking-[0.12em] text-[#fff6ea] md:hidden">
                 Follow Us On
               </p>
-              <p className="hidden font-[family-name:var(--font-biorhyme)] uppercase tracking-[0.08em] text-[#fff6ea] md:block md:text-[24px]">
+              <p className="hidden font-[family-name:var(--font-biorhyme)] uppercase tracking-[0.08em] text-[#fff6ea] md:block md:text-[22px]">
                 Follow Us On
               </p>
               <div className="flex items-center gap-3 md:mt-3 md:gap-4 md:justify-end">
@@ -144,6 +144,12 @@ export function SiteFooter() {
               </div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-10 border-t border-[#a4a684]/50 pt-4 text-center md:mt-14 md:pt-5">
+          <p className="font-[family-name:var(--font-brinnan)] text-[12px] leading-[1.45] text-[#f7ecd9] md:text-[15px] md:tracking-[0.01em]">
+            &copy; 2026 Refuje Experiences Private Limited. All rights reserved.
+          </p>
         </div>
       </div>
     </footer>
