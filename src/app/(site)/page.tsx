@@ -1,10 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ExperienceCard } from "@/components/site/ExperienceCard";
 import { ImageGallery } from "@/components/site/ImageGallery";
 import { TestimonialsCarousel } from "@/components/site/TestimonialsCarousel";
-import { LazyVideo } from "@/components/site/LazyVideo";
 import { HeroVideo } from "@/components/site/HeroVideo";
 
 export const metadata: Metadata = {
@@ -12,6 +10,8 @@ export const metadata: Metadata = {
   description:
     "Refuje offers luxury offbeat travel experiences and adventures in the Indian Himalayas: cycling, ebiking, stargazing, orchard food tastings and more.",
 };
+
+const INSTAGRAM_PROFILE_URL = "https://instagram.com/refuje.travel";
 
 const categories = [
   {
@@ -78,29 +78,29 @@ const signatureExperiences = [
 
 const testimonials = [
   {
-    text: "Amazing !!!! Perfect place to be. Looking forward with excitement and anticipation. Go for it folks",
     author: "Jitender Jagta",
-    location: "",
+    initial: "J",
+    text: "Amazing !!!! Perfect place to be. Looking forward with excitement and anticipation. Go for it folks",
   },
   {
-    text: "Away from the fast paced, noise, and pollution free cities, Refuje is the best place to find a refuge nowadays.",
     author: "Arpit Verma",
-    location: "",
+    initial: "A",
+    text: "Away from the fast paced, noise, and pollution free cities, Refuje is the best place to find a refuge nowadays.",
   },
   {
-    text: "Telangi kanda is a beautiful, calm and serene place \u2013 perfect to unwind and escape the noise of everyday life. The snow-capped peaks create a stunning backdrop for nature lovers and photographers alike. The tranquility of the surroundings is perfect for those seeking a peaceful escape from the hustle and bustle of city life.",
     author: "Divya Tharangzak",
-    location: "",
+    initial: "D",
+    text: "Telangi Kanda is a beautiful, calm and serene place - perfect to unwind and escape the noise of everyday life. It is peaceful, relaxing and truly refreshing.\n\nIf you want to relax and recharge, then this experience is absolutely for you.",
   },
   {
-    text: "We visited telangi kandae and breathtaking scenery. The sundowner we saw at that place was remarkable! Highly recommend for people who want to spend time in the silence of the mountains and spend some quality and peaceful time with their loved ones.",
-    author: "ishikha agarwal",
-    location: "",
+    author: "Ishikha Agarwal",
+    initial: "I",
+    text: "We visited Telangi Kanda and the scenery was breathtaking. The sundowner was remarkable. Highly recommend for peaceful mountain time with loved ones.",
   },
   {
-    text: "I\u2019m 55 years old and recently did a cycling activity with Refuje \u2013 and it was absolutely wonderful. The route was beautiful, the pace was comfortable, and the team made sure I felt supported the whole way. Highly recommended!",
-    author: "Chander Singh Chauhan",
-    location: "",
+    author: "Chander S. Chauhan",
+    initial: "C",
+    text: "At 55, I recently did a cycling activity with Refuje and it was wonderful. Beautiful route, comfortable pace, and great support from the team.",
   },
 ];
 
@@ -122,15 +122,107 @@ const ethosItems = [
   },
   {
     icon: "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/icons/starry-sky.png",
-    title: "Stay a Little Wild",
-    description: "Great stories begin with a little adventure.",
+    title: "Comfort Is Overrated",
+    description: "We do scratched knees and starry skies.",
   },
 ];
 
-export default function HomePage() {
+const fallbackSocialPhotos = [
+  "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/ride-into-stillness/gallery-1.jpg",
+  "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/ride-into-stillness/gallery-2.jpg",
+  "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/ride-into-stillness/gallery-3.jpg",
+  "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/ride-into-stillness/gallery-4.jpg",
+  "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/calm-circuit/gallery-1.jpg",
+  "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/calm-circuit/gallery-2.jpg",
+  "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/sundowner/gallery-1.jpg",
+  "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/sundowner/gallery-2.jpg",
+];
+
+type InstagramApiMedia = {
+  id: string;
+  caption?: string;
+  media_type: "IMAGE" | "VIDEO" | "CAROUSEL_ALBUM";
+  media_url?: string;
+  thumbnail_url?: string;
+  permalink?: string;
+};
+
+type InstagramApiResponse = {
+  data?: InstagramApiMedia[];
+};
+
+type SocialFeedItem = {
+  id: string;
+  imageUrl: string;
+  permalink: string;
+  alt: string;
+};
+
+function getFallbackSocialFeed(): SocialFeedItem[] {
+  return fallbackSocialPhotos.slice(0, 4).map((imageUrl, index) => ({
+    id: `fallback-${index + 1}`,
+    imageUrl,
+    permalink: INSTAGRAM_PROFILE_URL,
+    alt: `Instagram post ${index + 1}`,
+  }));
+}
+
+async function getInstagramFeed(limit = 4): Promise<SocialFeedItem[]> {
+  const maxItems = Math.min(Math.max(limit, 2), 4);
+
+  const mapGraphFeed = (payload: InstagramApiResponse): SocialFeedItem[] =>
+    (payload.data ?? [])
+      .map((post): SocialFeedItem | null => {
+        const imageUrl = post.media_type === "VIDEO" ? post.thumbnail_url : post.media_url;
+        if (!imageUrl || !post.permalink) return null;
+
+        const alt = post.caption?.replace(/\s+/g, " ").trim() || "Instagram post";
+        return {
+          id: post.id,
+          imageUrl,
+          permalink: post.permalink,
+          alt: alt.slice(0, 120),
+        };
+      })
+      .filter((post): post is SocialFeedItem => Boolean(post))
+      .slice(0, maxItems);
+
+  const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN?.trim();
+  if (accessToken) {
+    const graphEndpoint = new URL("https://graph.instagram.com/me/media");
+    graphEndpoint.searchParams.set(
+      "fields",
+      "id,caption,media_type,media_url,thumbnail_url,permalink,timestamp"
+    );
+    graphEndpoint.searchParams.set("limit", String(maxItems));
+    graphEndpoint.searchParams.set("access_token", accessToken);
+
+    try {
+      const response = await fetch(graphEndpoint.toString(), { next: { revalidate: 300 } });
+      if (response.ok) {
+        const payload = (await response.json()) as InstagramApiResponse;
+        const graphFeed = mapGraphFeed(payload);
+        if (graphFeed.length >= 2) return graphFeed;
+      } else {
+        console.error(`Instagram Graph API fetch failed: ${response.status}`);
+      }
+    } catch (error) {
+      console.error("Instagram Graph API fetch error:", error);
+    }
+  }
+
+  return getFallbackSocialFeed();
+}
+
+export default async function HomePage() {
+  const leadCategory = categories[0];
+  const sideCategories = categories.slice(1);
+  const instagramFeed = await getInstagramFeed(4);
+  const socialFeed = instagramFeed;
+
   return (
     <>
-      {/* Preload hero poster images for fast LCP */}
+      {/* Preload hero poster for fast LCP */}
       <link
         rel="preconnect"
         href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev"
@@ -139,277 +231,343 @@ export default function HomePage() {
         rel="preload"
         as="image"
         type="image/webp"
-        href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.webp"
-        media="(max-width: 767px)"
-      />
-      <link
-        rel="preload"
-        as="image"
-        type="image/webp"
         href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
-        media="(min-width: 768px)"
       />
 
-      {/* Hero with background video — src deferred to let poster paint as LCP */}
-      <section className="relative h-[70vh] md:h-[85vh] overflow-hidden">
-        {/* Desktop video */}
+      <section className="relative h-[100svh] md:h-[1024px] overflow-hidden bg-[#2f3032]">
         <HeroVideo
           src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-desktop.mp4"
           poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
-          className="hidden md:block absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 h-full w-full object-cover"
         />
-        {/* Mobile video */}
-        <HeroVideo
-          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-mobile.mp4"
-          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-mobile-poster.webp"
-          className="md:hidden absolute inset-0 w-full h-full object-cover"
-        />
-        {/* Scroll-down chevron */}
-        <a href="#intro" aria-label="Scroll to introduction" className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors animate-bounce">
-          <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <div className="absolute inset-0 bg-black/45" />
+        <a
+          href="#intro"
+          aria-label="Scroll to introduction"
+          className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-white/80 transition-colors hover:text-white md:bottom-10"
+        >
+          <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
             <path d="M19 9l-7 7-7-7" />
           </svg>
         </a>
       </section>
 
-      {/* Intro Section */}
-      <section id="intro" className="px-5 md:px-10 py-12 md:py-20 max-w-[1400px] mx-auto text-center">
-        <h1 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#333333] text-center uppercase">
-          Luxury Offbeat Travel
-        </h1>
-        <p className="mt-4 font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] text-[#434431] max-w-[600px] mx-auto leading-relaxed tracking-[1px]">
-          Discover authentic experiences and activities in the Himalayas through mindful adventures
-          that reconnect you with nature and yourself.
-        </p>
-        <Link
-          href="/about-us"
-          className="inline-block mt-6 font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#434431] hover:text-[#BA6000] transition-colors tracking-[2px] uppercase"
-        >
-          Explore More
-        </Link>
-      </section>
-
-      {/* Experiences Section */}
-      <section className="px-5 md:px-10 py-12 md:py-20 max-w-[1400px] mx-auto">
-        <h2 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#434431] uppercase text-center mb-4">
-          Experiences
-        </h2>
-        <p className="font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] text-[#434431] leading-relaxed text-center max-w-[700px] mx-auto mb-10 tracking-[1px]">
-          Lie beneath starlit skies, taste local food, pluck fresh apples, discover silk route tales
-          from locals, or meander through mountain countryside on an ebike to rediscover simple joys
-          in the wilderness.
-        </p>
-
-        {/* Experience category bento grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 md:grid-rows-2 gap-x-[6px] gap-y-[10px] md:gap-5">
-          {categories.map((cat, i) => (
-            <Link
-              key={cat.title}
-              href={cat.comingSoon ? "#" : cat.href}
-              className={`group relative overflow-hidden block ${
-                i === 0
-                  ? "col-span-2 md:col-span-2 md:row-span-2 aspect-[335/400] md:aspect-auto md:h-full"
-                  : "aspect-[165/250] md:aspect-square"
-              }`}
-            >
-              <Image
-                src={cat.image}
-                alt={cat.title}
-                fill
-                className="object-cover group-hover:scale-105 transition-transform duration-500"
-                sizes={i === 0 ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 50vw, 25vw"}
-              />
-              <div className={`absolute bottom-0 left-0 right-0 bg-black/80 ${
-                i === 0 ? "p-4 md:p-5" : "px-2 py-1.5 md:p-5"
-              }`}>
-                <h3 className={`font-[family-name:var(--font-biorhyme)] font-bold text-white uppercase ${
-                  i === 0 ? "text-[24px] md:text-[35px] tracking-[4px]" : "text-[12px] md:text-[23px] tracking-[1px]"
-                }`}>
-                  {cat.title}
-                </h3>
-                {cat.comingSoon ? (
-                  <span className={`inline-block font-[family-name:var(--font-brinnan)] text-[8px] md:text-[15px] text-white tracking-[1px] uppercase underline underline-offset-4 ${
-                    i === 0 ? "mt-2" : "mt-1 md:mt-2"
-                  }`}>
-                    Coming Soon
-                  </span>
-                ) : (
-                  <span className={`inline-block font-[family-name:var(--font-brinnan)] text-[8px] md:text-[15px] text-white tracking-[1px] uppercase underline underline-offset-4 ${
-                    i === 0 ? "mt-2" : "mt-1 md:mt-2"
-                  }`}>
-                    Explore More
-                  </span>
-                )}
-              </div>
-            </Link>
-          ))}
-        </div>
-
-        <div className="text-center mt-8">
+      <section id="intro" className="bg-[#efe7dd] px-5 py-10 text-center md:px-10 md:py-20">
+        <div className="mx-auto max-w-[1272px]">
+          <h1 className="font-[family-name:var(--font-biorhyme)] text-[26px] font-bold uppercase tracking-[0.1em] text-[#434431] md:text-[38px] md:tracking-[0.08em]">
+            Himalayan Soul Journeys
+          </h1>
+          <p className="mx-auto mt-4 max-w-[980px] font-[family-name:var(--font-brinnan)] text-[14px] leading-[1.6] tracking-[0.01em] text-[#5e5f45] md:text-[21px]">
+            Discover authentic, slow experiences in the Indian Himalayas through mindful adventures
+            that reconnect you with nature and yourself.
+          </p>
           <Link
-            href="/experiences"
-            className="inline-block font-[family-name:var(--font-brinnan)] text-[12px] md:text-[22px] font-bold text-white bg-[#9E5200] px-6 py-2.5 md:px-8 md:py-3 hover:bg-[#874600] transition-colors tracking-[1px] uppercase"
+            href="/about-us"
+            className="mt-5 inline-block border border-[#a45e1a] bg-[#b26214] px-5 py-2 font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.14em] text-[#f8e9d5] transition-colors hover:bg-[#9a530f] md:mt-8 md:px-8 md:py-3 md:text-[17px]"
           >
-            Explore All Experiences
+            Explore More
           </Link>
         </div>
       </section>
 
-      {/* Signature Experiences */}
-      <section className="px-5 md:px-10 py-12 md:py-20 max-w-[1400px] mx-auto">
-        <h2 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#434431] uppercase text-center mb-8 md:mb-12">
-          Signature Experiences
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {signatureExperiences.map((exp) => (
-            <ExperienceCard key={exp.slug} {...exp} />
-          ))}
+      <section id="experiences" className="bg-[#efe7dd] px-5 py-8 md:px-10 md:py-20">
+        <div className="mx-auto max-w-[1272px]">
+          <h2 className="text-center font-[family-name:var(--font-biorhyme)] text-[20px] font-bold uppercase tracking-[0.12em] text-[#434431] md:text-[40px] md:tracking-[0.08em]">
+            Experiences
+          </h2>
+          <p className="mx-auto mt-3 max-w-[1020px] text-center font-[family-name:var(--font-brinnan)] text-[13px] leading-[1.55] tracking-[0.01em] text-[#5e5f45] md:mt-6 md:text-[20px]">
+            Lie beneath skies, pluck fresh apples, discover silk route tales from locals, or meander
+            through mountain countryside on e-bike and rediscover simple joys in the Himalayan
+            wilderness.
+          </p>
+          <div className="mt-4 text-center md:mt-8">
+            <Link
+              href="/experiences"
+              className="inline-block border border-[#a45e1a] bg-[#b26214] px-4 py-2 font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.14em] text-[#f8e9d5] transition-colors hover:bg-[#9a530f] md:px-8 md:py-3 md:text-[17px]"
+            >
+              Explore All Experiences
+            </Link>
+          </div>
+
+          <div className="mt-5 space-y-2 md:hidden">
+            <Link
+              href={leadCategory.href}
+              className="group relative block h-[344px] overflow-hidden"
+            >
+              <Image
+                src={leadCategory.image}
+                alt={leadCategory.title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="100vw"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-[#222428]/72 px-4 py-3">
+                <h3 className="font-[family-name:var(--font-biorhyme)] text-[32px] font-bold uppercase tracking-[0.1em] text-white">
+                  {leadCategory.title}
+                </h3>
+                <span className="mt-1 inline-block font-[family-name:var(--font-brinnan)] text-[12px] uppercase tracking-[0.12em] text-[#e5ddd2] underline underline-offset-2">
+                  Explore More
+                </span>
+              </div>
+            </Link>
+
+            <div className="-mx-5 flex snap-x snap-mandatory gap-2 overflow-x-auto px-5 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              {sideCategories.map((category) => (
+                <Link
+                  key={category.title}
+                  href={category.href}
+                  className="group relative block h-[208px] min-w-[44.5vw] snap-start overflow-hidden"
+                >
+                  <Image
+                    src={category.image}
+                    alt={category.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="45vw"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-[#222428]/60 px-2.5 py-2">
+                    <h3 className="font-[family-name:var(--font-biorhyme)] text-[17px] font-bold uppercase leading-[1.05] tracking-[0.06em] text-white">
+                      {category.title}
+                    </h3>
+                    <span className="mt-1 inline-block font-[family-name:var(--font-brinnan)] text-[10px] uppercase tracking-[0.12em] text-[#e5ddd2] underline underline-offset-2">
+                      {category.comingSoon ? "Coming Soon" : "Explore More"}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className="mt-10 hidden grid-cols-[1.15fr_1fr] gap-4 md:grid">
+            <Link
+              href={leadCategory.href}
+              className="group relative block h-[696px] overflow-hidden"
+            >
+              <Image
+                src={leadCategory.image}
+                alt={leadCategory.title}
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
+                sizes="40vw"
+              />
+              <div className="absolute inset-x-0 bottom-0 bg-[#222428]/86 px-8 py-5">
+                <h3 className="font-[family-name:var(--font-biorhyme)] text-[40px] font-bold uppercase tracking-[0.1em] text-white">
+                  {leadCategory.title}
+                </h3>
+                <span className="mt-3 inline-block font-[family-name:var(--font-brinnan)] text-[17px] uppercase tracking-[0.14em] text-[#e5ddd2] underline underline-offset-2">
+                  Explore More
+                </span>
+              </div>
+            </Link>
+
+            <div className="grid grid-cols-2 gap-4">
+              {sideCategories.map((category) => (
+                <Link
+                  key={category.title}
+                  href={category.href}
+                  className="group relative block h-[340px] overflow-hidden"
+                >
+                  <Image
+                    src={category.image}
+                    alt={category.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="20vw"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-[#222428]/86 px-5 py-3">
+                    <h3 className="font-[family-name:var(--font-biorhyme)] text-[22px] font-bold uppercase tracking-[0.07em] text-white">
+                      {category.title}
+                    </h3>
+                    <span className="mt-1 inline-block font-[family-name:var(--font-brinnan)] text-[13px] uppercase tracking-[0.12em] text-[#e5ddd2] underline underline-offset-2">
+                      {category.comingSoon ? "Coming Soon" : "Explore More"}
+                    </span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Video Section — lazy-loaded to avoid downloading ~6MB below the fold */}
-      <section className="relative w-full overflow-hidden">
-        {/* Desktop video */}
-        <LazyVideo
-          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/midpage.mp4"
-          className="hidden md:block w-full"
-          controls
-        />
-        {/* Mobile video */}
-        <LazyVideo
-          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/midpage.mp4"
-          className="md:hidden w-full"
-          controls
-        />
+      <section id="signature" className="bg-[#efe7dd] px-5 py-8 md:px-10 md:py-20">
+        <div className="mx-auto max-w-[1272px]">
+          <h2 className="text-center font-[family-name:var(--font-biorhyme)] text-[20px] font-bold uppercase tracking-[0.12em] text-[#434431] md:text-[40px] md:tracking-[0.08em]">
+            Signature Experiences
+          </h2>
+          <div className="-mx-5 mt-4 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-10 md:grid md:grid-cols-3 md:gap-8 md:overflow-visible md:px-0 md:pb-0">
+            {signatureExperiences.map((experience) => (
+              <Link
+                key={experience.slug}
+                href={`/experience/${experience.slug}`}
+                className="group flex min-w-[84vw] flex-col overflow-hidden bg-[#f8f5ef] md:min-w-0"
+              >
+                <div className="relative h-[210px] md:h-[420px]">
+                  <Image
+                    src={experience.image}
+                    alt={experience.title}
+                    fill
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    sizes="(max-width: 768px) 84vw, 32vw"
+                  />
+                </div>
+                <div className="flex flex-1 flex-col space-y-2 px-4 pb-5 pt-4 md:space-y-2 md:px-6 md:pb-8 md:pt-6">
+                  <p className="font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.12em] text-[#6f7055] md:text-[13px]">
+                    {experience.location}
+                  </p>
+                  <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 md:min-h-[4.2rem]">
+                    <h3 className="font-[family-name:var(--font-biorhyme)] text-[24px] font-bold leading-[1.08] text-[#434431] md:text-[30px] md:leading-[1.1]">
+                      {experience.title}
+                    </h3>
+                    <div className="w-[88px] shrink-0 text-right md:w-[110px]">
+                      <p className="font-[family-name:var(--font-brinnan)] text-[12px] leading-[1.15] text-[#434431] md:text-[14px]">
+                        {experience.price.replace(/onwards?/i, "").trim()}
+                      </p>
+                      <p className="font-[family-name:var(--font-brinnan)] text-[11px] text-[#7d7f59] md:text-[13px]">
+                        onwards
+                      </p>
+                    </div>
+                  </div>
+                  <p className="font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.11em] text-[#6f7055] md:text-[13px]">
+                    {experience.duration}
+                  </p>
+                  <p className="line-clamp-3 min-h-[3.3rem] font-[family-name:var(--font-brinnan)] text-[13px] leading-[1.45] text-[#5f5f4c] md:min-h-[2.8rem] md:text-[14px] md:leading-[1.6]">
+                    {experience.description}
+                  </p>
+                  <span className="mt-auto inline-block self-start bg-[#b26214] px-4 py-2 font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.1em] text-[#f7e8d4] md:px-4 md:py-2 md:text-[13px]">
+                    View More
+                  </span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* The Refuje Way */}
-      <section className="px-5 md:px-10 py-12 md:py-20">
-        <div className="max-w-[1400px] mx-auto">
-          <h2 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#434431] uppercase text-center mb-3">
+      <section className="relative h-[257px] overflow-hidden bg-[#4d4e53] md:h-[600px]">
+        <video
+          controls
+          playsInline
+          preload="metadata"
+          className="h-full w-full object-cover"
+        >
+          <source
+            src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/midpage.mp4"
+            type="video/mp4"
+          />
+        </video>
+      </section>
+
+      <section className="bg-[#efe7dd] px-5 py-8 md:px-10 md:py-20">
+        <div className="mx-auto max-w-[1272px] rounded-[24px] border border-[#d8ccb8] bg-[linear-gradient(180deg,#f4ece0_0%,#efe7dd_100%)] p-5 md:rounded-[36px] md:p-10">
+          <h2 className="text-center font-[family-name:var(--font-biorhyme)] text-[20px] font-bold uppercase tracking-[0.12em] text-[#434431] md:text-[40px] md:tracking-[0.08em]">
             The Refuje Way
           </h2>
-          <p className="font-[family-name:var(--font-biorhyme)] text-[24px] md:text-[32px] font-medium text-[#434431] text-center mb-10">
+          <p className="mt-1 text-center font-[family-name:var(--font-biorhyme)] text-[16px] text-[#5b5c45] md:mt-2 md:text-[34px]">
             Our Ethos, Your Compass
           </p>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <p className="mx-auto mt-3 max-w-[840px] text-center font-[family-name:var(--font-brinnan)] text-[13px] leading-[1.5] text-[#686a52] md:mt-4 md:text-[17px] md:leading-[1.65]">
+            These are not just values on paper. They define how we design every route, every pause,
+            and every interaction in the mountains.
+          </p>
+
+          <div className="mt-6 grid grid-cols-2 gap-3 md:mt-10 md:grid-cols-2 md:gap-6 lg:grid-cols-4">
             {ethosItems.map((item, i) => (
-              <div
+              <article
                 key={item.title}
-                className={`${
-                  i % 2 === 0 ? "bg-[#5E5D40]" : "bg-[#434431]"
-                } rounded-[60px] py-10 px-5 text-center flex flex-col items-center`}
+                className={`relative flex flex-col items-center rounded-[16px] px-3.5 py-4 text-center text-[#f6ebda] shadow-[0_10px_24px_rgba(67,68,49,0.18)] md:min-h-[250px] md:rounded-[24px] md:px-6 md:py-7 ${
+                  i % 2 === 0 ? "bg-[#727a50] lg:-translate-y-3" : "bg-[#616944] lg:translate-y-3"
+                }`}
               >
                 <Image
                   src={item.icon}
                   alt={item.title}
-                  width={134}
-                  height={134}
-                  className="mb-5"
+                  width={96}
+                  height={96}
+                  className="h-12 w-12 object-contain md:h-20 md:w-20 md:rounded-full md:bg-[#6f7450] md:p-3.5"
                 />
-                <hr className="w-full border-t border-white/20 mb-4" />
-                <h3 className="font-[family-name:var(--font-brinnan)] text-[12px] md:text-[20px] font-bold text-[#FFE9CF] tracking-[2px] mb-2 uppercase">
+                <hr className="my-2 border-white/25 md:my-4" />
+                <h3 className="text-center font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.1em] md:text-[18px] md:tracking-[0.06em]">
                   {item.title}
                 </h3>
-                <p className="font-[family-name:var(--font-brinnan)] text-[10px] md:text-[16px] text-[#E1D5C8] tracking-[0.5px] leading-[1.6]">
+                <p className="mt-1.5 line-clamp-3 text-center font-[family-name:var(--font-brinnan)] text-[11px] leading-[1.4] text-[#f1e8d7] md:mt-3 md:text-[15px] md:leading-[1.5]">
                   {item.description}
                 </p>
-              </div>
+              </article>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Video Gallery */}
-      <section className="bg-[#FFE9CF] px-5 md:px-10 py-12 md:py-20">
-        <div className="max-w-[1400px] mx-auto">
-          <h2 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#434431] uppercase text-center mb-8">
-            Video Gallery
+      <section className="bg-[#efe7dd] px-5 py-8 md:px-10 md:py-20">
+        <div className="mx-auto max-w-[1272px]">
+          <h2 className="text-center font-[family-name:var(--font-biorhyme)] text-[20px] font-bold uppercase tracking-[0.12em] text-[#434431] md:text-[40px] md:tracking-[0.08em]">
+            Gallery
           </h2>
-          <ImageGallery />
+          <div className="mt-4 md:mt-8">
+            <ImageGallery />
+          </div>
         </div>
       </section>
 
-      {/* Testimonials */}
-      <section className="px-5 md:px-10 py-12 md:py-20 max-w-[1400px] mx-auto">
-        <h2 className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#434431] uppercase text-center mb-3">
-          Testimonials
-        </h2>
-        <p className="font-[family-name:var(--font-biorhyme)] text-[22px] md:text-[28px] font-medium text-[#434431] text-center mb-10">
-          Hear what our explorers have to say!
-        </p>
-        <TestimonialsCarousel testimonials={testimonials} />
+      <section className="bg-[#efe7dd] px-5 py-8 md:px-10 md:py-20">
+        <div className="mx-auto max-w-[1272px]">
+          <h2 className="text-center font-[family-name:var(--font-biorhyme)] text-[20px] font-bold uppercase tracking-[0.12em] text-[#434431] md:text-[40px] md:tracking-[0.08em]">
+            Testimonials
+          </h2>
+          <p className="mt-1 text-center font-[family-name:var(--font-biorhyme)] text-[14px] text-[#5b5c45] md:mt-3 md:text-[30px]">
+            Hear what our explorers have to say!
+          </p>
+
+          <div className="mt-4 md:mt-10">
+            <TestimonialsCarousel testimonials={testimonials} />
+          </div>
+        </div>
       </section>
 
-      {/* Follow Us */}
-      <section className="py-10 md:py-16 text-center">
-        <p className="font-[family-name:var(--font-brinnan)] text-[18px] md:text-[22px] font-bold text-[#434431] tracking-[2px] uppercase mb-2">
+      <section className="bg-[#efe7dd] py-5 text-center md:py-14">
+        <p className="font-[family-name:var(--font-brinnan)] text-[12px] uppercase tracking-[0.16em] text-[#5d5d48] md:text-[20px]">
           Follow Us On
         </p>
         <a
-          href="https://instagram.com/refuje.travel"
+          href={INSTAGRAM_PROFILE_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="font-[family-name:var(--font-biorhyme)] text-[28px] md:text-[38px] font-bold text-[#434431] hover:text-[#BA6000] transition-colors tracking-[1px]"
+          className="mt-1 inline-block font-[family-name:var(--font-biorhyme)] text-[26px] font-bold text-[#434431] transition-colors hover:text-[#a45e1a] md:mt-2 md:text-[40px]"
         >
           @refuje.travel
         </a>
+        <div className="mt-3 md:mt-5">
+          <a
+            href={INSTAGRAM_PROFILE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-block border border-[#a45e1a] bg-[#b26214] px-5 py-2 font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.14em] text-[#f8e9d5] transition-colors hover:bg-[#9a530f] md:px-7 md:py-2.5 md:text-[14px]"
+          >
+            Follow
+          </a>
+        </div>
       </section>
 
-      {/* Instagram Feed */}
-      <section className="px-5 md:px-10 pb-12 md:pb-20 max-w-[1400px] mx-auto">
-        <div className="overflow-hidden bg-[#C9B29D] p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-8 h-8 rounded-full bg-[#434431] flex items-center justify-center">
-              <Image
-                src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/logo.png"
-                alt="Refuje"
-                width={20}
-                height={20}
-                className="brightness-0 invert"
-              />
-            </div>
-            <span className="font-[family-name:var(--font-brinnan)] text-[13px] text-[#434431] tracking-[0.5px]">
-              @refuje.travel
-            </span>
+      <section className="bg-[#efe7dd] px-5 pb-8 md:px-10 md:pb-16">
+        <div className="mx-auto grid max-w-[1272px] grid-cols-2 gap-2 md:grid-cols-4 md:gap-4">
+          {socialFeed.map((post, index) => (
             <a
-              href="https://instagram.com/refuje.travel"
+              key={post.id}
+              href={post.permalink}
               target="_blank"
               rel="noopener noreferrer"
-              className="ml-auto font-[family-name:var(--font-brinnan)] text-[12px] font-bold text-white bg-[#A56014] px-4 py-1.5 rounded-[3px] hover:bg-[#8A4F10] transition-colors tracking-[0.5px]"
+              className="group relative block aspect-square overflow-hidden bg-[#bcbcbc]"
             >
-              Follow
+              <Image
+                src={post.imageUrl}
+                alt={post.alt || `Instagram post ${index + 1}`}
+                fill
+                className="object-cover transition-transform duration-300 group-hover:scale-105"
+                sizes="(max-width: 768px) 25vw, 22vw"
+              />
+              <div className="absolute inset-0 bg-black/0 transition-colors group-hover:bg-black/20" />
             </a>
-          </div>
-          <div className="grid grid-cols-2 gap-2">
-            {[
-              "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/sundowner/gallery-1.jpg",
-              "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/ride-into-stillness/gallery-3.jpg",
-              "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/calm-circuit/gallery-1.jpg",
-              "https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/experiences/slow-brunch/gallery-1.jpg",
-            ].map((src, i) => (
-              <a
-                key={i}
-                href="https://instagram.com/refuje.travel"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative aspect-square overflow-hidden group"
-              >
-                <Image
-                  src={src}
-                  alt="Instagram post"
-                  fill
-                  className="object-cover group-hover:scale-105 transition-transform duration-300"
-                  sizes="50vw"
-                />
-                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
-                  <svg className="w-8 h-8 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M7.8 2h8.4C19.4 2 22 4.6 22 7.8v8.4a5.8 5.8 0 0 1-5.8 5.8H7.8C4.6 22 2 19.4 2 16.2V7.8A5.8 5.8 0 0 1 7.8 2m-.2 2A3.6 3.6 0 0 0 4 7.6v8.8C4 18.39 5.61 20 7.6 20h8.8a3.6 3.6 0 0 0 3.6-3.6V7.6C20 5.61 18.39 4 16.4 4H7.6m9.65 1.5a1.25 1.25 0 0 1 1.25 1.25A1.25 1.25 0 0 1 17.25 8 1.25 1.25 0 0 1 16 6.75a1.25 1.25 0 0 1 1.25-1.25M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3z" />
-                  </svg>
-                </div>
-              </a>
-            ))}
-          </div>
+          ))}
         </div>
       </section>
     </>

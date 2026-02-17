@@ -1,27 +1,38 @@
 @import "tailwindcss";
 
 @theme {
-  --color-bg: #FFE9CF;
+  /* Refuje brand foundation */
+  --color-brand-olive-deep: #434431;
+  --color-brand-rust: #A56014;
+  --color-brand-olive-muted: #7C7B55;
+  --color-brand-sand: #C9B29D;
+  --color-brand-cream: #FFE9CF;
+  --color-brand-white: #FFFFFF;
+
+  /* Semantic application tokens */
+  --color-bg: var(--color-brand-cream);
   --color-bg-card: #FFFAF3;
   --color-bg-tab: #FFF8F0;
-  --color-text: #434431;
-  --color-text-secondary: #7C7B55;
+  --color-text: var(--color-brand-olive-deep);
+  --color-text-secondary: var(--color-brand-olive-muted);
   --color-text-dark: #1A1A1A;
-  --color-accent: #A56014;
+  --color-accent: var(--color-brand-rust);
   --color-border: rgba(165, 96, 20, 0.12);
   --color-zone-fill: #D9B99A;
   --color-zone-outline: #A07040;
-  --font-sans: "DM Sans", -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-serif: "DM Serif Display", serif;
+
+  /* Typography roles from brand guide */
+  --font-brand-body: var(--font-brinnan), "DM Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-brand-display: var(--font-biorhyme), "DM Serif Display", Georgia, serif;
+  --font-sans: var(--font-brand-body);
+  --font-serif: var(--font-brand-display);
 
   /* Site (WP) tokens */
   --color-wp-bg-light: #FFF4E8;
-  --color-wp-accent: #C9B29D;
+  --color-wp-accent: var(--color-brand-sand);
   --color-wp-accent-dark: #A08B7A;
   --color-wp-orange: #BA6000;
   --color-wp-gray: #868282;
-  --font-brinnan: var(--font-brinnan), sans-serif;
-  --font-biorhyme: var(--font-biorhyme), serif;
 }
 
 /* ========================================
@@ -43,6 +54,15 @@ body {
   overflow-x: hidden;
   min-height: 100vh;
   min-height: 100dvh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-serif);
 }
 
 /* ========================================
@@ -79,7 +99,7 @@ body {
   border-radius: 10px;
   font-size: 13px;
   font-weight: 500;
-  font-family: "DM Sans", sans-serif;
+  font-family: var(--font-sans);
   white-space: nowrap;
   box-shadow: 0 3px 12px rgba(67, 68, 49, 0.25);
   transform: translateY(-10px);
@@ -105,7 +125,7 @@ body {
   padding: 12px 16px;
   border-radius: 10px;
   box-shadow: 0 4px 16px rgba(67, 68, 49, 0.3);
-  font-family: "DM Sans", sans-serif;
+  font-family: var(--font-sans);
 }
 
 .poi-popup-container .mapboxgl-popup-tip {
@@ -121,7 +141,7 @@ body {
 }
 
 .mapboxgl-popup-content {
-  font-family: "DM Sans", sans-serif;
+  font-family: var(--font-sans);
   padding: 8px 12px;
   border-radius: 8px;
   font-size: 13px;

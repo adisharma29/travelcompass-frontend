@@ -16,6 +16,14 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+Set these environment variables for the live Instagram block on the homepage:
+
+```bash
+INSTAGRAM_ACCESS_TOKEN=your-instagram-graph-api-token
+```
+
+Without `INSTAGRAM_ACCESS_TOKEN`, the homepage gracefully falls back to static images.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

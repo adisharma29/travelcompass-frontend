@@ -18,105 +18,132 @@ const policyLinks = [
 
 export function SiteFooter() {
   return (
-    <footer className="bg-[#434431] text-[#FFF4E8] px-5 py-12 md:px-10 md:py-16">
-      <div className="max-w-[1400px] mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-16">
-          {/* Logo + social */}
-          <div>
-            <Image
-              src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/footer-logo.png"
-              alt="Refuje"
-              width={120}
-              height={50}
-              className="mb-6"
-            />
-            <div className="flex gap-4 mt-4">
-              <a
-                href="https://instagram.com/refuje.travel"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#FFF4E8] hover:text-white transition-colors"
-                aria-label="Instagram"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z" />
-                </svg>
-              </a>
-              <a
-                href="https://www.youtube.com/@RefujeOfficial"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#FFF4E8] hover:text-white transition-colors"
-                aria-label="YouTube"
-              >
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                </svg>
-              </a>
-            </div>
-          </div>
-
-          {/* Quick links */}
-          <div>
-            <h3 className="font-[family-name:var(--font-brinnan)] text-[20px] md:text-[28px] font-bold tracking-[1px] uppercase mb-4">
+    <footer className="bg-[#7f805d] px-5 py-12 text-[#fff2df] md:px-10 md:py-20">
+      <div className="mx-auto max-w-[1272px]">
+        <div className="grid grid-cols-1 gap-10 md:grid-cols-3 md:gap-16">
+          <div className="relative">
+            <h3 className="mb-4 font-[family-name:var(--font-brinnan)] text-[22px] uppercase tracking-[0.08em] text-[#fff6ea] md:mb-5 md:font-[family-name:var(--font-biorhyme)] md:text-[32px] md:leading-[1.05] md:tracking-[0.06em]">
               Quick Links
             </h3>
-            <ul className="space-y-2.5">
+            <ul className="space-y-2.5 md:space-y-3">
               {quickLinks.map((link) => (
-                <li key={link.href}>
+                <li key={`${link.href}-${link.label}`}>
                   <Link
                     href={link.href}
-                    className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[20px] text-white hover:text-white/80 transition-colors tracking-[1px]"
+                    className="font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] transition-colors hover:text-white md:text-[19px] md:leading-[1.5]"
                   >
                     {link.label}
                   </Link>
                 </li>
               ))}
             </ul>
+
+            <ul className="mt-6 space-y-2.5 md:mt-8 md:space-y-3">
+              {policyLinks.map((link) => (
+                <li key={`${link.href}-${link.label}`}>
+                  <Link
+                    href={link.href}
+                    className="font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] transition-colors hover:text-white md:text-[19px] md:leading-[1.5]"
+                  >
+                    {link.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+
+            <Image
+              src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/footer-logo.png"
+              alt="Refuje"
+              width={298}
+              height={298}
+              quality={100}
+              unoptimized
+              sizes="104px"
+              className="absolute right-4 top-3 h-auto w-[104px] md:hidden"
+            />
           </div>
 
-          {/* Contact + policies */}
-          <div>
-            <h3 className="font-[family-name:var(--font-brinnan)] text-[20px] md:text-[28px] font-bold tracking-[1px] uppercase mb-4">
-              Contact
+          <div className="order-3 md:order-none">
+            <h3 className="mb-4 font-[family-name:var(--font-brinnan)] text-[22px] uppercase tracking-[0.08em] text-[#fff6ea] md:mb-5 md:font-[family-name:var(--font-biorhyme)] md:text-[32px] md:leading-[1.05] md:tracking-[0.06em]">
+              Contact Us
             </h3>
-            <address className="not-italic font-[family-name:var(--font-brinnan)] text-[16px] md:text-[20px] text-[#FFF4E8] leading-relaxed tracking-[1px] mb-6">
-              G+1 Rear Unit, Chauhan Enclave, Apple Garden,
+            <p className="mb-3 font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:mb-4 md:text-[18px] md:leading-[1.52]">
+              Refuje Experiences Private Limited
+            </p>
+            <address className="mb-4 not-italic font-[family-name:var(--font-brinnan)] text-[14px] leading-[1.5] text-[#fff2df] md:mb-6 md:text-[18px] md:leading-[1.62]">
+              Address: G+1 Rear Unit, Chauhan Enclave, Apple Garden,
               <br />
               Near SSB training centre, Kasumpti,
               <br />
-              Shimla, HP 171002
+              Shimla, HP
             </address>
-            <p className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[20px] text-[#FFF4E8] tracking-[1px]">
+            <p className="font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:text-[18px] md:leading-[1.52]">
+              Phone:{" "}
               <a href="tel:+917807740707" className="hover:text-white">
                 +91-7807740707
               </a>
             </p>
-            <p className="font-[family-name:var(--font-brinnan)] text-[16px] md:text-[20px] text-[#FFF4E8] tracking-[1px] mt-1">
+            <p className="mt-1 font-[family-name:var(--font-brinnan)] text-[14px] font-medium leading-[1.45] text-[#fff2df] md:text-[18px] md:leading-[1.52]">
+              Email:{" "}
               <a href="mailto:myrefuje@gmail.com" className="hover:text-[#FFE9CF]">
                 myrefuje@gmail.com
               </a>
             </p>
+            <p className="mt-4 font-[family-name:var(--font-brinnan)] text-[13px] leading-[1.4] text-[#f7ecd9] md:mt-6 md:text-[16px] md:tracking-[0.01em]">
+              Refuje&copy;2026 All Rights Reserved
+            </p>
+          </div>
 
-            <div className="mt-6 flex flex-wrap gap-3">
-              {policyLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="font-[family-name:var(--font-brinnan)] text-[13px] md:text-[16px] text-white hover:text-white/80 transition-colors tracking-[1px]"
+          <div className="order-2 flex flex-col justify-between md:order-none md:items-end">
+            <Image
+              src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/shared/footer-logo.png"
+              alt="Refuje"
+              width={298}
+              height={298}
+              quality={100}
+              unoptimized
+              sizes="(min-width: 768px) 190px, 0px"
+              className="ml-auto hidden h-auto w-[120px] md:block md:w-[190px]"
+            />
+            <div className="mt-2 md:mt-10 md:text-right">
+              <p className="mb-2 font-[family-name:var(--font-brinnan)] text-[14px] uppercase tracking-[0.12em] text-[#fff6ea] md:hidden">
+                Follow Us On
+              </p>
+              <p className="hidden font-[family-name:var(--font-biorhyme)] uppercase tracking-[0.08em] text-[#fff6ea] md:block md:text-[24px]">
+                Follow Us On
+              </p>
+              <div className="flex items-center gap-3 md:mt-3 md:gap-4 md:justify-end">
+                <a
+                  href="https://instagram.com/refuje.travel"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Instagram"
+                  className="text-[#f6ebda] transition-colors hover:text-white"
                 >
-                  {link.label}
-                </Link>
-              ))}
+                  <svg className="h-6 w-6 md:h-7 md:w-7" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <rect x="3.5" y="3.5" width="17" height="17" rx="5" stroke="currentColor" strokeWidth="2" />
+                    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
+                    <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+                  </svg>
+                </a>
+                <a
+                  href="https://www.youtube.com/@RefujeOfficial"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="YouTube"
+                  className="text-[#f6ebda] transition-colors hover:text-white"
+                >
+                  <svg className="h-6 w-6 md:h-7 md:w-7" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                    <path
+                      d="M21 8.5c0-1.4-1.1-2.5-2.5-2.5H5.5C4.1 6 3 7.1 3 8.5v7c0 1.4 1.1 2.5 2.5 2.5h13c1.4 0 2.5-1.1 2.5-2.5v-7Z"
+                      fill="currentColor"
+                    />
+                    <path d="m10 10 5 2-5 2v-4Z" fill="#7f805d" />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
-        </div>
-
-        <div className="mt-10 pt-6 border-t border-[#FFF4E8]/10 text-center">
-          <p className="font-[family-name:var(--font-brinnan)] text-[13px] md:text-[16px] text-[#FFF4E8] tracking-[1px]">
-            &copy; {new Date().getFullYear()} Refuje Experiences Private Limited. All rights
-            reserved.
-          </p>
         </div>
       </div>
     </footer>

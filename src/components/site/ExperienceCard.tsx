@@ -20,46 +20,50 @@ export function ExperienceCard({
   description,
   image,
 }: ExperienceCardProps) {
+  const cleanPrice = price.replace(/onwards?/i, "").trim();
+
   return (
-    <Link href={`/experience/${slug}`} className="group block">
-      <div className="overflow-hidden bg-white border-b border-x border-[#C9B29D]/30">
-        <div className="relative h-[300px] md:h-[400px] overflow-hidden">
-          <Image
-            src={image}
-            alt={title}
-            fill
-            className="object-cover group-hover:scale-105 transition-transform duration-500"
-            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-          />
-        </div>
-        <div className="p-6 flex flex-col justify-between min-h-[320px]">
-          <div>
-            <p className="font-[family-name:var(--font-brinnan)] text-[14px] md:text-[16px] font-bold text-[#434431] tracking-[6px] uppercase mb-3">
-              {location}
+    <Link href={`/experience/${slug}`} className="group flex h-full flex-col overflow-hidden bg-[#f8f5ef]">
+      <div className="relative h-[260px] overflow-hidden md:h-[420px]">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 48vw, 32vw"
+        />
+      </div>
+
+      <div className="flex flex-1 flex-col space-y-2 px-4 pb-5 pt-4 md:space-y-3 md:px-6 md:pb-8 md:pt-6">
+        <p className="font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.12em] text-[#6f7055] md:text-[13px]">
+          {location}
+        </p>
+
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
+          <h3 className="min-h-[48px] font-[family-name:var(--font-biorhyme)] text-[22px] leading-[1.1] text-[#434431] md:min-h-[66px] md:text-[30px]">
+            {title}
+          </h3>
+          <div className="w-[92px] shrink-0 text-right md:w-[110px]">
+            <p className="font-[family-name:var(--font-brinnan)] text-[11px] leading-[1.1] text-[#434431] md:text-[14px]">
+              {cleanPrice}
             </p>
-            <div className="flex items-start justify-between gap-3 mb-2">
-              <h3 className="font-[family-name:var(--font-biorhyme)] text-[24px] font-bold text-[#434431] leading-[1.1] tracking-[2px]">
-                {title}
-              </h3>
-              <span className="font-[family-name:var(--font-biorhyme)] text-[14px] font-bold text-[#434431] shrink-0 mt-1">
-                {price}
-              </span>
-            </div>
-            <div className="flex items-center gap-1.5 font-[family-name:var(--font-brinnan)] text-[14px] text-[#434431] tracking-[2px] mb-3">
-              <svg className="w-4 h-4 text-[#434431]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <circle cx="12" cy="12" r="10" />
-                <path d="M12 6v6l4 2" />
-              </svg>
-              <span>{duration}</span>
-            </div>
-            <p className="font-[family-name:var(--font-brinnan)] text-[10px] text-[#434431] leading-[14px] tracking-[0.5px] mb-4 line-clamp-3">
-              {description}
+            <p className="font-[family-name:var(--font-brinnan)] text-[10px] leading-[1.2] text-[#7d7f59] md:text-[13px]">
+              onwards
             </p>
           </div>
-          <span className="inline-block w-fit font-[family-name:var(--font-brinnan)] text-[14px] font-bold text-white bg-[#A85600] px-5 py-2 hover:bg-[#8F4900] transition-colors tracking-[1px] uppercase">
-            View More
-          </span>
         </div>
+
+        <p className="font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.11em] text-[#6f7055] md:text-[13px]">
+          {duration}
+        </p>
+
+        <p className="line-clamp-3 min-h-[56px] font-[family-name:var(--font-brinnan)] text-[12px] leading-[1.55] text-[#5f5f4c] md:min-h-[67px] md:text-[14px] md:leading-[1.6]">
+          {description}
+        </p>
+
+        <span className="mt-auto inline-block w-fit bg-[#b26214] px-4 py-2 font-[family-name:var(--font-brinnan)] text-[11px] uppercase tracking-[0.12em] text-[#f7e8d4] transition-colors group-hover:bg-[#9a530f] md:text-[13px]">
+          View More
+        </span>
       </div>
     </Link>
   );
