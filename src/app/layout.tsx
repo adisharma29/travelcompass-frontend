@@ -54,10 +54,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${dmSans.variable} ${dmSerif.variable} ${brinnan.variable} ${bioRhyme.variable} antialiased`}
-      >
+    <html
+      lang="en"
+      className={`${dmSans.variable} ${dmSerif.variable} ${brinnan.variable} ${bioRhyme.variable}`}
+    >
+      <body className="antialiased">
         {children}
       </body>
     </html>

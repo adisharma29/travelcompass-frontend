@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { ImageGallery } from "@/components/site/ImageGallery";
 import { TestimonialsCarousel } from "@/components/site/TestimonialsCarousel";
+import { HeroVideo } from "@/components/site/HeroVideo";
 
 export const metadata: Metadata = {
   title: "Refuje | Luxe Offbeat Travel Experiences",
@@ -150,16 +151,6 @@ type InstagramApiResponse = {
   data?: InstagramApiMedia[];
 };
 
-type InstagramPublicNode = {
-  id?: string;
-  shortcode?: string;
-  display_url?: string;
-  thumbnail_src?: string;
-  edge_media_to_caption?: {
-    edges?: Array<{ node?: { text?: string } }>;
-  };
-};
-
 type SocialFeedItem = {
   id: string;
   imageUrl: string;
@@ -196,43 +187,6 @@ async function getInstagramFeed(limit = 4): Promise<SocialFeedItem[]> {
       .filter((post): post is SocialFeedItem => Boolean(post))
       .slice(0, maxItems);
 
-  const mapPublicNodes = (nodes: InstagramPublicNode[]): SocialFeedItem[] =>
-    nodes
-      .map((node, index): SocialFeedItem | null => {
-        const imageUrl = node.display_url || node.thumbnail_src;
-        const shortcode = node.shortcode;
-        if (!imageUrl || !shortcode) return null;
-
-        const caption =
-          node.edge_media_to_caption?.edges?.[0]?.node?.text?.replace(/\s+/g, " ").trim() ||
-          "Instagram post";
-        return {
-          id: node.id || `public-${shortcode}-${index}`,
-          imageUrl,
-          permalink: `https://www.instagram.com/p/${shortcode}/`,
-          alt: caption.slice(0, 120),
-        };
-      })
-      .filter((post): post is SocialFeedItem => Boolean(post))
-      .slice(0, maxItems);
-
-  const getPublicNodes = (payload: unknown): InstagramPublicNode[] => {
-    const data = payload as {
-      data?: {
-        user?: { edge_owner_to_timeline_media?: { edges?: Array<{ node?: InstagramPublicNode }> } };
-      };
-      graphql?: {
-        user?: { edge_owner_to_timeline_media?: { edges?: Array<{ node?: InstagramPublicNode }> } };
-      };
-    };
-
-    const edges =
-      data.data?.user?.edge_owner_to_timeline_media?.edges ||
-      data.graphql?.user?.edge_owner_to_timeline_media?.edges ||
-      [];
-    return edges.map((edge) => edge.node).filter((node): node is InstagramPublicNode => Boolean(node));
-  };
-
   const accessToken = process.env.INSTAGRAM_ACCESS_TOKEN?.trim();
   if (accessToken) {
     const graphEndpoint = new URL("https://graph.instagram.com/me/media");
@@ -257,52 +211,6 @@ async function getInstagramFeed(limit = 4): Promise<SocialFeedItem[]> {
     }
   }
 
-  try {
-    const publicEndpoint = new URL("https://i.instagram.com/api/v1/users/web_profile_info/");
-    publicEndpoint.searchParams.set("username", "refuje.travel");
-
-    const response = await fetch(publicEndpoint.toString(), {
-      headers: {
-        "x-ig-app-id": "936619743392459",
-        "user-agent": "Mozilla/5.0 (compatible; RefujeWeb/1.0)",
-      },
-      next: { revalidate: 300 },
-    });
-
-    if (response.ok) {
-      const payload = (await response.json()) as unknown;
-      const publicFeed = mapPublicNodes(getPublicNodes(payload));
-      if (publicFeed.length >= 2) return publicFeed;
-    } else {
-      console.error(`Instagram public profile fetch failed: ${response.status}`);
-    }
-  } catch (error) {
-    console.error("Instagram public profile fetch error:", error);
-  }
-
-  try {
-    const fallbackEndpoint = new URL("https://www.instagram.com/refuje.travel/");
-    fallbackEndpoint.searchParams.set("__a", "1");
-    fallbackEndpoint.searchParams.set("__d", "dis");
-
-    const response = await fetch(fallbackEndpoint.toString(), {
-      headers: {
-        "user-agent": "Mozilla/5.0 (compatible; RefujeWeb/1.0)",
-      },
-      next: { revalidate: 300 },
-    });
-
-    if (response.ok) {
-      const payload = (await response.json()) as unknown;
-      const publicFeed = mapPublicNodes(getPublicNodes(payload));
-      if (publicFeed.length >= 2) return publicFeed;
-    } else {
-      console.error(`Instagram profile JSON fetch failed: ${response.status}`);
-    }
-  } catch (error) {
-    console.error("Instagram profile JSON fetch error:", error);
-  }
-
   return getFallbackSocialFeed();
 }
 
@@ -314,22 +222,28 @@ export default async function HomePage() {
 
   return (
     <>
+      {/* Preload hero poster for fast LCP */}
+      <link
+        rel="preconnect"
+        href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev"
+      />
+      <link
+        rel="preload"
+        as="image"
+        type="image/webp"
+        href="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
+      />
+
       <section className="relative h-[100svh] md:h-[1024px] overflow-hidden bg-[#2f3032]">
-        <video
-          autoPlay
-          loop
-          muted
-          playsInline
+        <HeroVideo
+          src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-desktop.mp4"
+          poster="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/images/site/home/hero-desktop-poster.webp"
           className="absolute inset-0 h-full w-full object-cover"
-        >
-          <source
-            src="https://pub-076e9945ca564bacabf26969ce8f8e9c.r2.dev/videos/site/home/hero-desktop.mp4"
-            type="video/mp4"
-          />
-        </video>
+        />
         <div className="absolute inset-0 bg-black/45" />
         <a
           href="#intro"
+          aria-label="Scroll to introduction"
           className="absolute bottom-6 left-1/2 z-10 -translate-x-1/2 text-white/80 transition-colors hover:text-white md:bottom-10"
         >
           <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

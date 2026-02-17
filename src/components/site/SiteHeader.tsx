@@ -69,7 +69,7 @@ export function SiteHeader() {
 
           <Link
             href="/experiences"
-            className="border border-[#a45e1a] bg-[#b26214] px-3 py-1.5 font-[family-name:var(--font-brinnan)] text-[10px] uppercase tracking-[0.14em] text-[#f8e9d5] transition-colors hover:bg-[#9a530f] md:px-5 md:py-2.5 md:text-[13px]"
+            className="font-[family-name:var(--font-biorhyme)] text-[14px] md:text-[16px] font-bold text-white bg-[#A85600] px-5 py-2 md:px-6 md:py-2.5 hover:bg-[#8F4900] transition-colors tracking-[1px] uppercase"
           >
             Book
           </Link>
