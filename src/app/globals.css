@@ -349,6 +349,86 @@ h6 {
 }
 
 /* ========================================
+   TIPTAP / PROSEMIRROR
+   ======================================== */
+.tiptap-editor {
+  font-family: var(--font-sans);
+}
+
+.tiptap-editor:focus {
+  outline: none;
+}
+
+.tiptap-editor p.is-editor-empty:first-child::before {
+  content: attr(data-placeholder);
+  float: left;
+  color: var(--muted-foreground);
+  pointer-events: none;
+  height: 0;
+}
+
+.tiptap-editor h2 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.25em;
+  font-family: var(--font-sans);
+}
+
+.tiptap-editor h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0.75em 0 0.25em;
+  font-family: var(--font-sans);
+}
+
+.tiptap-editor p {
+  margin: 0.35em 0;
+}
+
+.tiptap-editor ul,
+.tiptap-editor ol {
+  padding-left: 1.25rem;
+  margin: 0.35em 0;
+}
+
+.tiptap-editor ul {
+  list-style: disc;
+}
+
+.tiptap-editor ol {
+  list-style: decimal;
+}
+
+.tiptap-editor li {
+  margin: 0.15em 0;
+}
+
+.tiptap-editor blockquote {
+  border-left: 3px solid var(--border);
+  padding-left: 0.75rem;
+  margin: 0.5em 0;
+  color: var(--muted-foreground);
+}
+
+.tiptap-editor hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 0.75em 0;
+}
+
+.tiptap-editor strong {
+  font-weight: 600;
+}
+
+.tiptap-editor em {
+  font-style: italic;
+}
+
+.tiptap-editor s {
+  text-decoration: line-through;
+}
+
+/* ========================================
    REDUCED MOTION
    ======================================== */
 @media (prefers-reduced-motion: reduce) {

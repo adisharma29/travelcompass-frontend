@@ -121,6 +121,14 @@ export interface Department {
   is_active: boolean;
 }
 
+export interface ExperienceImage {
+  id: number;
+  image: string;
+  alt_text: string;
+  display_order: number;
+  created_at: string;
+}
+
 export interface Experience {
   id: number;
   name: string;
@@ -136,6 +144,7 @@ export interface Experience {
   highlights: string[];
   is_active: boolean;
   display_order: number;
+  gallery_images: ExperienceImage[];
 }
 
 export interface GuestStay {

@@ -5,6 +5,7 @@ import type {
   DashboardStats,
   Department,
   Experience,
+  ExperienceImage,
   Hotel,
   HotelMembership,
   HotelSettings,
@@ -56,6 +57,13 @@ export async function getMyHotels(): Promise<HotelMembership[]> {
 export async function getHotelPublic(hotelSlug: string): Promise<Hotel> {
   const res = await authFetch(url(`/hotels/${hotelSlug}/`));
   return json<Hotel>(res);
+}
+
+export async function getHotelSettings(
+  hotelSlug: string,
+): Promise<HotelSettings> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/settings/`));
+  return json<HotelSettings>(res);
 }
 
 export async function updateHotelSettings(
@@ -164,7 +172,8 @@ export async function getDepartments(
   const res = await authFetch(
     url(`/hotels/${hotelSlug}/admin/departments/`),
   );
-  return json<Department[]>(res);
+  const page = await json<PaginatedResponse<Department>>(res);
+  return page.results;
 }
 
 export async function createDepartment(
@@ -188,6 +197,17 @@ export async function updateDepartment(
     { method: "PATCH", body: data },
   );
   return json<Department>(res);
+}
+
+export async function deleteDepartment(
+  hotelSlug: string,
+  deptSlug: string,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/`),
+    { method: "DELETE" },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
 }
 
 // ----- Experiences -----
@@ -219,18 +239,96 @@ export async function updateExperience(
   return json<Experience>(res);
 }
 
+export async function deleteExperience(
+  hotelSlug: string,
+  deptSlug: string,
+  expId: number,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/experiences/${expId}/`),
+    { method: "DELETE" },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+// ----- Reorder -----
+
+export async function reorderDepartments(
+  hotelSlug: string,
+  order: number[],
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/reorder/`),
+    { method: "PATCH", body: JSON.stringify({ order }) },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+export async function reorderExperiences(
+  hotelSlug: string,
+  deptSlug: string,
+  order: number[],
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/experiences/reorder/`),
+    { method: "PATCH", body: JSON.stringify({ order }) },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+// ----- Experience Images -----
+
+export async function uploadExperienceImage(
+  hotelSlug: string,
+  deptSlug: string,
+  expId: number,
+  data: FormData,
+): Promise<ExperienceImage> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/experiences/${expId}/images/`),
+    { method: "POST", body: data },
+  );
+  return json<ExperienceImage>(res);
+}
+
+export async function deleteExperienceImage(
+  hotelSlug: string,
+  deptSlug: string,
+  imageId: number,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/experience-images/${imageId}/`),
+    { method: "DELETE" },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+export async function reorderExperienceImages(
+  hotelSlug: string,
+  deptSlug: string,
+  expId: number,
+  order: number[],
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/experiences/${expId}/images/reorder/`),
+    { method: "PATCH", body: JSON.stringify({ order }) },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
 // ----- Members -----
 
 export async function getMembers(
   hotelSlug: string,
 ): Promise<HotelMembership[]> {
   const res = await authFetch(url(`/hotels/${hotelSlug}/admin/members/`));
-  return json<HotelMembership[]>(res);
+  const page = await json<PaginatedResponse<HotelMembership>>(res);
+  return page.results;
 }
 
 export async function inviteMember(
   hotelSlug: string,
-  data: { email: string; role: string; department?: number; phone?: string },
+  data: { email?: string; role: string; department?: number; phone?: string },
 ): Promise<HotelMembership> {
   const res = await authFetch(url(`/hotels/${hotelSlug}/admin/members/`), {
     method: "POST",
@@ -242,7 +340,7 @@ export async function inviteMember(
 export async function updateMember(
   hotelSlug: string,
   id: number,
-  data: { role?: string; is_active?: boolean },
+  data: { role?: string; is_active?: boolean; department?: number },
 ): Promise<HotelMembership> {
   const res = await authFetch(
     url(`/hotels/${hotelSlug}/admin/members/${id}/`),
@@ -255,7 +353,8 @@ export async function updateMember(
 
 export async function getQRCodes(hotelSlug: string): Promise<QRCode[]> {
   const res = await authFetch(url(`/hotels/${hotelSlug}/admin/qr-codes/`));
-  return json<QRCode[]>(res);
+  const page = await json<PaginatedResponse<QRCode>>(res);
+  return page.results;
 }
 
 export async function createQRCode(
@@ -267,6 +366,17 @@ export async function createQRCode(
     body: JSON.stringify(data),
   });
   return json<QRCode>(res);
+}
+
+export async function deleteQRCode(
+  hotelSlug: string,
+  id: number,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/qr-codes/${id}/`),
+    { method: "DELETE" },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
 }
 
 // ----- Notifications -----
