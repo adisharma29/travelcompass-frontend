@@ -8,18 +8,12 @@ import type { NearbyPlace } from "@/lib/types";
 export function NearbyPlaces() {
   const { state, destination } = useApp();
   const [places, setPlaces] = useState<NearbyPlace[]>([]);
-  const [loading, setLoading] = useState(false);
 
   const expCode = state.currentExperienceCode;
 
   useEffect(() => {
-    if (!expCode) {
-      setPlaces([]);
-      return;
-    }
+    if (!expCode) return;
 
-    setPlaces([]);
-    setLoading(true);
     let stale = false;
 
     fetchNearbyPlaces(destination.slug, expCode)
@@ -28,22 +22,22 @@ export function NearbyPlaces() {
       })
       .catch((err) => {
         if (!stale) console.error(err);
-      })
-      .finally(() => {
-        if (!stale) setLoading(false);
       });
 
-    return () => { stale = true; };
+    return () => {
+      stale = true;
+      setPlaces([]);
+    };
   }, [expCode, destination.slug]);
 
-  if (loading || places.length === 0) return null;
+  if (places.length === 0) return null;
 
   const restaurants = places.filter((p) => p.place_type === "restaurant");
   const attractions = places.filter((p) => p.place_type !== "restaurant");
 
   return (
     <div className="mt-8">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-accent mb-2.5">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-accent mb-2.5">
         Nearby
       </div>
 
@@ -104,7 +98,7 @@ function NearbyItem({
         </div>
       </div>
       {place.rating > 0 && (
-        <div className="text-[11px] text-accent font-medium shrink-0">
+        <div className="text-[11px] text-brand-accent font-medium shrink-0">
           {place.rating} ★
         </div>
       )}

@@ -32,37 +32,35 @@ export function ExperienceView() {
   );
 
   useEffect(() => {
-    if (!expCode) {
-      setDetail(null);
-      return;
-    }
+    if (!expCode) return;
 
-    // Check cache
-    const cached = detailCache.current.get(expCode);
-    if (cached) {
-      setDetail(cached);
-      return;
-    }
-
-    // Clear stale detail from previous experience
-    setDetail(null);
-    setLoading(true);
     let stale = false;
 
-    fetchExperienceDetail(destination.slug, expCode)
-      .then((d) => {
+    (async () => {
+      // Check cache
+      const cached = detailCache.current.get(expCode);
+      if (cached) {
+        setDetail(cached);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const d = await fetchExperienceDetail(destination.slug, expCode);
         if (stale) return;
         detailCache.current.set(expCode, d);
         setDetail(d);
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!stale) console.error(err);
-      })
-      .finally(() => {
+      } finally {
         if (!stale) setLoading(false);
-      });
+      }
+    })();
 
-    return () => { stale = true; };
+    return () => {
+      stale = true;
+      setDetail(null);
+    };
   }, [expCode, destination.slug, detailCache]);
 
   if (!expListItem) return null;
@@ -70,7 +68,7 @@ export function ExperienceView() {
   return (
     <div className="flex flex-col">
       {/* Header */}
-      <div className="flex items-center gap-3 px-5 py-4 border-b border-accent/12 sticky top-0 bg-bg z-10">
+      <div className="flex items-center gap-3 px-5 py-4 border-b border-brand-accent/12 sticky top-0 bg-bg z-10">
         <BackButton onClick={() => dispatch({ type: "GO_BACK" })} />
         <div className="flex-1 min-w-0">
           <h1 className="font-serif text-lg text-text leading-tight truncate">
@@ -95,7 +93,7 @@ export function ExperienceView() {
       <div className="pb-[calc(20px+env(safe-area-inset-bottom,0px))]">
         {loading && (
           <div className="flex items-center justify-center py-12">
-            <div className="h-6 w-6 animate-spin rounded-full border-2 border-accent border-t-transparent" />
+            <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-accent border-t-transparent" />
           </div>
         )}
 
@@ -186,7 +184,7 @@ function Section({
 }) {
   return (
     <div className="mb-6 last:mb-0">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-accent mb-2.5">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-accent mb-2.5">
         {title}
       </div>
       <div>{children}</div>

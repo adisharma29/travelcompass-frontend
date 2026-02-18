@@ -1,0 +1,300 @@
+import { authFetch } from "./auth";
+import { getClientApiUrl } from "./utils";
+import type {
+  AuthProfile,
+  DashboardStats,
+  Department,
+  Experience,
+  Hotel,
+  HotelMembership,
+  HotelSettings,
+  Notification,
+  PaginatedResponse,
+  QRCode,
+  ServiceRequest,
+  ServiceRequestListItem,
+} from "./concierge-types";
+
+const API = getClientApiUrl();
+
+function url(path: string): string {
+  return `${API}/api/v1${path}`;
+}
+
+async function json<T>(res: Response): Promise<T> {
+  if (!res.ok) {
+    const body = await res.text().catch(() => "");
+    throw new ApiError(res.status, body);
+  }
+  return res.json() as Promise<T>;
+}
+
+export class ApiError extends Error {
+  constructor(
+    public status: number,
+    public body: string,
+  ) {
+    super(`API ${status}: ${body}`);
+    this.name = "ApiError";
+  }
+}
+
+// ----- Auth / Profile -----
+
+export async function getProfile(): Promise<AuthProfile> {
+  const res = await authFetch(url("/auth/profile/"));
+  return json<AuthProfile>(res);
+}
+
+// ----- Hotels -----
+
+export async function getMyHotels(): Promise<HotelMembership[]> {
+  const res = await authFetch(url("/me/hotels/"));
+  return json<HotelMembership[]>(res);
+}
+
+export async function getHotelPublic(hotelSlug: string): Promise<Hotel> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/`));
+  return json<Hotel>(res);
+}
+
+export async function updateHotelSettings(
+  hotelSlug: string,
+  data: Partial<HotelSettings>,
+): Promise<HotelSettings> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/settings/`), {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return json<HotelSettings>(res);
+}
+
+// ----- Dashboard -----
+
+export async function getDashboardStats(
+  hotelSlug: string,
+  signal?: AbortSignal,
+): Promise<DashboardStats> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/dashboard/`), { signal });
+  return json<DashboardStats>(res);
+}
+
+// ----- Requests -----
+
+export async function getRequests(
+  hotelSlug: string,
+  params?: URLSearchParams,
+  signal?: AbortSignal,
+): Promise<ServiceRequestListItem[]> {
+  const qs = params ? `?${params.toString()}` : "";
+  const res = await authFetch(url(`/hotels/${hotelSlug}/requests/list/${qs}`), { signal });
+  const page = await json<PaginatedResponse<ServiceRequestListItem>>(res);
+  return page.results;
+}
+
+export async function getRequest(
+  hotelSlug: string,
+  id: number,
+): Promise<ServiceRequest> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/requests/${id}/`));
+  return json<ServiceRequest>(res);
+}
+
+export async function getRequestByPublicId(
+  publicId: string,
+): Promise<ServiceRequest & { hotel_slug: string }> {
+  const res = await authFetch(url(`/me/requests/${publicId}/`));
+  return json<ServiceRequest & { hotel_slug: string }>(res);
+}
+
+export async function acknowledgeRequest(
+  hotelSlug: string,
+  id: number,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/requests/${id}/acknowledge/`),
+    { method: "POST" },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+export async function updateRequest(
+  hotelSlug: string,
+  id: number,
+  data: { status?: string; staff_notes?: string; confirmation_reason?: string },
+): Promise<ServiceRequest> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/requests/${id}/`), {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+  return json<ServiceRequest>(res);
+}
+
+export async function addRequestNote(
+  hotelSlug: string,
+  id: number,
+  note: string,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/requests/${id}/notes/`),
+    {
+      method: "POST",
+      body: JSON.stringify({ content: note }),
+    },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+export async function takeOwnership(
+  hotelSlug: string,
+  id: number,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/requests/${id}/take-ownership/`),
+    { method: "POST" },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+// ----- Departments -----
+
+export async function getDepartments(
+  hotelSlug: string,
+): Promise<Department[]> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/`),
+  );
+  return json<Department[]>(res);
+}
+
+export async function createDepartment(
+  hotelSlug: string,
+  data: FormData,
+): Promise<Department> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/`),
+    { method: "POST", body: data },
+  );
+  return json<Department>(res);
+}
+
+export async function updateDepartment(
+  hotelSlug: string,
+  deptSlug: string,
+  data: FormData,
+): Promise<Department> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/`),
+    { method: "PATCH", body: data },
+  );
+  return json<Department>(res);
+}
+
+// ----- Experiences -----
+
+export async function createExperience(
+  hotelSlug: string,
+  deptSlug: string,
+  data: FormData,
+): Promise<Experience> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/experiences/`),
+    { method: "POST", body: data },
+  );
+  return json<Experience>(res);
+}
+
+export async function updateExperience(
+  hotelSlug: string,
+  deptSlug: string,
+  expId: number,
+  data: FormData,
+): Promise<Experience> {
+  const res = await authFetch(
+    url(
+      `/hotels/${hotelSlug}/admin/departments/${deptSlug}/experiences/${expId}/`,
+    ),
+    { method: "PATCH", body: data },
+  );
+  return json<Experience>(res);
+}
+
+// ----- Members -----
+
+export async function getMembers(
+  hotelSlug: string,
+): Promise<HotelMembership[]> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/members/`));
+  return json<HotelMembership[]>(res);
+}
+
+export async function inviteMember(
+  hotelSlug: string,
+  data: { email: string; role: string; department?: number; phone?: string },
+): Promise<HotelMembership> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/members/`), {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return json<HotelMembership>(res);
+}
+
+export async function updateMember(
+  hotelSlug: string,
+  id: number,
+  data: { role?: string; is_active?: boolean },
+): Promise<HotelMembership> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/members/${id}/`),
+    { method: "PATCH", body: JSON.stringify(data) },
+  );
+  return json<HotelMembership>(res);
+}
+
+// ----- QR Codes -----
+
+export async function getQRCodes(hotelSlug: string): Promise<QRCode[]> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/qr-codes/`));
+  return json<QRCode[]>(res);
+}
+
+export async function createQRCode(
+  hotelSlug: string,
+  data: { placement: string; label: string; department?: number },
+): Promise<QRCode> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/qr-codes/`), {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+  return json<QRCode>(res);
+}
+
+// ----- Notifications -----
+
+export async function getNotifications(): Promise<Notification[]> {
+  const res = await authFetch(url("/me/notifications/"));
+  return json<Notification[]>(res);
+}
+
+export async function markNotificationsRead(
+  ids: number[],
+): Promise<void> {
+  const res = await authFetch(url("/me/notifications/mark-read/"), {
+    method: "POST",
+    body: JSON.stringify({ ids }),
+  });
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+// ----- Guest stays (staff view) -----
+
+export async function revokeStay(
+  hotelSlug: string,
+  stayId: number,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/stays/${stayId}/revoke/`),
+    { method: "POST" },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}

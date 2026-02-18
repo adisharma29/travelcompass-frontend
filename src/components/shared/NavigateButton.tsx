@@ -79,11 +79,11 @@ export function NavigateButton({
 
   return (
     <button
-      className="flex items-center justify-center w-10 h-10 border-none bg-accent/10 rounded-full cursor-pointer tap-highlight-none shrink-0 active:bg-accent/20"
+      className="flex items-center justify-center w-10 h-10 border-none bg-brand-accent/10 rounded-full cursor-pointer tap-highlight-none shrink-0 active:bg-brand-accent/20"
       onClick={handleClick}
     >
       <svg
-        className="w-5 h-5 text-accent"
+        className="w-5 h-5 text-brand-accent"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
