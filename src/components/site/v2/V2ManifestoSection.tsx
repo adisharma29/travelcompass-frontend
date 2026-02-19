@@ -31,8 +31,8 @@ export function V2ManifestoSection() {
       "(prefers-reduced-motion: reduce)"
     ).matches;
     if (prefersReduced) {
-      setProgress(1);
-      return;
+      const frame = requestAnimationFrame(() => setProgress(1));
+      return () => cancelAnimationFrame(frame);
     }
 
     let ticking = false;

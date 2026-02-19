@@ -135,20 +135,39 @@ export default function TeamPage() {
                 No team members yet
               </p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Contact</TableHead>
-                    <TableHead>Role</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Status</TableHead>
-                    {myRole === "SUPERADMIN" && <TableHead className="w-[100px]">Actions</TableHead>}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
+              <>
+                {/* Desktop table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Name</TableHead>
+                        <TableHead>Contact</TableHead>
+                        <TableHead>Role</TableHead>
+                        <TableHead>Department</TableHead>
+                        <TableHead>Status</TableHead>
+                        {myRole === "SUPERADMIN" && <TableHead className="w-[100px]">Actions</TableHead>}
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {members.map((m) => (
+                        <MemberRow
+                          key={m.id}
+                          member={m}
+                          departments={departments}
+                          hotelSlug={activeHotelSlug}
+                          canEdit={myRole === "SUPERADMIN"}
+                          isSelf={m.id === activeMembership?.id}
+                          onUpdated={fetchData}
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+                {/* Mobile cards */}
+                <div className="md:hidden space-y-3">
                   {members.map((m) => (
-                    <MemberRow
+                    <MemberCard
                       key={m.id}
                       member={m}
                       departments={departments}
@@ -158,8 +177,8 @@ export default function TeamPage() {
                       onUpdated={fetchData}
                     />
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+              </>
             )}
           </CardContent>
         </Card>
@@ -226,7 +245,6 @@ function MemberRow({
     }
   }
 
-  const toggleAction = member.is_active ? "deactivate" : "activate";
   const memberName = member.first_name || member.email;
 
   return (
@@ -354,6 +372,185 @@ function MemberRow({
           </TableCell>
         </TableRow>
       )}
+    </>
+  );
+}
+
+function MemberCard({
+  member,
+  departments,
+  hotelSlug,
+  canEdit,
+  isSelf,
+  onUpdated,
+}: {
+  member: HotelMembership;
+  departments: Department[];
+  hotelSlug: string;
+  canEdit: boolean;
+  isSelf: boolean;
+  onUpdated: () => void;
+}) {
+  const [updating, setUpdating] = useState(false);
+  const [showToggleConfirm, setShowToggleConfirm] = useState(false);
+  const [pendingStaffDept, setPendingStaffDept] = useState<number | null>(null);
+  const [showDeptPicker, setShowDeptPicker] = useState(false);
+  const dept = departments.find((d) => d.id === member.department);
+
+  async function handleRoleChange(role: string) {
+    if (role === "STAFF" && !member.department) {
+      setShowDeptPicker(true);
+      return;
+    }
+    setUpdating(true);
+    try {
+      await updateMember(hotelSlug, member.id, { role });
+      onUpdated();
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  async function handleConfirmStaffRole() {
+    if (!pendingStaffDept) return;
+    setUpdating(true);
+    try {
+      await updateMember(hotelSlug, member.id, { role: "STAFF", department: pendingStaffDept });
+      setShowDeptPicker(false);
+      setPendingStaffDept(null);
+      onUpdated();
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  async function handleToggleActive() {
+    setUpdating(true);
+    try {
+      await updateMember(hotelSlug, member.id, { is_active: !member.is_active });
+      onUpdated();
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  const memberName = member.first_name || member.email;
+
+  return (
+    <>
+      <div className={`rounded-lg border p-3 space-y-2 ${!member.is_active ? "opacity-50" : ""}`}>
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="font-medium text-sm">
+              {member.first_name} {member.last_name}
+              {isSelf && (
+                <span className="ml-1.5 text-xs text-muted-foreground">(you)</span>
+              )}
+            </div>
+            {member.email && (
+              <div className="text-xs text-muted-foreground">{member.email}</div>
+            )}
+            {member.phone && (
+              <div className="text-xs text-muted-foreground">{member.phone}</div>
+            )}
+          </div>
+          <Badge variant={member.is_active ? "default" : "outline"}>
+            {member.is_active ? "Active" : "Inactive"}
+          </Badge>
+        </div>
+        <div className="flex items-center gap-2 flex-wrap">
+          {canEdit && !isSelf ? (
+            <Select
+              value={member.role}
+              onValueChange={handleRoleChange}
+              disabled={updating}
+            >
+              <SelectTrigger className="w-[120px] h-7 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="SUPERADMIN">Super Admin</SelectItem>
+                <SelectItem value="ADMIN">Admin</SelectItem>
+                <SelectItem value="STAFF">Staff</SelectItem>
+              </SelectContent>
+            </Select>
+          ) : (
+            <Badge variant={ROLE_VARIANT[member.role] ?? "outline"}>
+              {member.role}
+            </Badge>
+          )}
+          {dept && (
+            <span className="text-xs text-muted-foreground">{dept.name}</span>
+          )}
+          {canEdit && !isSelf && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowToggleConfirm(true)}
+              disabled={updating}
+              className="text-xs h-7 ml-auto"
+            >
+              {updating ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : member.is_active ? (
+                "Deactivate"
+              ) : (
+                "Activate"
+              )}
+            </Button>
+          )}
+        </div>
+        {showDeptPicker && (
+          <div className="flex items-center gap-2 flex-wrap pt-1 border-t">
+            <span className="text-xs text-muted-foreground">Department:</span>
+            <Select
+              value={pendingStaffDept?.toString() ?? ""}
+              onValueChange={(v) => setPendingStaffDept(Number(v))}
+            >
+              <SelectTrigger className="w-[160px] h-7 text-xs">
+                <SelectValue placeholder="Select" />
+              </SelectTrigger>
+              <SelectContent>
+                {departments.map((d) => (
+                  <SelectItem key={d.id} value={d.id.toString()}>
+                    {d.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              size="sm"
+              className="h-7 text-xs"
+              disabled={!pendingStaffDept || updating}
+              onClick={handleConfirmStaffRole}
+            >
+              {updating && <Loader2 className="size-3 animate-spin mr-1" />}
+              OK
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="h-7 text-xs"
+              onClick={() => { setShowDeptPicker(false); setPendingStaffDept(null); }}
+            >
+              Cancel
+            </Button>
+          </div>
+        )}
+      </div>
+      <ConfirmDialog
+        open={showToggleConfirm}
+        onOpenChange={setShowToggleConfirm}
+        title={`${member.is_active ? "Deactivate" : "Activate"} ${memberName}?`}
+        description={
+          member.is_active
+            ? `${memberName} will lose access to this hotel's dashboard.`
+            : `${memberName} will regain access to this hotel's dashboard.`
+        }
+        confirmLabel={member.is_active ? "Deactivate" : "Activate"}
+        variant={member.is_active ? "destructive" : "default"}
+        onConfirm={handleToggleActive}
+      />
     </>
   );
 }

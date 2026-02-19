@@ -28,18 +28,29 @@ export type DragHandleProps = {
   attributes: UseSortableReturn["attributes"];
 };
 
+export type MoveActions = {
+  onMoveUp: (() => void) | null;
+  onMoveDown: (() => void) | null;
+};
+
 interface SortableListProps<T extends { id: number }> {
   items: T[];
   onReorder: (reordered: T[]) => void;
-  renderItem: (item: T, dragHandleProps: DragHandleProps) => ReactNode;
+  renderItem: (
+    item: T,
+    dragHandleProps: DragHandleProps,
+    moveActions: MoveActions,
+  ) => ReactNode;
 }
 
 function SortableItem<T extends { id: number }>({
   item,
   renderItem,
+  moveActions,
 }: {
   item: T;
   renderItem: SortableListProps<T>["renderItem"];
+  moveActions: MoveActions;
 }) {
   const {
     attributes,
@@ -59,11 +70,15 @@ function SortableItem<T extends { id: number }>({
 
   return (
     <div ref={setNodeRef} style={style}>
-      {renderItem(item, {
-        ref: setActivatorNodeRef,
-        listeners,
-        attributes,
-      })}
+      {renderItem(
+        item,
+        {
+          ref: setActivatorNodeRef,
+          listeners,
+          attributes,
+        },
+        moveActions,
+      )}
     </div>
   );
 }
@@ -104,11 +119,21 @@ export function SortableList<T extends { id: number }>({
         items={items.map((i) => i.id)}
         strategy={verticalListSortingStrategy}
       >
-        {items.map((item) => (
+        {items.map((item, index) => (
           <SortableItem
             key={item.id}
             item={item}
             renderItem={renderItem}
+            moveActions={{
+              onMoveUp:
+                index > 0
+                  ? () => onReorder(arrayMove([...items], index, index - 1))
+                  : null,
+              onMoveDown:
+                index < items.length - 1
+                  ? () => onReorder(arrayMove([...items], index, index + 1))
+                  : null,
+            }}
           />
         ))}
       </SortableContext>

@@ -54,6 +54,8 @@ export type ExperienceCategory =
   | "TRANSPORT"
   | "OTHER";
 
+export type ContentStatus = "DRAFT" | "PUBLISHED" | "UNPUBLISHED";
+
 export type QRPlacement =
   | "LOBBY"
   | "ROOM"
@@ -85,6 +87,23 @@ export interface Hotel {
   cover_image: string | null;
   timezone: string;
   escalation_enabled: boolean;
+  // Brand
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  heading_font: string;
+  body_font: string;
+  favicon: string | null;
+  og_image: string | null;
+  // Social
+  instagram_url: string;
+  facebook_url: string;
+  twitter_url: string;
+  whatsapp_number: string;
+  // Footer & Legal
+  footer_text: string;
+  terms_url: string;
+  privacy_url: string;
 }
 
 export interface HotelSettings {
@@ -99,6 +118,24 @@ export interface HotelSettings {
   oncall_phone: string | null;
   require_frontdesk_kiosk: boolean;
   escalation_tier_minutes: number[] | null;
+  settings_configured: boolean;
+  // Brand
+  primary_color: string;
+  secondary_color: string;
+  accent_color: string;
+  heading_font: string;
+  body_font: string;
+  favicon: string | null;
+  og_image: string | null;
+  // Social
+  instagram_url: string;
+  facebook_url: string;
+  twitter_url: string;
+  whatsapp_number: string;
+  // Footer & Legal
+  footer_text: string;
+  terms_url: string;
+  privacy_url: string;
 }
 
 export interface DepartmentSchedule {
@@ -119,6 +156,10 @@ export interface Department {
   experiences: Experience[];
   is_ops: boolean;
   is_active: boolean;
+  status: ContentStatus;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface ExperienceImage {
@@ -131,11 +172,13 @@ export interface ExperienceImage {
 
 export interface Experience {
   id: number;
+  department: number;
   name: string;
   slug: string;
   description: string;
   photo: string | null;
   cover_image: string | null;
+  price: string | null;
   price_display: string;
   category: ExperienceCategory;
   timing: string;
@@ -143,8 +186,12 @@ export interface Experience {
   capacity: string | null;
   highlights: string[];
   is_active: boolean;
+  status: ContentStatus;
+  published_at: string | null;
   display_order: number;
   gallery_images: ExperienceImage[];
+  created_at: string;
+  updated_at: string;
 }
 
 export interface GuestStay {
@@ -249,6 +296,16 @@ export interface QRCode {
   created_at: string;
 }
 
+export interface SetupFlags {
+  settings_configured: boolean;
+  has_departments: boolean;
+  has_experiences: boolean;
+  has_photos: boolean;
+  has_team: boolean;
+  has_qr_codes: boolean;
+  has_published: boolean;
+}
+
 export interface DashboardStats {
   total_requests: number;
   pending: number;
@@ -256,6 +313,7 @@ export interface DashboardStats {
   confirmed: number;
   conversion_rate: number;
   by_department: { name: string; count: number }[];
+  setup: SetupFlags;
 }
 
 // ----- Auth payloads -----

@@ -27,6 +27,9 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Save, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ImageUploadArea } from "@/components/dashboard/ImageUploadArea";
+import { FontCombobox } from "@/components/dashboard/FontCombobox";
+import { BrandPreview } from "@/components/dashboard/BrandPreview";
 
 const FALLBACK_CHANNELS = [
   { value: "NONE", label: "None" },
@@ -47,12 +50,20 @@ export default function SettingsPage() {
 
   // Editable form state
   const [form, setForm] = useState<HotelSettings | null>(null);
+  const [faviconFile, setFaviconFile] = useState<File | null>(null);
+  const [ogImageFile, setOgImageFile] = useState<File | null>(null);
+  const [removeFavicon, setRemoveFavicon] = useState(false);
+  const [removeOgImage, setRemoveOgImage] = useState(false);
 
   const fetchSettings = useCallback(async () => {
     const slug = slugRef.current;
     if (!slug) return;
     setLoading(true);
     setError(null);
+    setFaviconFile(null);
+    setOgImageFile(null);
+    setRemoveFavicon(false);
+    setRemoveOgImage(false);
     try {
       const s = await getHotelSettings(slug);
       if (slugRef.current !== slug) return;
@@ -70,6 +81,9 @@ export default function SettingsPage() {
     fetchSettings();
   }, [activeHotelSlug, fetchSettings]);
 
+  const hasFileChanges =
+    faviconFile !== null || ogImageFile !== null || removeFavicon || removeOgImage;
+
   async function handleSave() {
     const slug = slugRef.current;
     if (!slug || !form) return;
@@ -77,21 +91,55 @@ export default function SettingsPage() {
     setError(null);
     setSuccess(false);
     try {
-      const updated = await updateHotelSettings(slug, form);
+      let updated: HotelSettings;
+      if (hasFileChanges) {
+        // Use FormData when files or image removals are involved
+        const fd = new FormData();
+        const JSON_FIELDS = new Set(["blocked_room_numbers", "escalation_tier_minutes"]);
+        for (const [key, value] of Object.entries(form)) {
+          if (key === "favicon" || key === "og_image") continue;
+          if (JSON_FIELDS.has(key)) {
+            fd.append(key, JSON.stringify(value));
+            continue;
+          }
+          fd.append(key, value === null ? "" : String(value));
+        }
+        if (faviconFile) fd.append("favicon", faviconFile);
+        else if (removeFavicon) fd.append("favicon_clear", "true");
+        if (ogImageFile) fd.append("og_image", ogImageFile);
+        else if (removeOgImage) fd.append("og_image_clear", "true");
+        updated = await updateHotelSettings(slug, fd);
+      } else {
+        // JSON path: strip image URL fields — backend expects files, not strings
+        const jsonData: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(form)) {
+          if (key === "favicon" || key === "og_image") continue;
+          jsonData[key] = value;
+        }
+        if (removeFavicon) jsonData.favicon_clear = true;
+        if (removeOgImage) jsonData.og_image_clear = true;
+        updated = await updateHotelSettings(slug, jsonData as Partial<HotelSettings>);
+      }
       if (slugRef.current !== slug) return;
       setSettings(updated);
       setForm(updated);
+      setFaviconFile(null);
+      setOgImageFile(null);
+      setRemoveFavicon(false);
+      setRemoveOgImage(false);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       if (slugRef.current !== slug) return;
       setError(err instanceof Error ? err.message : "Failed to save settings");
     } finally {
-      if (slugRef.current === slug) setSaving(false);
+      setSaving(false);
     }
   }
 
-  const dirty = form && settings && JSON.stringify(form) !== JSON.stringify(settings);
+  const dirty =
+    (form && settings && JSON.stringify(form) !== JSON.stringify(settings)) ||
+    hasFileChanges;
 
   if (!activeHotelSlug) return null;
 
@@ -126,7 +174,193 @@ export default function SettingsPage() {
           <SettingsSkeleton />
         ) : form ? (
           <>
-            {/* Timezone */}
+            {/* Branding */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Branding</CardTitle>
+                <CardDescription>
+                  Colors, fonts, and images for your guest-facing pages
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <ColorField
+                    label="Primary"
+                    value={form.primary_color}
+                    onChange={(v) => setForm({ ...form, primary_color: v })}
+                  />
+                  <ColorField
+                    label="Secondary"
+                    value={form.secondary_color}
+                    onChange={(v) => setForm({ ...form, secondary_color: v })}
+                  />
+                  <ColorField
+                    label="Accent"
+                    value={form.accent_color}
+                    onChange={(v) => setForm({ ...form, accent_color: v })}
+                  />
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Heading Font</Label>
+                    <FontCombobox
+                      variant="heading"
+                      value={form.heading_font}
+                      onChange={(v) => setForm({ ...form, heading_font: v })}
+                      placeholder="Default (serif)"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Body Font</Label>
+                    <FontCombobox
+                      variant="body"
+                      value={form.body_font}
+                      onChange={(v) => setForm({ ...form, body_font: v })}
+                      placeholder="Default (sans-serif)"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label>Favicon</Label>
+                    <ImageUploadArea
+                      value={faviconFile}
+                      existingUrl={removeFavicon ? null : form.favicon}
+                      onChange={(f) => {
+                        setFaviconFile(f);
+                        if (f) setRemoveFavicon(false);
+                        else if (form.favicon) setRemoveFavicon(true);
+                      }}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label>OG Image</Label>
+                    <ImageUploadArea
+                      value={ogImageFile}
+                      existingUrl={removeOgImage ? null : form.og_image}
+                      onChange={(f) => {
+                        setOgImageFile(f);
+                        if (f) setRemoveOgImage(false);
+                        else if (form.og_image) setRemoveOgImage(true);
+                      }}
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Social sharing preview image (1200x630 recommended)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Live preview */}
+                <div className="space-y-2">
+                  <Label className="text-xs text-muted-foreground">Preview</Label>
+                  <BrandPreview
+                    primaryColor={form.primary_color}
+                    secondaryColor={form.secondary_color}
+                    accentColor={form.accent_color}
+                    headingFont={form.heading_font}
+                    bodyFont={form.body_font}
+                  />
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Social Links */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Social Links</CardTitle>
+                <CardDescription>
+                  Displayed in the footer of your guest pages
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="instagram">Instagram</Label>
+                    <Input
+                      id="instagram"
+                      value={form.instagram_url}
+                      onChange={(e) => setForm({ ...form, instagram_url: e.target.value })}
+                      placeholder="https://instagram.com/yourhotel"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="facebook">Facebook</Label>
+                    <Input
+                      id="facebook"
+                      value={form.facebook_url}
+                      onChange={(e) => setForm({ ...form, facebook_url: e.target.value })}
+                      placeholder="https://facebook.com/yourhotel"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="twitter">Twitter / X</Label>
+                    <Input
+                      id="twitter"
+                      value={form.twitter_url}
+                      onChange={(e) => setForm({ ...form, twitter_url: e.target.value })}
+                      placeholder="https://x.com/yourhotel"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="whatsapp">WhatsApp Number</Label>
+                    <Input
+                      id="whatsapp"
+                      value={form.whatsapp_number}
+                      onChange={(e) => setForm({ ...form, whatsapp_number: e.target.value })}
+                      placeholder="+919876543210"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      With country code
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Footer & Legal */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Footer & Legal</CardTitle>
+                <CardDescription>
+                  Footer tagline and links to legal pages
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="footer-text">Footer Text</Label>
+                  <Input
+                    id="footer-text"
+                    value={form.footer_text}
+                    onChange={(e) => setForm({ ...form, footer_text: e.target.value })}
+                    placeholder="e.g. Crafted with care by The Grand Hotel"
+                  />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="terms-url">Terms & Conditions URL</Label>
+                    <Input
+                      id="terms-url"
+                      value={form.terms_url}
+                      onChange={(e) => setForm({ ...form, terms_url: e.target.value })}
+                      placeholder="https://yourhotel.com/terms"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="privacy-url">Privacy Policy URL</Label>
+                    <Input
+                      id="privacy-url"
+                      value={form.privacy_url}
+                      onChange={(e) => setForm({ ...form, privacy_url: e.target.value })}
+                      placeholder="https://yourhotel.com/privacy"
+                    />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* General */}
             <Card>
               <CardHeader>
                 <CardTitle>General</CardTitle>
@@ -352,10 +586,45 @@ export default function SettingsPage() {
   );
 }
 
+// ---- Color field with picker + hex input ----
+
+function ColorField({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="space-y-2">
+      <Label>{label}</Label>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="h-9 w-9 cursor-pointer rounded border p-0.5"
+        />
+        <Input
+          value={value}
+          onChange={(e) => {
+            const v = e.target.value;
+            if (/^#[0-9a-fA-F]{0,6}$/.test(v)) onChange(v);
+          }}
+          className="font-mono text-sm w-24"
+          maxLength={7}
+        />
+      </div>
+    </div>
+  );
+}
+
 function SettingsSkeleton() {
   return (
     <div className="space-y-6">
-      {Array.from({ length: 4 }).map((_, i) => (
+      {Array.from({ length: 6 }).map((_, i) => (
         <Card key={i}>
           <CardHeader>
             <Skeleton className="h-5 w-32" />

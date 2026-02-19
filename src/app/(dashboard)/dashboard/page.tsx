@@ -27,6 +27,7 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
+import { SetupChecklist } from "@/components/dashboard/SetupChecklist";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   CREATED: "destructive",
@@ -167,6 +168,11 @@ export default function DashboardHomePage() {
             />
           </div>
         ) : null}
+
+        {/* Setup checklist */}
+        {stats?.setup && activeHotelSlug && (
+          <SetupChecklist setup={stats.setup} hotelSlug={activeHotelSlug} />
+        )}
 
         {/* Department breakdown */}
         {stats && stats.by_department.length > 0 && (

@@ -68,11 +68,12 @@ export async function getHotelSettings(
 
 export async function updateHotelSettings(
   hotelSlug: string,
-  data: Partial<HotelSettings>,
+  data: Partial<HotelSettings> | FormData,
 ): Promise<HotelSettings> {
+  const isFormData = data instanceof FormData;
   const res = await authFetch(url(`/hotels/${hotelSlug}/admin/settings/`), {
     method: "PATCH",
-    body: JSON.stringify(data),
+    body: isFormData ? data : JSON.stringify(data),
   });
   return json<HotelSettings>(res);
 }
@@ -176,6 +177,16 @@ export async function getDepartments(
   return page.results;
 }
 
+export async function getDepartment(
+  hotelSlug: string,
+  deptSlug: string,
+): Promise<Department> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/`),
+  );
+  return json<Department>(res);
+}
+
 export async function createDepartment(
   hotelSlug: string,
   data: FormData,
@@ -211,6 +222,17 @@ export async function deleteDepartment(
 }
 
 // ----- Experiences -----
+
+export async function getExperience(
+  hotelSlug: string,
+  deptSlug: string,
+  expId: number,
+): Promise<Experience> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/experiences/${expId}/`),
+  );
+  return json<Experience>(res);
+}
 
 export async function createExperience(
   hotelSlug: string,

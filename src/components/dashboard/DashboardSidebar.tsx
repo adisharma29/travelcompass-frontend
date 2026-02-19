@@ -91,6 +91,24 @@ function hasAccess(userRole: Role | null, minRole?: Role): boolean {
   return ROLE_RANK[userRole] >= ROLE_RANK[minRole];
 }
 
+/**
+ * Determine which nav item is active.
+ *
+ * Experience editors live under /dashboard/departments/[slug]/experiences/...
+ * but should highlight "Experiences", not "Departments".
+ */
+function isNavActive(pathname: string, href: string): boolean {
+  if (pathname === href) return true;
+  if (href === "/dashboard") return false;
+
+  // Experience routes nested under departments → highlight Experiences
+  const isNestedExpRoute = /^\/dashboard\/departments\/[^/]+\/experiences(\/|$)/.test(pathname);
+  if (href === "/dashboard/experiences" && isNestedExpRoute) return true;
+  if (href === "/dashboard/departments" && isNestedExpRoute) return false;
+
+  return pathname.startsWith(href);
+}
+
 export function DashboardSidebar() {
   const pathname = usePathname();
   const {
@@ -163,10 +181,7 @@ export function DashboardSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {visibleNav.map((item) => {
-                const active =
-                  pathname === item.href ||
-                  (item.href !== "/dashboard" &&
-                    pathname.startsWith(item.href));
+                const active = isNavActive(pathname, item.href);
                 return (
                   <SidebarMenuItem key={item.href}>
                     <SidebarMenuButton asChild isActive={active}>
