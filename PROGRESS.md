@@ -100,14 +100,65 @@
 - [x] Frontend: create BrandPreview component (live preview in settings page)
 
 ## Phase 4: Frontend — Guest-Facing (white-label aware)
-- [ ] Create `lib/guest-auth.ts` (sendOTP, verifyOTP, updateRoom)
-- [ ] Guest layout with BrandFontLoader + injectBrandTheme on mount + generateMetadata (title, favicon, OG image per hotel)
-- [ ] Hotel landing page (`/h/[hotelSlug]/`) with departments grid + schedule badges — brand colors/fonts
-- [ ] Department detail + experience list (`/h/[hotelSlug]/[deptSlug]/`) — brand colors/fonts
-- [ ] Guest OTP verification flow (`/h/[hotelSlug]/verify/`) — phone → code → room
-- [ ] Request form modal (guest_name pre-fill, date/time/guests/notes)
-- [ ] Request confirmation view (acknowledgement card + SLA info)
-- [ ] Guest footer component (footer_text, social icons, terms/privacy links)
+- [x] Create `lib/guest-auth.ts` (sendOTP, verifyOTP, updateRoom, public data endpoints)
+- [x] Create `lib/schedule-utils.ts` (getDeptStatus, isAfterHours, formatScheduleRange, getTodaySchedule)
+- [x] Create `context/GuestContext.tsx` (hotel, guestStay, qrCode, guardedNavigate, setAuthState)
+- [x] Create shared guest components (SafeHtml with DOMPurify, GuestFooter, GuestHeader)
+- [x] Guest layout with BrandFontLoader + injectBrandTheme on mount + generateMetadata (title, favicon, OG image per hotel)
+- [x] Hotel landing page (`/h/[hotelSlug]/`) with HotelHero, DepartmentGrid, ScheduleBadge — brand colors/fonts
+- [x] Department detail + experience list (`/h/[hotelSlug]/[deptSlug]/`) with ExperienceCard, SafeHtml — brand colors/fonts
+- [x] Experience detail page (`/h/[hotelSlug]/[deptSlug]/[expId]/`) with ExperienceGallery (CSS scroll-snap), StickyBookingBar, highlights, details
+- [x] Guest OTP verification flow (`/h/[hotelSlug]/verify/`) — phone → code → room, dev mode code display, auto-submit, resend cooldown
+- [x] Request form page (`/h/[hotelSlug]/request/`) — pre-filled from query params, category-adaptive fields, GuestStepper
+- [x] Request confirmation view (`/h/[hotelSlug]/confirmation/`) — acknowledgement card + SLA info + after-hours notice
+- [x] Loading skeletons for all guest routes (landing, dept detail, exp detail)
+- [x] Install DOMPurify for client-side HTML sanitization
+- [x] Build passes with no errors
+
+## Phase 4.5: Guest UI/UX Revamp (see GUEST_UI_REVAMP.md)
+- [x] Global max-width container (max-w-6xl) on landing page + all content areas
+- [x] HotelHero — constrained overlay text, desktop cinematic aspect (21/9), padding
+- [x] DepartmentGrid — responsive columns (2/3/4 at breakpoints)
+- [x] DepartmentCard — hover shadow elevation, responsive image sizes, icon badge overlay
+- [x] ExperienceCard — hover background, larger desktop thumbnail (md:size-28), 2-line title, button hover
+- [x] ScheduleBadge — replaced hardcoded hex with brand CSS vars
+- [x] GuestFooter — max-width + desktop horizontal layout
+- [x] Loading skeletons — updated to match new responsive grid + containers
+- [x] Experience detail — 2-column desktop layout (gallery left, info+booking right)
+- [x] ExperienceGallery — desktop arrows, dot indicators on mobile, thumbnail strip on desktop
+- [x] StickyBookingBar — entrance animation, hidden on desktop (replaced by inline booking card)
+- [x] Experience page server component — parallel department fetch with Promise.all
+- [x] GuestHeader — breadcrumb navigation on desktop, max-width container
+- [x] Department detail — 2-column layout (photo+schedule left, experiences right), breadcrumbs
+- [x] Desktop card wrappers on verify/request/confirmation pages
+- [x] Confirmation page — "Continue Browsing" text update
+- [x] Hotel description shown on landing page
+- [x] WhatsAppFAB — floating action button when hotel has whatsapp_number
+- [x] WeeklySchedule — full 7-day schedule table on department detail
+- [x] Request page — capacity-based stepper max from experience.capacity
+- [x] SafeHtml — added style prop support
+- [x] Focus-visible rings on all interactive guest elements (buttons, links, inputs)
+- [x] Build passes with no errors
+
+## Phase 4.75: Staff UX + Guest Landing Enhancements
+- [x] Staff requests: ACTION_LABEL map with imperative verbs (Acknowledge, Confirm, Mark Unavailable, Mark No-Show, Mark Booked Offline)
+- [x] Guest API: `getMyRequests(hotelSlug)` with paginated response unwrap (guest-auth.ts)
+- [x] Guest landing: "Your Requests" section with expandable cards (notes, date/time, guest count)
+- [x] Guest landing: user dropdown with logout in branded header
+- [x] Guest landing: hotel-scoped auth state (verified vs authenticated-but-expired)
+
+### Multi-Hotel Session Hardening
+- [x] Backend: `?hotel=` now mandatory on `/me/requests/` — returns 400 if missing (views.py)
+- [x] Backend: `expire_stale_stays_task` Celery beat job deactivates stays with `expires_at <= now` (hourly)
+- [x] Backend: OTP verify reuses active stay for same (guest, hotel) — extends expiry, updates QR code. Atomic + row lock for race safety (services.py)
+- [x] Backend: data migration dedupes existing active stays + partial unique constraint `unique_active_stay_per_guest_hotel` (migration 0011)
+- [x] Frontend: `isVerified` in GuestContext — checks `is_active` AND `expires_at > now - 60s` buffer (hotel-local access)
+- [x] Frontend: `isAuthenticated` remains global identity (has JWT); `isVerified` gates protected actions
+- [x] Frontend: `guardedNavigate` uses `isVerified && hasRoom` instead of `isAuthenticated && hasRoom`
+- [x] Frontend: header shows "Verify for this hotel" CTA when `isAuthenticated && !isVerified`
+- [x] Frontend: centralized 403 handler — `guestMutationFetch` dispatches `guest:session-expired` event on 403; GuestContext listens and redirects to verify page
+- [x] Frontend: request history still visible to expired guests (gates on `isAuthenticated`, not `isVerified`)
+- [x] Backend + frontend builds pass
 
 ## Phase 5: Notifications + PWA
 - [ ] PWA manifest — dynamic per-hotel theme_color/background_color from brand colors

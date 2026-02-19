@@ -12,7 +12,7 @@ import { Loader2 } from "lucide-react";
 export default function RequestPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { hotel, guestUser, isAuthenticated, guardedNavigate } = useGuest();
+  const { hotel, guestUser, isVerified, hasRoom, guardedNavigate } = useGuest();
 
   const deptSlug = searchParams.get("dept");
   const expSlug = searchParams.get("exp");
@@ -33,13 +33,13 @@ export default function RequestPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Redirect to verify if not authenticated
+  // Redirect to verify if not verified or missing room for this hotel
   useEffect(() => {
-    if (!isAuthenticated) {
+    if (!isVerified || !hasRoom) {
       const currentUrl = window.location.pathname + window.location.search;
       guardedNavigate(currentUrl);
     }
-  }, [isAuthenticated, guardedNavigate]);
+  }, [isVerified, hasRoom, guardedNavigate]);
 
   // Pre-fill guest name from profile
   useEffect(() => {

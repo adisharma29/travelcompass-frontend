@@ -15,17 +15,28 @@ import { getGuestProfile } from "@/lib/guest-auth";
 import { ensureCSRFCookie } from "@/lib/auth";
 import { injectBrandTheme, clearBrandTheme } from "@/lib/inject-brand-theme";
 
+/** Buffer in ms subtracted from expires_at to account for clock skew */
+const EXPIRY_BUFFER_MS = 60_000;
+
+function isStayValid(stay: GuestStay | null): boolean {
+  if (!stay || !stay.is_active) return false;
+  return new Date(stay.expires_at).getTime() - EXPIRY_BUFFER_MS > Date.now();
+}
+
 interface GuestContextValue {
   hotel: Hotel;
   guestStay: GuestStay | null;
   guestUser: AuthProfile | null;
   qrCode: string | null;
+  /** Has a valid JWT / profile (global identity) */
   isAuthenticated: boolean;
+  /** Has an active, non-expired stay for this hotel (hotel-local access) */
+  isVerified: boolean;
   hasRoom: boolean;
-  /** Navigate to target, redirecting through verify if not authenticated */
+  /** Navigate to target, redirecting through verify if not verified */
   guardedNavigate: (target: string) => void;
-  /** Update auth state after successful OTP verification */
-  setAuthState: (user: AuthProfile, stay: GuestStay) => void;
+  /** Update auth state after OTP verification, or clear on logout (pass nulls) */
+  setAuthState: (user: AuthProfile | null, stay: GuestStay | null) => void;
 }
 
 const GuestContext = createContext<GuestContextValue | null>(null);
@@ -57,51 +68,73 @@ export function GuestProvider({
     return () => clearBrandTheme();
   }, [hotel]);
 
-  // Bootstrap: ensure CSRF + silently check if user has existing session
-  const bootstrapRef = useRef(false);
+  // Bootstrap: ensure CSRF + silently check if user has existing session.
+  // Re-runs when hotel.id changes (e.g. soft navigation between hotels)
+  // to pick up the correct stay and clear stale state.
   useEffect(() => {
-    if (bootstrapRef.current) return;
-    bootstrapRef.current = true;
+    let cancelled = false;
+    setLoading(true);
 
     (async () => {
       try {
         await ensureCSRFCookie();
         const profile = await getGuestProfile();
+        if (cancelled) return;
         if (profile) {
           setGuestUser(profile);
-          // Find active stay for this hotel
           const stay = profile.stays?.find(
             (s) => s.hotel === hotel.id && s.is_active,
-          );
-          if (stay) setGuestStay(stay);
+          ) ?? null;
+          setGuestStay(stay);
+        } else {
+          setGuestUser(null);
+          setGuestStay(null);
         }
       } catch {
+        if (cancelled) return;
         // Not authenticated — that's fine for guest browsing
+        setGuestUser(null);
+        setGuestStay(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     })();
+
+    return () => { cancelled = true; };
   }, [hotel.id]);
 
   const isAuthenticated = guestUser !== null;
-  const hasRoom = guestStay !== null && !!guestStay.room_number;
+  const isVerified = isAuthenticated && isStayValid(guestStay);
+  const hasRoom = isVerified && !!guestStay?.room_number;
 
   const guardedNavigate = useCallback(
     (target: string) => {
-      if (isAuthenticated && hasRoom) {
+      if (isVerified && hasRoom) {
         routerRef.current.push(target);
       } else {
         const verifyUrl = `/h/${hotel.slug}/verify?next=${encodeURIComponent(target)}`;
         routerRef.current.push(verifyUrl);
       }
     },
-    [isAuthenticated, hasRoom, hotel.slug],
+    [isVerified, hasRoom, hotel.slug],
   );
 
-  const setAuthState = useCallback((user: AuthProfile, stay: GuestStay) => {
+  const setAuthState = useCallback((user: AuthProfile | null, stay: GuestStay | null) => {
     setGuestUser(user);
     setGuestStay(stay);
   }, []);
+
+  // Listen for 403 session-expired events from guestMutationFetch
+  useEffect(() => {
+    function handleExpired() {
+      setGuestStay(null);
+      const returnTo = window.location.pathname + window.location.search + window.location.hash;
+      const verifyUrl = `/h/${hotel.slug}/verify?next=${encodeURIComponent(returnTo)}`;
+      routerRef.current.push(verifyUrl);
+    }
+    window.addEventListener("guest:session-expired", handleExpired);
+    return () => window.removeEventListener("guest:session-expired", handleExpired);
+  }, [hotel.slug]);
 
   if (loading) {
     return null; // Layout skeleton handles loading state
@@ -115,6 +148,7 @@ export function GuestProvider({
         guestUser,
         qrCode,
         isAuthenticated,
+        isVerified,
         hasRoom,
         guardedNavigate,
         setAuthState,

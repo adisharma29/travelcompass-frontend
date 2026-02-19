@@ -71,26 +71,34 @@ export default function VerifyPage() {
     setLoading(true);
     try {
       const res = await verifyGuestOTP(fullPhone, cleanCode, hotel.slug, qrCode);
-      // Backend returns flat AuthProfile fields + stay_id
+      // Backend returns flat AuthProfile fields + stay_id (guest) or no stay_id (staff)
       const { stay_id, ...profile } = res;
       verifiedUserRef.current = profile;
-      setStayId(stay_id);
-      setAuthState(profile, {
-        id: stay_id,
-        hotel: hotel.id,
-        room_number: "",
-        is_active: true,
-        created_at: new Date().toISOString(),
-        expires_at: "",
-      });
-      setStep("room");
+
+      if (stay_id) {
+        // Guest flow — ask for room number
+        setStayId(stay_id);
+        setAuthState(profile, {
+          id: stay_id,
+          hotel: hotel.id,
+          room_number: "",
+          is_active: true,
+          created_at: new Date().toISOString(),
+          expires_at: "",
+        });
+        setStep("room");
+      } else {
+        // Staff user or no stay — skip room step, redirect
+        setAuthState(profile, null);
+        router.push(nextUrl);
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid code");
       setCode("");
     } finally {
       setLoading(false);
     }
-  }, [code, fullPhone, hotel.slug, hotel.id, qrCode, setAuthState]);
+  }, [code, fullPhone, hotel.slug, hotel.id, qrCode, setAuthState, router, nextUrl]);
 
   const handleSubmitRoom = useCallback(async () => {
     if (!roomNumber.trim() || !stayId || !verifiedUserRef.current) return;

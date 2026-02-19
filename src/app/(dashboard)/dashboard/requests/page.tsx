@@ -72,6 +72,14 @@ const STATUS_LABEL: Record<string, string> = {
   EXPIRED: "Expired",
 };
 
+const ACTION_LABEL: Record<string, string> = {
+  ACKNOWLEDGED: "Acknowledge",
+  CONFIRMED: "Confirm",
+  NOT_AVAILABLE: "Mark Unavailable",
+  NO_SHOW: "Mark No-Show",
+  ALREADY_BOOKED_OFFLINE: "Mark Booked Offline",
+};
+
 type FilterStatus = "ALL" | "OPEN" | RequestStatus;
 
 export default function RequestsPage() {
@@ -315,7 +323,7 @@ function RequestRow({
                 ) : (
                   <StatusIcon status={t} />
                 )}
-                <span className="ml-1">{STATUS_LABEL[t]}</span>
+                <span className="ml-1">{ACTION_LABEL[t] ?? STATUS_LABEL[t]}</span>
               </Button>
             ))}
           </div>

@@ -7,6 +7,7 @@ import type {
   GuestStay,
   Hotel,
   RequestType,
+  ServiceRequestListItem,
 } from "./concierge-types";
 
 const API = getClientApiUrl();
@@ -121,8 +122,8 @@ export async function sendGuestOTP(
   return json<SendOTPResponse>(res);
 }
 
-/** Backend returns flat AuthProfile fields + stay_id at the top level */
-type VerifyOTPResponse = AuthProfile & { stay_id: number };
+/** Backend returns flat AuthProfile fields + stay_id (guest) or no stay_id (staff) */
+type VerifyOTPResponse = AuthProfile & { stay_id?: number };
 
 export async function verifyGuestOTP(
   phone: string,
@@ -155,7 +156,7 @@ export async function updateGuestRoom(
   stayId: number,
   roomNumber: string,
 ): Promise<GuestStay> {
-  const res = await authFetch(
+  const res = await guestMutationFetch(
     url(`/hotels/${hotelSlug}/stays/${stayId}/`),
     {
       method: "PATCH",
@@ -163,6 +164,23 @@ export async function updateGuestRoom(
     },
   );
   return json<GuestStay>(res);
+}
+
+// ----- Auth-guarded fetch with 403 interception -----
+
+/**
+ * Wraps authFetch for guest mutation endpoints (hotel-scoped).
+ * On 403, dispatches a custom event so GuestContext can redirect to verify.
+ */
+async function guestMutationFetch(
+  input: string,
+  init?: RequestInit,
+): Promise<Response> {
+  const res = await authFetch(input, init);
+  if (res.status === 403 && typeof window !== "undefined") {
+    window.dispatchEvent(new CustomEvent("guest:session-expired"));
+  }
+  return res;
 }
 
 // ----- Guest actions (auth required) -----
@@ -183,11 +201,22 @@ export async function submitGuestRequest(
   hotelSlug: string,
   data: GuestRequestPayload,
 ): Promise<{ id: number; public_id: string }> {
-  const res = await authFetch(url(`/hotels/${hotelSlug}/requests/`), {
+  const res = await guestMutationFetch(url(`/hotels/${hotelSlug}/requests/`), {
     method: "POST",
     body: JSON.stringify(data),
   });
   return json<{ id: number; public_id: string }>(res);
+}
+
+export async function getMyRequests(hotelSlug: string): Promise<ServiceRequestListItem[]> {
+  try {
+    const res = await authFetch(url(`/me/requests/?hotel=${encodeURIComponent(hotelSlug)}`));
+    if (!res.ok) return [];
+    const data: PaginatedResponse<ServiceRequestListItem> = await res.json();
+    return data.results;
+  } catch {
+    return [];
+  }
 }
 
 export async function getGuestProfile(): Promise<AuthProfile | null> {
