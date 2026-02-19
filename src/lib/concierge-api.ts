@@ -101,6 +101,27 @@ export async function getRequests(
   return page.results;
 }
 
+export async function getRequestsPaginated(
+  hotelSlug: string,
+  params?: URLSearchParams,
+  signal?: AbortSignal,
+): Promise<{
+  results: ServiceRequestListItem[];
+  count: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}> {
+  const qs = params ? `?${params.toString()}` : "";
+  const res = await authFetch(url(`/hotels/${hotelSlug}/requests/list/${qs}`), { signal });
+  const page = await json<PaginatedResponse<ServiceRequestListItem>>(res);
+  return {
+    results: page.results,
+    count: page.count,
+    hasNext: page.next !== null,
+    hasPrev: page.previous !== null,
+  };
+}
+
 export async function getRequest(
   hotelSlug: string,
   id: number,

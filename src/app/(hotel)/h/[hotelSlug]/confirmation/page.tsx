@@ -111,7 +111,7 @@ export default function ConfirmationPage() {
         {/* CTAs */}
         <div className="w-full max-w-sm space-y-3">
           <Link
-            href={`/h/${hotel.slug}`}
+            href={`/h/${hotel.slug}/requests`}
             className="block w-full py-3 rounded-full text-sm font-semibold text-center transition-opacity active:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2"
             style={{
               backgroundColor: "var(--brand-accent)",
@@ -120,7 +120,7 @@ export default function ConfirmationPage() {
               lineHeight: "44px",
             }}
           >
-            Browse More Experiences
+            View My Requests
           </Link>
           <Link
             href={`/h/${hotel.slug}`}
@@ -129,7 +129,7 @@ export default function ConfirmationPage() {
               color: "color-mix(in oklch, var(--brand-primary) 50%, transparent)",
             }}
           >
-            Continue Browsing
+            Browse More Experiences
           </Link>
         </div>
         </div>

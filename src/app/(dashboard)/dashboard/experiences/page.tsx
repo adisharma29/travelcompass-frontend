@@ -10,8 +10,6 @@ import {
 } from "@/lib/concierge-api";
 import type { Department, Experience } from "@/lib/concierge-types";
 import type { DragHandleProps, MoveActions } from "@/components/dashboard/SortableList";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,15 +19,18 @@ import {
   Plus,
   Loader2,
   AlertCircle,
+  AlertTriangle,
   Pencil,
   Trash2,
   GripVertical,
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { SortableList } from "@/components/dashboard/SortableList";
 import { HtmlContent } from "@/components/dashboard/HtmlContent";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
+import { toast } from "sonner";
 
 export default function ExperiencesPage() {
   const { activeHotelSlug } = useAuth();
@@ -63,9 +64,11 @@ export default function ExperiencesPage() {
   const handleReorder = useCallback(
     async (dept: Department, reordered: Experience[]) => {
       if (!activeHotelSlug) return;
+      // Stamp new display_order so the .sort() in render preserves the new order
+      const withOrder = reordered.map((exp, i) => ({ ...exp, display_order: i }));
       setDepartments((prev) =>
         prev.map((d) =>
-          d.id === dept.id ? { ...d, experiences: reordered } : d,
+          d.id === dept.id ? { ...d, experiences: withOrder } : d,
         ),
       );
       try {
@@ -85,11 +88,7 @@ export default function ExperiencesPage() {
 
   return (
     <div className="flex flex-col">
-      <header className="flex h-14 items-center gap-2 border-b px-4">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-4" />
-        <h1 className="text-lg font-semibold">Experiences</h1>
-      </header>
+      <DashboardHeader title="Experiences" />
 
       <div className="flex-1 p-4 md:p-6 max-w-4xl">
         {error && (
@@ -193,6 +192,10 @@ function ExpCard({
     try {
       await deleteExperience(hotelSlug, dept.slug, exp.id);
       onDeleted();
+    } catch (err) {
+      toast.error("Delete failed", {
+        description: err instanceof Error ? err.message : "Could not delete experience",
+      });
     } finally {
       setDeleting(false);
     }
@@ -273,6 +276,18 @@ function ExpCard({
               <span>{exp.gallery_images.length} gallery images</span>
             )}
           </div>
+          {exp.status === "PUBLISHED" && (!exp.photo || !exp.description || !exp.price_display) && (
+            <div className="flex items-center gap-1 mt-1 text-xs text-amber-600">
+              <AlertTriangle className="size-3" />
+              <span>
+                Missing: {[
+                  !exp.photo && "photo",
+                  !exp.description && "description",
+                  !exp.price_display && "price",
+                ].filter(Boolean).join(", ")}
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <Button variant="ghost" size="icon" className="size-8" asChild>

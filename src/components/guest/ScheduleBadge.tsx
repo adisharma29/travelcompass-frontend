@@ -16,7 +16,9 @@ export function ScheduleBadge({
     <span
       className={`inline-flex items-center gap-1.5 text-xs font-medium ${compact ? "" : "px-2 py-0.5 rounded-full"}`}
       style={{
-        color: isOpen ? "var(--brand-accent)" : "color-mix(in oklch, var(--brand-primary) 50%, transparent)",
+        color: isOpen
+          ? compact ? "var(--brand-accent)" : "var(--brand-accent)"
+          : compact ? "rgba(255,255,255,0.7)" : "color-mix(in oklch, var(--brand-primary) 50%, transparent)",
         backgroundColor: compact
           ? "transparent"
           : isOpen
@@ -26,7 +28,11 @@ export function ScheduleBadge({
     >
       <span
         className="size-1.5 rounded-full"
-        style={{ backgroundColor: isOpen ? "var(--brand-accent)" : "color-mix(in oklch, var(--brand-primary) 40%, transparent)" }}
+        style={{
+          backgroundColor: isOpen
+            ? "var(--brand-accent)"
+            : compact ? "rgba(255,255,255,0.5)" : "color-mix(in oklch, var(--brand-primary) 40%, transparent)",
+        }}
       />
       {label}
     </span>

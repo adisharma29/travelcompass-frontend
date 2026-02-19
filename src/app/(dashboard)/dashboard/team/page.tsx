@@ -49,6 +49,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { UserPlus, Loader2, AlertCircle } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
+import { toast } from "sonner";
 
 const ROLE_VARIANT: Record<string, "default" | "secondary" | "outline"> = {
   SUPERADMIN: "default",
@@ -211,6 +212,10 @@ function MemberRow({
     try {
       await updateMember(hotelSlug, member.id, { role });
       onUpdated();
+    } catch (err) {
+      toast.error("Role change failed", {
+        description: err instanceof Error ? err.message : "Could not update role",
+      });
     } finally {
       setUpdating(false);
     }
@@ -224,6 +229,10 @@ function MemberRow({
       setShowDeptPicker(false);
       setPendingStaffDept(null);
       onUpdated();
+    } catch (err) {
+      toast.error("Role change failed", {
+        description: err instanceof Error ? err.message : "Could not update role",
+      });
     } finally {
       setUpdating(false);
     }
@@ -234,6 +243,10 @@ function MemberRow({
     try {
       await updateMember(hotelSlug, member.id, { is_active: !member.is_active });
       onUpdated();
+    } catch (err) {
+      toast.error("Update failed", {
+        description: err instanceof Error ? err.message : "Could not update member",
+      });
     } finally {
       setUpdating(false);
     }
@@ -400,6 +413,10 @@ function MemberCard({
     try {
       await updateMember(hotelSlug, member.id, { role });
       onUpdated();
+    } catch (err) {
+      toast.error("Role change failed", {
+        description: err instanceof Error ? err.message : "Could not update role",
+      });
     } finally {
       setUpdating(false);
     }
@@ -413,6 +430,10 @@ function MemberCard({
       setShowDeptPicker(false);
       setPendingStaffDept(null);
       onUpdated();
+    } catch (err) {
+      toast.error("Role change failed", {
+        description: err instanceof Error ? err.message : "Could not update role",
+      });
     } finally {
       setUpdating(false);
     }
@@ -423,6 +444,10 @@ function MemberCard({
     try {
       await updateMember(hotelSlug, member.id, { is_active: !member.is_active });
       onUpdated();
+    } catch (err) {
+      toast.error("Update failed", {
+        description: err instanceof Error ? err.message : "Could not update member",
+      });
     } finally {
       setUpdating(false);
     }

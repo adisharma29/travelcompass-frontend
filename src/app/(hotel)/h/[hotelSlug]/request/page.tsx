@@ -51,11 +51,12 @@ export default function RequestPage() {
 
   // Fetch experience and/or department
   useEffect(() => {
+    let cancelled = false;
     (async () => {
       if (expSlug && deptSlug) {
         try {
           const exp = await getPublicExperience(hotel.slug, deptSlug, expSlug);
-          setExperience(exp);
+          if (!cancelled) setExperience(exp);
         } catch {
           // Experience not found — continue without it
         }
@@ -63,12 +64,13 @@ export default function RequestPage() {
       if (deptSlug) {
         try {
           const dept = await getPublicDepartment(hotel.slug, deptSlug);
-          setDepartmentId(dept.id);
+          if (!cancelled) setDepartmentId(dept.id);
         } catch {
           // Department not found — submit will show error
         }
       }
     })();
+    return () => { cancelled = true; };
   }, [expSlug, deptSlug, hotel.slug]);
 
   // Today's date for min attribute

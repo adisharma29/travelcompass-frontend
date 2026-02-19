@@ -40,6 +40,12 @@ export async function generateMetadata({
       description: hotel.tagline || hotel.description,
       images: hotel.og_image ? [{ url: hotel.og_image }] : undefined,
     },
+    twitter: {
+      card: hotel.og_image ? "summary_large_image" : "summary",
+      title: hotel.name,
+      description: hotel.tagline || hotel.description,
+      images: hotel.og_image ? [hotel.og_image] : undefined,
+    },
     other: {
       "theme-color": hotel.primary_color,
     },

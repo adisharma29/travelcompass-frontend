@@ -124,7 +124,7 @@ export function NotificationBell() {
 
     if (notification.request_public_id) {
       setOpen(false);
-      router.push("/dashboard/requests");
+      router.push(`/dashboard/requests/${notification.request_public_id}`);
     }
   }
 

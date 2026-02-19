@@ -181,16 +181,58 @@
 - [x] `InstallPrompt` component — `beforeinstallprompt` listener, branded bottom-sheet CTA, localStorage dismissal
 - [x] Backend: `generate_vapid_keys` command outputs base64url applicationServerKey format
 - [x] Backend: `PushSubscriptionCreate` endpoint-based upsert with user row locking for concurrency safety
-- [x] Build passes with no errors
+- [x] Backend: push subscription JSON validation (endpoint, keys.p256dh, keys.auth)
+- [x] Backend: `_ExperienceNestedSerializer` with status field for admin department view
+- [x] Backend: `reminder_sent_at` dedup field on ServiceRequest — prevents duplicate reminder notifications
+- [x] Backend: disable `check-escalations` and `response-due-reminder` celery beat tasks (dev)
+- [x] Backend: OTP verify returns `stay_room_number` + `stay_expires_at` for returning guest UX
+- [x] Backend: decouple `NEXT_PUBLIC_VAPID_PUBLIC_KEY` from `VAPID_PUBLIC_KEY` in docker-compose
+- [x] Guest requests: top 3 on landing page with "View all (N)" link using real API count
+- [x] Guest requests: paginated `/h/[hotelSlug]/requests` page with prev/next from API `next`/`previous`
+- [x] Guest requests: `RequestCard` extracted to shared component (`components/guest/RequestCard.tsx`)
+- [x] Guest requests: `getMyRequestsPaginated()` returns `hasNext`/`hasPrev` (no hardcoded page size)
+- [x] Guest requests: 403 session-expiry detection in `getMyRequests` + `getMyRequestsPaginated`
+- [x] Fix: returning guests skip room step when stay already has room number
+- [x] Fix: synthetic stay `expires_at` uses real backend value (not empty string) — `isVerified` now correct
+- [x] Fix: notification unread tab removes items on click (filter, not toggle)
+- [x] Fix: unhandled rejection on per-item mark-read (`.catch` added)
+- [x] Fix: VAPID key rotation detection — `keysMatch()` compares applicationServerKey, resubscribes on mismatch
+- [x] Fix: OTP login state race — `flushSync` before `router.push`
+- [x] Fix: dead Install button after browser prompt dismissed
+- [x] Fix: experience status "Unpublished" on dashboard — wrong serializer for nested experiences
+- [x] Build + lint pass with no errors
 
-## Phase 6: Polish
-- [ ] Request detail page with activity timeline
-- [ ] Request status update flow (valid transitions only)
-- [ ] EscalationHealth indicator + degraded banner (SUPERADMIN)
-- [ ] Mobile responsive dashboard
-- [ ] Error handling, loading states, empty states
-- [ ] CSP headers for guest route group — allow Google Fonts CDN
-- [ ] OG tag / social sharing validation per hotel
+## Phase 6: Polish (see PHASE6_POLISH.md)
+
+### P0 — Critical fixes
+- [x] Add toast.error catches to silent action handlers (requests, departments, qr-codes, team, experiences pages)
+- [x] Add mobile card view for requests table (responsive `md:hidden` / `hidden md:block`)
+- [x] Add error state + Alert to dashboard home page
+- [x] Add defensive `.catch()` to guest requests fetch (requests-client.tsx)
+- [x] Fix SSE toast description (was "Room ..." → now "Request ...")
+- [x] Replace experiences page inline header with DashboardHeader
+
+### P1 — Key features
+- [x] Request detail page (`/dashboard/requests/[publicId]`) — full detail view, staff notes editor, enum-based confirmation reason dialog, add note, take ownership, activity timeline, SSE refresh
+- [x] Backend: `assigned_to_name` SerializerMethodField on ServiceRequestDetailSerializer
+- [x] NotificationBell + SSE toast deep-link to specific request detail page
+- [x] Service worker: remove URL normalization regex that blocked detail page navigation
+- [x] Request list: server-side pagination with `getRequestsPaginated()` (hasNext/hasPrev from DRF)
+- [x] Request list: click-to-navigate to detail page (desktop table rows + mobile cards)
+- [x] Dashboard home: recent requests link to detail page
+
+### P2 — Polish & robustness
+- [x] Error boundaries: `(dashboard)/error.tsx`, `(dashboard)/not-found.tsx`, `(hotel)/error.tsx`, `(hotel)/not-found.tsx`
+- [x] Confirmation page: primary CTA changed to "View My Requests" → `/h/[hotelSlug]/requests`
+- [x] GuestContext: brand-colored loading spinner instead of `null` flash
+- [x] Guest landing: defensive `.catch(() => {})` on getMyRequests
+- [x] Settings page: `useUnsavedChanges(dirty)` guard + ConfirmDialog
+- [x] DnD keyboard accessibility: already implemented (SortableList has KeyboardSensor)
+- [x] Content completeness indicators: amber warnings on published departments/experiences missing photo, description, etc.
+- [x] CSP: `Content-Security-Policy-Report-Only` header for guest routes (`/h/*`) in next.config.ts
+- [x] Twitter card metadata in hotel layout (`generateMetadata`)
+- [x] Request form: cancellation guard on experience/department fetch effect
+- [x] Build passes with no errors
 
 ---
 

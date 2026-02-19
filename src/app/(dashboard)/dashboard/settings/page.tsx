@@ -30,6 +30,8 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ImageUploadArea } from "@/components/dashboard/ImageUploadArea";
 import { FontCombobox } from "@/components/dashboard/FontCombobox";
 import { BrandPreview } from "@/components/dashboard/BrandPreview";
+import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
+import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 
 const FALLBACK_CHANNELS = [
   { value: "NONE", label: "None" },
@@ -140,6 +142,8 @@ export default function SettingsPage() {
   const dirty =
     (form && settings && JSON.stringify(form) !== JSON.stringify(settings)) ||
     hasFileChanges;
+
+  const { confirmDialogProps } = useUnsavedChanges(!!dirty);
 
   if (!activeHotelSlug) return null;
 
@@ -577,6 +581,7 @@ export default function SettingsPage() {
           </>
         ) : null}
       </div>
+      <ConfirmDialog {...confirmDialogProps} />
     </div>
   );
 }

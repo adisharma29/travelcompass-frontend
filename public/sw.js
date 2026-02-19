@@ -29,12 +29,6 @@ self.addEventListener("notificationclick", function (event) {
     ? event.notification.data.url
     : "/dashboard";
 
-  // Normalize /dashboard/requests/<uuid> → /dashboard/requests
-  // until Phase 6 adds a dedicated detail route
-  if (/^\/dashboard\/requests\/[0-9a-f-]+$/i.test(targetUrl)) {
-    targetUrl = "/dashboard/requests";
-  }
-
   event.waitUntil(
     self.clients
       .matchAll({ type: "window", includeUncontrolled: true })

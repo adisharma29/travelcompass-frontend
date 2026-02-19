@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 import {
-  getRequests,
+  getRequestsPaginated,
   acknowledgeRequest,
   updateRequest,
 } from "@/lib/concierge-api";
@@ -12,7 +13,7 @@ import type {
   ServiceRequestListItem,
   RequestStatus,
 } from "@/lib/concierge-types";
-import { VALID_TRANSITIONS, TERMINAL_STATUSES } from "@/lib/concierge-types";
+import { VALID_TRANSITIONS } from "@/lib/concierge-types";
 import {
   Card,
   CardContent,
@@ -45,11 +46,14 @@ import {
   Wifi,
   WifiOff,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   Clock,
   XCircle,
   Eye,
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
+import { toast } from "sonner";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   CREATED: "destructive",
@@ -81,63 +85,100 @@ const ACTION_LABEL: Record<string, string> = {
 
 type FilterStatus = "ALL" | "OPEN" | RequestStatus;
 
+// Non-terminal statuses to send as ?status= params for the "OPEN" filter
+const OPEN_STATUSES: RequestStatus[] = ["CREATED", "ACKNOWLEDGED"];
+
 export default function RequestsPage() {
+  const router = useRouter();
   const { activeHotelSlug } = useAuth();
   const [requests, setRequests] = useState<ServiceRequestListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<FilterStatus>("OPEN");
+  const [page, setPage] = useState(1);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrev, setHasPrev] = useState(false);
+  const [totalCount, setTotalCount] = useState(0);
+
+  // Build server-side query params from filter + page
+  function buildParams(pageNum: number, statusFilter: FilterStatus): URLSearchParams {
+    const params = new URLSearchParams();
+    params.set("page", String(pageNum));
+    if (statusFilter === "OPEN") {
+      for (const s of OPEN_STATUSES) params.append("status", s);
+    } else if (statusFilter !== "ALL") {
+      params.set("status", statusFilter);
+    }
+    return params;
+  }
+
   const slugRef = useRef(activeHotelSlug);
   slugRef.current = activeHotelSlug;
 
-  const fetchData = useCallback(async () => {
+  // Monotonic fetch ID — only the latest fetch's response applies state.
+  // Protects against both effect-triggered and SSE-triggered stale responses.
+  const fetchIdRef = useRef(0);
+
+  const fetchData = useCallback(async (
+    pageNum: number,
+    statusFilter: FilterStatus,
+    signal?: AbortSignal,
+  ) => {
     const slug = slugRef.current;
     if (!slug) return;
+    const id = ++fetchIdRef.current;
     setLoading(true);
     setError(null);
     try {
-      const r = await getRequests(
-        slug,
-        new URLSearchParams({ limit: "100" }),
-      );
-      if (slugRef.current !== slug) return;
-      setRequests(r);
+      const r = await getRequestsPaginated(slug, buildParams(pageNum, statusFilter), signal);
+      if (fetchIdRef.current !== id) return;
+      setRequests(r.results);
+      setTotalCount(r.count);
+      setHasNext(r.hasNext);
+      setHasPrev(r.hasPrev);
     } catch {
-      if (slugRef.current !== slug) return;
+      if (fetchIdRef.current !== id) return;
       setError("Failed to load requests");
     } finally {
-      if (slugRef.current === slug) setLoading(false);
+      if (fetchIdRef.current === id) setLoading(false);
     }
   }, []);
 
+  // Re-fetch when hotel, filter, or page changes.
+  // AbortController cancels the network request; fetchId guards state writes.
   useEffect(() => {
-    fetchData();
-  }, [activeHotelSlug, fetchData]);
+    const controller = new AbortController();
+    fetchData(page, filter, controller.signal);
+    return () => controller.abort();
+  }, [activeHotelSlug, page, filter, fetchData]);
 
-  // Live updates via centralized SSE
+  // Reset page to 1 when hotel or filter changes
+  const prevSlugRef = useRef(activeHotelSlug);
+  const prevFilterRef = useRef(filter);
+  useEffect(() => {
+    if (prevSlugRef.current !== activeHotelSlug || prevFilterRef.current !== filter) {
+      prevSlugRef.current = activeHotelSlug;
+      prevFilterRef.current = filter;
+      setPage(1);
+    }
+  }, [activeHotelSlug, filter]);
+
+  // Live updates via centralized SSE — fetchId guard covers these too
   const { connected } = useSSE();
-  useSSERefetch(fetchData);
-
-  const filtered = requests.filter((r) => {
-    if (filter === "ALL") return true;
-    if (filter === "OPEN") return !TERMINAL_STATUSES.includes(r.status);
-    return r.status === filter;
-  });
-
-  const openCount = requests.filter(
-    (r) => !TERMINAL_STATUSES.includes(r.status),
-  ).length;
+  useSSERefetch(() => fetchData(page, filter));
 
   if (!activeHotelSlug) return null;
+
+  const filterLabel =
+    filter === "ALL"
+      ? "All Requests"
+      : filter === "OPEN"
+        ? "Open Requests"
+        : STATUS_LABEL[filter] ?? filter;
 
   return (
     <div className="flex flex-col">
       <DashboardHeader title="Requests">
-        {openCount > 0 && (
-          <Badge variant="destructive">
-            {openCount}
-          </Badge>
-        )}
         <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           {connected ? (
             <>
@@ -159,8 +200,8 @@ export default function RequestsPage() {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="OPEN">Open ({openCount})</SelectItem>
-            <SelectItem value="ALL">All ({requests.length})</SelectItem>
+            <SelectItem value="OPEN">Open</SelectItem>
+            <SelectItem value="ALL">All</SelectItem>
             <SelectItem value="CREATED">New</SelectItem>
             <SelectItem value="ACKNOWLEDGED">Acknowledged</SelectItem>
             <SelectItem value="CONFIRMED">Confirmed</SelectItem>
@@ -183,11 +224,7 @@ export default function RequestsPage() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {filter === "ALL"
-                ? `All Requests (${filtered.length})`
-                : filter === "OPEN"
-                  ? `Open Requests (${filtered.length})`
-                  : `${STATUS_LABEL[filter]} (${filtered.length})`}
+              {filterLabel} ({totalCount})
             </CardTitle>
             <CardDescription>Guest service requests</CardDescription>
           </CardHeader>
@@ -198,33 +235,77 @@ export default function RequestsPage() {
                   <Skeleton key={i} className="h-14 w-full" />
                 ))}
               </div>
-            ) : filtered.length === 0 ? (
+            ) : requests.length === 0 ? (
               <p className="py-12 text-center text-sm text-muted-foreground">
                 No requests found
               </p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="w-[100px]">ID</TableHead>
-                    <TableHead>Guest</TableHead>
-                    <TableHead>Department</TableHead>
-                    <TableHead>Date / Time</TableHead>
-                    <TableHead>Status</TableHead>
-                    <TableHead className="w-[200px]">Actions</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {filtered.map((req) => (
-                    <RequestRow
+              <>
+                {/* Mobile card view */}
+                <div className="md:hidden space-y-3">
+                  {requests.map((req) => (
+                    <MobileRequestCard
                       key={req.id}
                       req={req}
                       hotelSlug={activeHotelSlug}
-                      onUpdated={fetchData}
+                      onUpdated={() => fetchData(page, filter)}
+                      onNavigate={() => router.push(`/dashboard/requests/${req.public_id}`)}
                     />
                   ))}
-                </TableBody>
-              </Table>
+                </div>
+                {/* Desktop table */}
+                <div className="hidden md:block">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[100px]">ID</TableHead>
+                        <TableHead>Guest</TableHead>
+                        <TableHead>Department</TableHead>
+                        <TableHead>Date / Time</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="w-[200px]">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {requests.map((req) => (
+                        <RequestRow
+                          key={req.id}
+                          req={req}
+                          hotelSlug={activeHotelSlug}
+                          onUpdated={() => fetchData(page, filter)}
+                          onNavigate={() => router.push(`/dashboard/requests/${req.public_id}`)}
+                        />
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </>
+            )}
+            {/* Pagination */}
+            {(hasPrev || hasNext) && !loading && (
+              <div className="flex items-center justify-between pt-4 border-t mt-4">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(page - 1)}
+                  disabled={!hasPrev}
+                >
+                  <ChevronLeft className="size-4 mr-1" />
+                  Previous
+                </Button>
+                <span className="text-xs text-muted-foreground">
+                  Page {page} · {totalCount} total
+                </span>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage(page + 1)}
+                  disabled={!hasNext}
+                >
+                  Next
+                  <ChevronRight className="size-4 ml-1" />
+                </Button>
+              </div>
             )}
           </CardContent>
         </Card>
@@ -237,13 +318,14 @@ function RequestRow({
   req,
   hotelSlug,
   onUpdated,
+  onNavigate,
 }: {
   req: ServiceRequestListItem;
   hotelSlug: string;
   onUpdated: () => void;
+  onNavigate: () => void;
 }) {
   const [updating, setUpdating] = useState(false);
-  const [expanded, setExpanded] = useState(false);
   const transitions = VALID_TRANSITIONS[req.status] ?? [];
 
   async function handleAction(status: RequestStatus) {
@@ -255,6 +337,10 @@ function RequestRow({
         await updateRequest(hotelSlug, req.id, { status });
       }
       onUpdated();
+    } catch (err) {
+      toast.error("Action failed", {
+        description: err instanceof Error ? err.message : "Could not update request",
+      });
     } finally {
       setUpdating(false);
     }
@@ -264,7 +350,7 @@ function RequestRow({
     <>
       <TableRow
         className="cursor-pointer"
-        onClick={() => setExpanded(!expanded)}
+        onClick={onNavigate}
       >
         <TableCell className="font-mono text-xs">
           {req.public_id}
@@ -321,51 +407,89 @@ function RequestRow({
           </div>
         </TableCell>
       </TableRow>
-      {expanded && (
-        <TableRow>
-          <TableCell colSpan={6} className="bg-muted/30">
-            <div className="grid gap-3 py-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
-              <div>
-                <span className="text-xs font-medium text-muted-foreground">
-                  Type
-                </span>
-                <div>{req.request_type}</div>
-              </div>
-              <div>
-                <span className="text-xs font-medium text-muted-foreground">
-                  Guests
-                </span>
-                <div>{req.guest_count ?? "—"}</div>
-              </div>
-              <div>
-                <span className="text-xs font-medium text-muted-foreground">
-                  Created
-                </span>
-                <div>{formatDateTime(req.created_at)}</div>
-              </div>
-              <div>
-                <span className="text-xs font-medium text-muted-foreground">
-                  Due By
-                </span>
-                <div>
-                  {req.response_due_at
-                    ? formatDateTime(req.response_due_at)
-                    : "—"}
-                </div>
-              </div>
-              {req.guest_notes && (
-                <div className="sm:col-span-2 lg:col-span-4">
-                  <span className="text-xs font-medium text-muted-foreground">
-                    Guest Notes
-                  </span>
-                  <div className="whitespace-pre-wrap">{req.guest_notes}</div>
-                </div>
-              )}
-            </div>
-          </TableCell>
-        </TableRow>
-      )}
     </>
+  );
+}
+
+function MobileRequestCard({
+  req,
+  hotelSlug,
+  onUpdated,
+  onNavigate,
+}: {
+  req: ServiceRequestListItem;
+  hotelSlug: string;
+  onUpdated: () => void;
+  onNavigate: () => void;
+}) {
+  const [updating, setUpdating] = useState(false);
+  const transitions = VALID_TRANSITIONS[req.status] ?? [];
+
+  async function handleAction(status: RequestStatus) {
+    setUpdating(true);
+    try {
+      if (status === "ACKNOWLEDGED") {
+        await acknowledgeRequest(hotelSlug, req.id);
+      } else {
+        await updateRequest(hotelSlug, req.id, { status });
+      }
+      onUpdated();
+    } catch (err) {
+      toast.error("Action failed", {
+        description: err instanceof Error ? err.message : "Could not update request",
+      });
+    } finally {
+      setUpdating(false);
+    }
+  }
+
+  return (
+    <div className="rounded-lg border p-3 space-y-2 cursor-pointer" onClick={onNavigate}>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <div className="font-medium text-sm truncate">
+            {req.department_name}
+            {req.experience_name && (
+              <span className="text-muted-foreground font-normal"> — {req.experience_name}</span>
+            )}
+          </div>
+          <div className="text-xs text-muted-foreground mt-0.5">
+            {req.guest_name}
+            {req.room_number && ` · Room ${req.room_number}`}
+          </div>
+        </div>
+        <Badge variant={STATUS_VARIANT[req.status] ?? "outline"} className="shrink-0">
+          {STATUS_LABEL[req.status] ?? req.status}
+        </Badge>
+      </div>
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <span>{formatDateTime(req.created_at)}</span>
+        {req.after_hours && (
+          <Badge variant="outline" className="text-[10px]">After Hours</Badge>
+        )}
+      </div>
+      {transitions.length > 0 && (
+        <div className="flex items-center gap-1 flex-wrap pt-1 border-t" onClick={(e) => e.stopPropagation()}>
+          {transitions.map((t) => (
+            <Button
+              key={t}
+              variant={t === "CONFIRMED" ? "default" : "outline"}
+              size="sm"
+              className="text-xs h-7"
+              disabled={updating}
+              onClick={() => handleAction(t)}
+            >
+              {updating ? (
+                <Loader2 className="size-3 animate-spin" />
+              ) : (
+                <StatusIcon status={t} />
+              )}
+              <span className="ml-1">{ACTION_LABEL[t] ?? STATUS_LABEL[t]}</span>
+            </Button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 }
 

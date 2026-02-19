@@ -18,6 +18,7 @@ import {
   Plus,
   Loader2,
   AlertCircle,
+  AlertTriangle,
   Pencil,
   Trash2,
   GripVertical,
@@ -28,6 +29,7 @@ import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { SortableList, type DragHandleProps, type MoveActions } from "@/components/dashboard/SortableList";
 import { HtmlContent } from "@/components/dashboard/HtmlContent";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
+import { toast } from "sonner";
 
 export default function DepartmentsPage() {
   const { activeHotelSlug } = useAuth();
@@ -148,6 +150,10 @@ function DeptCard({
     try {
       await deleteDepartment(hotelSlug, dept.slug);
       onDeleted();
+    } catch (err) {
+      toast.error("Delete failed", {
+        description: err instanceof Error ? err.message : "Could not delete department",
+      });
     } finally {
       setDeleting(false);
     }
@@ -227,6 +233,18 @@ function DeptCard({
             <span>{dept.experiences.length} experiences</span>
             <span>{scheduleStr}</span>
           </div>
+          {dept.status === "PUBLISHED" && (!dept.photo || !dept.description || dept.experiences.length === 0) && (
+            <div className="flex items-center gap-1 mt-1 text-xs text-amber-600">
+              <AlertTriangle className="size-3" />
+              <span>
+                Missing: {[
+                  !dept.photo && "photo",
+                  !dept.description && "description",
+                  dept.experiences.length === 0 && "experiences",
+                ].filter(Boolean).join(", ")}
+              </span>
+            </div>
+          )}
         </div>
         <div className="flex items-center gap-1 shrink-0">
           <Button variant="ghost" size="icon" className="size-8" asChild>

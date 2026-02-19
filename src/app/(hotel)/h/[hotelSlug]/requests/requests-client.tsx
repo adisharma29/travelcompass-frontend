@@ -31,6 +31,8 @@ export function RequestsClient({ hotel }: { hotel: Hotel }) {
       setHasNext(data.hasNext);
       setHasPrev(data.hasPrev);
       setLoading(false);
+    }).catch(() => {
+      if (!stale) setLoading(false);
     });
     return () => { stale = true; };
   }, [isAuthenticated, hotel.slug, page]);

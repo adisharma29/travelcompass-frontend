@@ -34,11 +34,11 @@ export function SSEProvider({ children }: { children: ReactNode }) {
     // 3. Show toast
     if (event.event === "request.created") {
       toast.info("New request received", {
-        description: `Room ${event.public_id.slice(0, 8)}…`,
+        description: `Request ${event.public_id.slice(0, 8)}…`,
         action: {
           label: "View",
           onClick: () => {
-            window.location.href = "/dashboard/requests";
+            window.location.href = `/dashboard/requests/${event.public_id}`;
           },
         },
       });

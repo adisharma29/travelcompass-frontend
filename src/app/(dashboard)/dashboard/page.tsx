@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback, useRef } from "react";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getDashboardStats, getRequests } from "@/lib/concierge-api";
 import { useSSE, useSSERefetch } from "@/context/SSEContext";
@@ -17,6 +18,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import {
   Inbox,
   Clock,
@@ -24,6 +26,7 @@ import {
   TrendingUp,
   Wifi,
   WifiOff,
+  AlertCircle,
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { SetupChecklist } from "@/components/dashboard/SetupChecklist";
@@ -43,6 +46,7 @@ export default function DashboardHomePage() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [requests, setRequests] = useState<ServiceRequestListItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Track current hotel so SSE refetches can detect staleness
   const activeSlugRef = useRef(activeHotelSlug);
@@ -56,6 +60,7 @@ export default function DashboardHomePage() {
     setStats(null);
     setRequests([]);
     setLoading(true);
+    setError(null);
 
     (async () => {
       try {
@@ -69,6 +74,7 @@ export default function DashboardHomePage() {
         if (controller.signal.aborted) return;
         setStats(null);
         setRequests([]);
+        setError("Failed to load dashboard data");
       } finally {
         if (!controller.signal.aborted) setLoading(false);
       }
@@ -126,6 +132,13 @@ export default function DashboardHomePage() {
       </DashboardHeader>
 
       <div className="flex-1 space-y-6 p-4 md:p-6">
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="size-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         {/* Stats cards */}
         {loading ? (
           <StatsSkeletons />
@@ -216,9 +229,10 @@ export default function DashboardHomePage() {
             ) : (
               <div className="space-y-2">
                 {requests.map((req) => (
-                  <div
+                  <Link
                     key={req.id}
-                    className="flex items-center gap-3 rounded-lg border p-3"
+                    href={`/dashboard/requests/${req.public_id}`}
+                    className="flex items-center gap-3 rounded-lg border p-3 transition-colors hover:bg-muted/50"
                   >
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
@@ -241,7 +255,7 @@ export default function DashboardHomePage() {
                     <time className="text-xs text-muted-foreground whitespace-nowrap">
                       {formatRelative(req.created_at)}
                     </time>
-                  </div>
+                  </Link>
                 ))}
               </div>
             )}

@@ -230,6 +230,8 @@ export interface ServiceRequest extends ServiceRequestListItem {
   department: Department;
   staff_notes: string;
   confirmation_reason: string | null;
+  assigned_to_name: string | null;
+  assigned_to_id: number | null;
   activities: RequestActivity[];
 }
 

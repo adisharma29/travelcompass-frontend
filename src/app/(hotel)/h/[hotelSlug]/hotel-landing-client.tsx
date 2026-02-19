@@ -41,7 +41,7 @@ export function HotelLandingClient({
     getMyRequests(hotel.slug).then(({ results, count }) => {
       setRequests(results);
       setRequestCount(count);
-    });
+    }).catch(() => {});
   }, [isAuthenticated, hotel.slug]);
 
   const guestDisplayName =

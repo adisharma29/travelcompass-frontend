@@ -49,6 +49,7 @@ import {
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
+import { toast } from "sonner";
 
 const PLACEMENTS = [
   "LOBBY",
@@ -170,6 +171,10 @@ function QRCard({
     try {
       await deleteQRCode(hotelSlug, qr.id);
       onDeleted();
+    } catch (err) {
+      toast.error("Delete failed", {
+        description: err instanceof Error ? err.message : "Could not delete QR code",
+      });
     } finally {
       setDeleting(false);
     }

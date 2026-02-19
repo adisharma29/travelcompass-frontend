@@ -137,7 +137,20 @@ export function GuestProvider({
   }, [hotel.slug]);
 
   if (loading) {
-    return null; // Layout skeleton handles loading state
+    return (
+      <div className="min-h-dvh flex flex-col">
+        <div
+          className="h-14"
+          style={{ backgroundColor: "var(--brand-primary)" }}
+        />
+        <div className="flex-1 flex items-center justify-center">
+          <div
+            className="size-6 rounded-full border-2 border-t-transparent animate-spin"
+            style={{ borderColor: "var(--brand-accent, #888) transparent var(--brand-accent, #888) var(--brand-accent, #888)" }}
+          />
+        </div>
+      </div>
+    );
   }
 
   return (
