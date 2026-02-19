@@ -148,7 +148,7 @@ export async function addRequestNote(
     url(`/hotels/${hotelSlug}/requests/${id}/notes/`),
     {
       method: "POST",
-      body: JSON.stringify({ content: note }),
+      body: JSON.stringify({ note }),
     },
   );
   if (!res.ok) throw new ApiError(res.status, await res.text());
@@ -350,7 +350,7 @@ export async function getMembers(
 
 export async function inviteMember(
   hotelSlug: string,
-  data: { email?: string; role: string; department?: number; phone?: string },
+  data: { email?: string; role: string; department?: number; phone?: string; first_name?: string; last_name?: string },
 ): Promise<HotelMembership> {
   const res = await authFetch(url(`/hotels/${hotelSlug}/admin/members/`), {
     method: "POST",

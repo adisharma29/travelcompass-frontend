@@ -2,6 +2,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Buttons should always show pointer cursor */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+}
+
 /* ========================================
    BRAND TOKENS (marketing/guest pages)
    ======================================== */
@@ -222,6 +230,29 @@ h4,
 h5,
 h6 {
   font-family: var(--font-serif);
+}
+
+/*
+ * Guest (hotel) pages use per-hotel brand fonts injected via CSS custom
+ * properties.  Override the site-wide font rules so they don't bleed
+ * into the guest route group.
+ */
+[data-guest-fonts] {
+  font-family: var(--brand-body-font, sans-serif);
+}
+[data-guest-fonts] h1,
+[data-guest-fonts] h2,
+[data-guest-fonts] h3,
+[data-guest-fonts] h4,
+[data-guest-fonts] h5,
+[data-guest-fonts] h6 {
+  font-family: var(--brand-heading-font, serif);
+}
+[data-guest-fonts] button,
+[data-guest-fonts] input,
+[data-guest-fonts] select,
+[data-guest-fonts] textarea {
+  font-family: inherit;
 }
 
 /* shadcn base: default border color on all elements */

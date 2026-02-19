@@ -1,11 +1,14 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { isLocalFont } from "@/lib/inject-brand-theme";
 
 /**
  * Dynamically loads Google Fonts for the hotel's configured heading
  * and body fonts. Injects <link> tags into <head> and cleans up on
  * unmount or when fonts change.
+ *
+ * Fonts that are already loaded locally (Brinnan, BioRhyme) are skipped.
  */
 export function BrandFontLoader({
   headingFont,
@@ -24,8 +27,8 @@ export function BrandFontLoader({
     linksRef.current = [];
 
     const fonts = [headingFont, bodyFont].filter(Boolean);
-    // Deduplicate in case both are the same font
-    const unique = [...new Set(fonts)];
+    // Deduplicate, then skip fonts that are already loaded locally
+    const unique = [...new Set(fonts)].filter((f) => !isLocalFont(f));
 
     for (const font of unique) {
       const family = font.replace(/ /g, "+");

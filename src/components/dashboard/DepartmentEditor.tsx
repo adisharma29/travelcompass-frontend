@@ -44,7 +44,6 @@ const DEFAULT_SCHEDULE: DepartmentSchedule = {
 interface DeptFormData {
   name: string;
   description: string;
-  icon: string;
   is_ops: boolean;
   status: ContentStatus;
   schedule: DepartmentSchedule;
@@ -53,7 +52,6 @@ interface DeptFormData {
 const EMPTY_FORM: DeptFormData = {
   name: "",
   description: "",
-  icon: "",
   is_ops: false,
   status: "DRAFT",
   schedule: DEFAULT_SCHEDULE,
@@ -76,6 +74,9 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
   const [error, setError] = useState<string | null>(null);
   const [photo, setPhoto] = useState<File | null>(null);
   const [existingPhotoUrl, setExistingPhotoUrl] = useState<string | null>(null);
+  const [icon, setIcon] = useState<File | null>(null);
+  const [existingIconUrl, setExistingIconUrl] = useState<string | null>(null);
+  const [iconCleared, setIconCleared] = useState(false);
   const [serverData, setServerData] = useState<DeptFormData | null>(null);
 
   const draftKey = `dept:${activeHotelSlug}:${deptSlug || "new"}`;
@@ -93,19 +94,20 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
   const isDirty = useMemo(() => {
     if (!serverData && !isEdit) {
       // Create mode: dirty if any field has content
-      return form.name.trim() !== "" || form.description.trim() !== "" || photo !== null;
+      return form.name.trim() !== "" || form.description.trim() !== "" || photo !== null || icon !== null;
     }
     if (!serverData) return false;
     return (
       form.name !== serverData.name ||
       form.description !== serverData.description ||
-      form.icon !== serverData.icon ||
       form.is_ops !== serverData.is_ops ||
       form.status !== serverData.status ||
       JSON.stringify(form.schedule) !== JSON.stringify(serverData.schedule) ||
-      photo !== null
+      photo !== null ||
+      icon !== null ||
+      iconCleared
     );
-  }, [form, serverData, photo, isEdit]);
+  }, [form, serverData, photo, icon, iconCleared, isEdit]);
 
   const { guardNavigation, confirmDialogProps } = useUnsavedChanges(isDirty);
 
@@ -123,13 +125,13 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
         const data: DeptFormData = {
           name: dept.name,
           description: dept.description,
-          icon: dept.icon ?? "",
           is_ops: dept.is_ops,
           status: dept.status,
           schedule: dept.schedule ?? DEFAULT_SCHEDULE,
         };
         setServerData(data);
         setExistingPhotoUrl(dept.photo);
+        setExistingIconUrl(dept.icon || null);
         // Only set form if no draft to restore
         if (!hasDraft) {
           setForm(data);
@@ -152,11 +154,12 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
     const fd = new FormData();
     fd.append("name", form.name);
     fd.append("description", form.description);
-    fd.append("icon", form.icon);
     fd.append("is_ops", form.is_ops ? "true" : "false");
     fd.append("status", form.status);
     fd.append("schedule", JSON.stringify(form.schedule));
     if (photo) fd.append("photo", photo);
+    if (icon) fd.append("icon", icon);
+    else if (iconCleared) fd.append("icon_clear", "true");
     return fd;
   }
 
@@ -188,6 +191,8 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
   function handleDiscardDraft() {
     discardDraft();
     setPhoto(null);
+    setIcon(null);
+    setIconCleared(false);
     if (serverData) {
       setForm(serverData);
     }
@@ -265,12 +270,15 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="dept-icon">Icon</Label>
-              <Input
-                id="dept-icon"
-                value={form.icon}
-                onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                placeholder="e.g. utensils, spa"
+              <Label>Icon</Label>
+              <ImageUploadArea
+                value={icon}
+                existingUrl={iconCleared ? null : existingIconUrl}
+                onChange={(file) => {
+                  setIcon(file);
+                  if (!file && existingIconUrl) setIconCleared(true);
+                  if (file) setIconCleared(false);
+                }}
               />
             </div>
             <div className="space-y-2">

@@ -588,6 +588,8 @@ function InviteDialog({
       await inviteMember(hotelSlug, {
         ...(form.email ? { email: form.email } : {}),
         ...(form.phone ? { phone: form.phone } : {}),
+        ...(form.first_name ? { first_name: form.first_name } : {}),
+        ...(form.last_name ? { last_name: form.last_name } : {}),
         role: form.role,
         ...(form.role === "STAFF" && form.department
           ? { department: form.department }
