@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import { flushSync } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { useGuest } from "@/context/GuestContext";
@@ -72,11 +73,25 @@ export default function VerifyPage() {
     try {
       const res = await verifyGuestOTP(fullPhone, cleanCode, hotel.slug, qrCode);
       // Backend returns flat AuthProfile fields + stay_id (guest) or no stay_id (staff)
-      const { stay_id, ...profile } = res;
+      const { stay_id, stay_room_number, stay_expires_at, ...profile } = res;
       verifiedUserRef.current = profile;
+      const expiresAt = stay_expires_at || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString();
 
-      if (stay_id) {
-        // Guest flow — ask for room number
+      if (stay_id && stay_room_number) {
+        // Returning guest with room already set — skip room step
+        flushSync(() =>
+          setAuthState(profile, {
+            id: stay_id,
+            hotel: hotel.id,
+            room_number: stay_room_number,
+            is_active: true,
+            created_at: new Date().toISOString(),
+            expires_at: expiresAt,
+          }),
+        );
+        router.push(nextUrl);
+      } else if (stay_id) {
+        // New guest — ask for room number
         setStayId(stay_id);
         setAuthState(profile, {
           id: stay_id,
@@ -84,12 +99,12 @@ export default function VerifyPage() {
           room_number: "",
           is_active: true,
           created_at: new Date().toISOString(),
-          expires_at: "",
+          expires_at: expiresAt,
         });
         setStep("room");
       } else {
         // Staff user or no stay — skip room step, redirect
-        setAuthState(profile, null);
+        flushSync(() => setAuthState(profile, null));
         router.push(nextUrl);
       }
     } catch (err) {
@@ -106,7 +121,7 @@ export default function VerifyPage() {
     setLoading(true);
     try {
       const stay = await updateGuestRoom(hotel.slug, stayId, roomNumber.trim());
-      setAuthState(verifiedUserRef.current, stay);
+      flushSync(() => setAuthState(verifiedUserRef.current, stay));
       router.push(nextUrl);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Invalid room number");

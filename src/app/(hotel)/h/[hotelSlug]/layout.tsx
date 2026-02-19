@@ -34,6 +34,7 @@ export async function generateMetadata({
     },
     description: hotel.tagline || hotel.description || `Welcome to ${hotel.name}`,
     icons: hotel.favicon ? { icon: hotel.favicon } : undefined,
+    manifest: `/h/${hotelSlug}/manifest.json`,
     openGraph: {
       title: hotel.name,
       description: hotel.tagline || hotel.description,

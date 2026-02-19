@@ -403,9 +403,19 @@ export async function deleteQRCode(
 
 // ----- Notifications -----
 
-export async function getNotifications(): Promise<Notification[]> {
-  const res = await authFetch(url("/me/notifications/"));
-  return json<Notification[]>(res);
+export async function getNotifications(
+  filter?: "unread" | "all",
+): Promise<{ results: Notification[]; count: number }> {
+  const qs = filter === "unread" ? "?is_read=false" : "";
+  const res = await authFetch(url(`/me/notifications/${qs}`));
+  const data = await json<PaginatedResponse<Notification>>(res);
+  return { results: data.results, count: data.count };
+}
+
+export async function getUnreadNotificationCount(): Promise<number> {
+  const res = await authFetch(url("/me/notifications/?is_read=false"));
+  const data = await json<PaginatedResponse<Notification>>(res);
+  return data.count;
 }
 
 export async function markNotificationsRead(
@@ -416,6 +426,27 @@ export async function markNotificationsRead(
     body: JSON.stringify({ ids }),
   });
   if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+// ----- Push Subscriptions -----
+
+export async function subscribePush(
+  subscriptionInfo: PushSubscriptionJSON,
+): Promise<{ id: number }> {
+  const res = await authFetch(url("/me/push-subscriptions/"), {
+    method: "POST",
+    body: JSON.stringify({ subscription_info: subscriptionInfo }),
+  });
+  return json<{ id: number }>(res);
+}
+
+export async function unsubscribeAllPush(): Promise<void> {
+  const res = await authFetch(url("/me/push-subscriptions/all/"), {
+    method: "DELETE",
+  });
+  if (!res.ok && res.status !== 204) {
+    throw new ApiError(res.status, await res.text());
+  }
 }
 
 // ----- Guest stays (staff view) -----

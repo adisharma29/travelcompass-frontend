@@ -9,8 +9,6 @@ import {
   reorderDepartments,
 } from "@/lib/concierge-api";
 import type { Department } from "@/lib/concierge-types";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -26,6 +24,7 @@ import {
   ChevronUp,
   ChevronDown,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { SortableList, type DragHandleProps, type MoveActions } from "@/components/dashboard/SortableList";
 import { HtmlContent } from "@/components/dashboard/HtmlContent";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
@@ -79,18 +78,13 @@ export default function DepartmentsPage() {
 
   return (
     <div className="flex flex-col">
-      <header className="flex h-14 items-center gap-2 border-b px-4">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-4" />
-        <h1 className="text-lg font-semibold">Departments</h1>
-        <div className="ml-auto">
-          <Button size="sm" asChild>
-            <Link href="/dashboard/departments/new">
-              <Plus className="size-4 mr-1.5" /> New Department
-            </Link>
-          </Button>
-        </div>
-      </header>
+      <DashboardHeader title="Departments">
+        <Button size="sm" asChild>
+          <Link href="/dashboard/departments/new">
+            <Plus className="size-4 mr-1.5" /> New Department
+          </Link>
+        </Button>
+      </DashboardHeader>
 
       <div className="flex-1 p-4 md:p-6 max-w-4xl">
         {error && (

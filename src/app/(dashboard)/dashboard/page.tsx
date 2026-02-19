@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getDashboardStats, getRequests } from "@/lib/concierge-api";
-import { useRequestStream } from "@/hooks/use-request-stream";
+import { useSSE, useSSERefetch } from "@/context/SSEContext";
 import type {
   DashboardStats,
   ServiceRequestListItem,
@@ -17,8 +17,6 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import {
   Inbox,
   Clock,
@@ -27,6 +25,7 @@ import {
   Wifi,
   WifiOff,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { SetupChecklist } from "@/components/dashboard/SetupChecklist";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -95,17 +94,8 @@ export default function DashboardHomePage() {
     }
   }, [activeHotelSlug]);
 
-  const handleSSE = useCallback(
-    () => {
-      refetch();
-    },
-    [refetch],
-  );
-
-  const { connected } = useRequestStream({
-    hotelSlug: activeHotelSlug,
-    onEvent: handleSSE,
-  });
+  const { connected } = useSSE();
+  useSSERefetch(refetch);
 
   if (!activeHotelSlug) {
     return (
@@ -119,12 +109,8 @@ export default function DashboardHomePage() {
 
   return (
     <div className="flex flex-col">
-      {/* Header */}
-      <header className="flex h-14 items-center gap-2 border-b px-4">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-4" />
-        <h1 className="text-lg font-semibold">Dashboard</h1>
-        <div className="ml-auto flex items-center gap-1.5 text-xs text-muted-foreground">
+      <DashboardHeader title="Dashboard">
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
           {connected ? (
             <>
               <Wifi className="size-3.5 text-green-500" />
@@ -137,7 +123,7 @@ export default function DashboardHomePage() {
             </>
           )}
         </div>
-      </header>
+      </DashboardHeader>
 
       <div className="flex-1 space-y-6 p-4 md:p-6">
         {/* Stats cards */}

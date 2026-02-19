@@ -7,14 +7,12 @@ import {
   acknowledgeRequest,
   updateRequest,
 } from "@/lib/concierge-api";
-import { useRequestStream } from "@/hooks/use-request-stream";
+import { useSSE, useSSERefetch } from "@/context/SSEContext";
 import type {
   ServiceRequestListItem,
   RequestStatus,
 } from "@/lib/concierge-types";
 import { VALID_TRANSITIONS, TERMINAL_STATUSES } from "@/lib/concierge-types";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import {
   Card,
   CardContent,
@@ -51,6 +49,7 @@ import {
   XCircle,
   Eye,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 
 const STATUS_VARIANT: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
   CREATED: "destructive",
@@ -115,11 +114,9 @@ export default function RequestsPage() {
     fetchData();
   }, [activeHotelSlug, fetchData]);
 
-  // Live updates
-  const { connected } = useRequestStream({
-    hotelSlug: activeHotelSlug,
-    onEvent: fetchData,
-  });
+  // Live updates via centralized SSE
+  const { connected } = useSSE();
+  useSSERefetch(fetchData);
 
   const filtered = requests.filter((r) => {
     if (filter === "ALL") return true;
@@ -135,50 +132,45 @@ export default function RequestsPage() {
 
   return (
     <div className="flex flex-col">
-      <header className="flex h-14 items-center gap-2 border-b px-4">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-4" />
-        <h1 className="text-lg font-semibold">Requests</h1>
+      <DashboardHeader title="Requests">
         {openCount > 0 && (
-          <Badge variant="destructive" className="ml-1">
+          <Badge variant="destructive">
             {openCount}
           </Badge>
         )}
-        <div className="ml-auto flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-            {connected ? (
-              <>
-                <Wifi className="size-3.5 text-green-500" />
-                Live
-              </>
-            ) : (
-              <>
-                <WifiOff className="size-3.5" />
-                Connecting...
-              </>
-            )}
-          </div>
-          <Select
-            value={filter}
-            onValueChange={(v) => setFilter(v as FilterStatus)}
-          >
-            <SelectTrigger className="w-[160px] h-8 text-xs">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="OPEN">Open ({openCount})</SelectItem>
-              <SelectItem value="ALL">All ({requests.length})</SelectItem>
-              <SelectItem value="CREATED">New</SelectItem>
-              <SelectItem value="ACKNOWLEDGED">Acknowledged</SelectItem>
-              <SelectItem value="CONFIRMED">Confirmed</SelectItem>
-              <SelectItem value="NOT_AVAILABLE">Not Available</SelectItem>
-              <SelectItem value="NO_SHOW">No Show</SelectItem>
-              <SelectItem value="ALREADY_BOOKED_OFFLINE">Booked Offline</SelectItem>
-              <SelectItem value="EXPIRED">Expired</SelectItem>
-            </SelectContent>
-          </Select>
+        <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+          {connected ? (
+            <>
+              <Wifi className="size-3.5 text-green-500" />
+              Live
+            </>
+          ) : (
+            <>
+              <WifiOff className="size-3.5" />
+              Connecting...
+            </>
+          )}
         </div>
-      </header>
+        <Select
+          value={filter}
+          onValueChange={(v) => setFilter(v as FilterStatus)}
+        >
+          <SelectTrigger className="w-[160px] h-8 text-xs">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="OPEN">Open ({openCount})</SelectItem>
+            <SelectItem value="ALL">All ({requests.length})</SelectItem>
+            <SelectItem value="CREATED">New</SelectItem>
+            <SelectItem value="ACKNOWLEDGED">Acknowledged</SelectItem>
+            <SelectItem value="CONFIRMED">Confirmed</SelectItem>
+            <SelectItem value="NOT_AVAILABLE">Not Available</SelectItem>
+            <SelectItem value="NO_SHOW">No Show</SelectItem>
+            <SelectItem value="ALREADY_BOOKED_OFFLINE">Booked Offline</SelectItem>
+            <SelectItem value="EXPIRED">Expired</SelectItem>
+          </SelectContent>
+        </Select>
+      </DashboardHeader>
 
       <div className="flex-1 p-4 md:p-6">
         {error && (

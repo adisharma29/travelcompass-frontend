@@ -9,8 +9,6 @@ import {
   deleteQRCode,
 } from "@/lib/concierge-api";
 import type { QRCode, Department } from "@/lib/concierge-types";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import {
   Card,
   CardContent,
@@ -49,6 +47,7 @@ import {
   ExternalLink,
   Users,
 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
 
 const PLACEMENTS = [
@@ -101,18 +100,13 @@ export default function QRCodesPage() {
 
   return (
     <div className="flex flex-col">
-      <header className="flex h-14 items-center gap-2 border-b px-4">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-4" />
-        <h1 className="text-lg font-semibold">QR Codes</h1>
-        <div className="ml-auto">
-          <CreateQRDialog
-            hotelSlug={activeHotelSlug}
-            departments={departments}
-            onCreated={fetchData}
-          />
-        </div>
-      </header>
+      <DashboardHeader title="QR Codes">
+        <CreateQRDialog
+          hotelSlug={activeHotelSlug}
+          departments={departments}
+          onCreated={fetchData}
+        />
+      </DashboardHeader>
 
       <div className="flex-1 p-4 md:p-6">
         {error && (

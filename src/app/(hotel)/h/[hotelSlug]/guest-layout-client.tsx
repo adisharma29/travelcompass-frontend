@@ -6,6 +6,8 @@ import type { Hotel } from "@/lib/concierge-types";
 import { GuestProvider } from "@/context/GuestContext";
 import { BrandFontLoader } from "@/components/guest/BrandFontLoader";
 import { WhatsAppFAB } from "@/components/guest/WhatsAppFAB";
+import { ServiceWorkerRegistration } from "@/components/shared/ServiceWorkerRegistration";
+import { InstallPrompt } from "@/components/guest/InstallPrompt";
 
 export function GuestLayoutClient({
   hotel,
@@ -31,6 +33,8 @@ export function GuestLayoutClient({
         >
           {children}
           <WhatsAppFAB />
+          <InstallPrompt />
+          <ServiceWorkerRegistration />
         </div>
       </GuestProvider>
     </Suspense>

@@ -14,7 +14,7 @@ export function OTPInput({
   disabled?: boolean;
 }) {
   const inputsRef = useRef<(HTMLInputElement | null)[]>([]);
-  const digits = value.padEnd(DIGIT_COUNT, "").split("").slice(0, DIGIT_COUNT);
+  const digits = value.split("").concat(Array(DIGIT_COUNT).fill("")).slice(0, DIGIT_COUNT);
 
   const focusInput = useCallback((idx: number) => {
     const clamped = Math.max(0, Math.min(idx, DIGIT_COUNT - 1));
@@ -95,9 +95,9 @@ export function OTPInput({
           style={{
             borderColor: digit
               ? "var(--brand-accent)"
-              : "color-mix(in oklch, var(--brand-primary) 15%, transparent)",
+              : "color-mix(in oklch, var(--brand-primary) 30%, transparent)",
             color: "var(--brand-primary)",
-            backgroundColor: "color-mix(in oklch, var(--brand-primary) 3%, transparent)",
+            backgroundColor: "color-mix(in oklch, var(--brand-primary) 5%, transparent)",
           }}
           onFocus={(e) => e.target.select()}
           onInput={(e) => {

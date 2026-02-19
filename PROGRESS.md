@@ -160,12 +160,28 @@
 - [x] Frontend: request history still visible to expired guests (gates on `isAuthenticated`, not `isVerified`)
 - [x] Backend + frontend builds pass
 
-## Phase 5: Notifications + PWA
-- [ ] PWA manifest — dynamic per-hotel theme_color/background_color from brand colors
-- [ ] Service worker (`public/sw.js`) — push only, no offline cache
-- [ ] `lib/push.ts` — push subscription helper
-- [ ] Push subscription flow (subscribe on login, unregister before logout)
-- [ ] NotificationBell component + dropdown
+## Phase 5: Notifications + PWA (see PHASE5_NOTIFICATIONS_PWA.md)
+- [x] VAPID key generation + env vars (`NEXT_PUBLIC_VAPID_PUBLIC_KEY`) in `.env.local` and `.dev.vars`
+- [x] Push subscription API functions (`subscribePush`, `unsubscribeAllPush`) in `concierge-api.ts`
+- [x] Fix `getNotifications()` to unwrap `PaginatedResponse<Notification>` → `.results`
+- [x] Service worker (`public/sw.js`) — push-only (no cache), notificationclick with URL normalization
+- [x] Push helper (`lib/push.ts`) — `isPushSupported`, `registerPush`, `unregisterPush`, `getPermissionState`
+- [x] Centralized SSE context (`context/SSEContext.tsx`) — single `useRequestStream`, custom event dispatch, Sonner toasts
+- [x] `DashboardHeader` component with shared page header + NotificationBell
+- [x] `NotificationBell` component — bell icon, unread badge, popover dropdown, 30s poll + SSE refresh, mark all read
+- [x] `PushPermissionBanner` — one-time opt-in banner with localStorage dismissal
+- [x] `ServiceWorkerRegistration` shared component — mounted in both dashboard and guest layouts
+- [x] Auth context push lifecycle — auto-register on bootstrap if permission granted, unregister before logout
+- [x] Dashboard layout — Toaster, SW registration, manifest metadata
+- [x] `DashboardShell` — SSEProvider wrapper, PushPermissionBanner
+- [x] All 6 dashboard pages updated: replace inline headers with `DashboardHeader`, swap `useRequestStream` with `useSSE()`/`useSSERefetch()`
+- [x] Static PWA manifest (`public/manifest.json`) for dashboard
+- [x] Dynamic PWA manifest route (`/h/[hotelSlug]/manifest.json/route.ts`) with hotel brand colors + favicon
+- [x] Guest hotel layout — manifest link in `generateMetadata`
+- [x] `InstallPrompt` component — `beforeinstallprompt` listener, branded bottom-sheet CTA, localStorage dismissal
+- [x] Backend: `generate_vapid_keys` command outputs base64url applicationServerKey format
+- [x] Backend: `PushSubscriptionCreate` endpoint-based upsert with user row locking for concurrency safety
+- [x] Build passes with no errors
 
 ## Phase 6: Polish
 - [ ] Request detail page with activity timeline

@@ -14,6 +14,7 @@ import {
   fetchProfile,
   logout as apiLogout,
 } from "@/lib/auth";
+import { registerPush, unregisterPush, isPushSupported } from "@/lib/push";
 import type {
   AuthProfile,
   HotelMembership,
@@ -131,6 +132,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     })();
   }, [applyProfile, clearAndRedirect]);
 
+  // Auto-register push if permission was previously granted
+  useEffect(() => {
+    if (!state.user || state.loading) return;
+    if (isPushSupported() && Notification.permission === "granted") {
+      registerPush();
+    }
+  }, [state.user, state.loading]);
+
   const setActiveHotel = useCallback(
     (slug: string) => {
       const exists = state.memberships.find((m) => m.hotel.slug === slug);
@@ -142,6 +151,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const logout = useCallback(async () => {
+    try { await unregisterPush(); } catch { /* non-critical */ }
     try { await apiLogout(); } catch { /* clear locally regardless */ }
     clearAndRedirect();
   }, [clearAndRedirect]);

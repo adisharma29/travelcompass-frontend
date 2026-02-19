@@ -3,7 +3,9 @@
 import { type ReactNode, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
+import { SSEProvider } from "@/context/SSEContext";
 import { DashboardSidebar } from "./DashboardSidebar";
+import { PushPermissionBanner } from "./PushPermissionBanner";
 import {
   SidebarProvider,
   SidebarInset,
@@ -37,8 +39,13 @@ export function DashboardShell({ children }: { children: ReactNode }) {
 
   return (
     <SidebarProvider>
-      <DashboardSidebar />
-      <SidebarInset>{children}</SidebarInset>
+      <SSEProvider>
+        <DashboardSidebar />
+        <SidebarInset>
+          <PushPermissionBanner />
+          {children}
+        </SidebarInset>
+      </SSEProvider>
     </SidebarProvider>
   );
 }

@@ -9,8 +9,6 @@ import {
   updateMember,
 } from "@/lib/concierge-api";
 import type { HotelMembership, Department, Role } from "@/lib/concierge-types";
-import { SidebarTrigger } from "@/components/ui/sidebar";
-import { Separator } from "@/components/ui/separator";
 import {
   Card,
   CardContent,
@@ -49,6 +47,7 @@ import {
 } from "@/components/ui/table";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { UserPlus, Loader2, AlertCircle } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
 
 const ROLE_VARIANT: Record<string, "default" | "secondary" | "outline"> = {
@@ -95,20 +94,15 @@ export default function TeamPage() {
 
   return (
     <div className="flex flex-col">
-      <header className="flex h-14 items-center gap-2 border-b px-4">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-4" />
-        <h1 className="text-lg font-semibold">Team</h1>
-        <div className="ml-auto">
-          {myRole === "SUPERADMIN" && (
-            <InviteDialog
-              hotelSlug={activeHotelSlug}
-              departments={departments}
-              onInvited={fetchData}
-            />
-          )}
-        </div>
-      </header>
+      <DashboardHeader title="Team">
+        {myRole === "SUPERADMIN" && (
+          <InviteDialog
+            hotelSlug={activeHotelSlug}
+            departments={departments}
+            onInvited={fetchData}
+          />
+        )}
+      </DashboardHeader>
 
       <div className="flex-1 p-4 md:p-6 max-w-5xl">
         {error && (

@@ -4,7 +4,6 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getHotelSettings, updateHotelSettings } from "@/lib/concierge-api";
 import type { HotelSettings } from "@/lib/concierge-types";
-import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import {
   Card,
@@ -27,6 +26,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Save, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ImageUploadArea } from "@/components/dashboard/ImageUploadArea";
 import { FontCombobox } from "@/components/dashboard/FontCombobox";
 import { BrandPreview } from "@/components/dashboard/BrandPreview";
@@ -145,22 +145,17 @@ export default function SettingsPage() {
 
   return (
     <div className="flex flex-col">
-      <header className="flex h-14 items-center gap-2 border-b px-4">
-        <SidebarTrigger />
-        <Separator orientation="vertical" className="h-4" />
-        <h1 className="text-lg font-semibold">Settings</h1>
-        <div className="ml-auto flex items-center gap-2">
-          {success && (
-            <span className="flex items-center gap-1 text-xs text-green-600">
-              <CheckCircle2 className="size-3.5" /> Saved
-            </span>
-          )}
-          <Button size="sm" disabled={!dirty || saving} onClick={handleSave}>
-            {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
-            <span className="ml-1.5">Save</span>
-          </Button>
-        </div>
-      </header>
+      <DashboardHeader title="Settings">
+        {success && (
+          <span className="flex items-center gap-1 text-xs text-green-600">
+            <CheckCircle2 className="size-3.5" /> Saved
+          </span>
+        )}
+        <Button size="sm" disabled={!dirty || saving} onClick={handleSave}>
+          {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
+          <span className="ml-1.5">Save</span>
+        </Button>
+      </DashboardHeader>
 
       <div className="flex-1 space-y-6 p-4 md:p-6 max-w-3xl">
         {error && (

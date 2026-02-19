@@ -123,7 +123,7 @@ export async function sendGuestOTP(
 }
 
 /** Backend returns flat AuthProfile fields + stay_id (guest) or no stay_id (staff) */
-type VerifyOTPResponse = AuthProfile & { stay_id?: number };
+type VerifyOTPResponse = AuthProfile & { stay_id?: number; stay_room_number?: string; stay_expires_at?: string };
 
 export async function verifyGuestOTP(
   phone: string,
@@ -208,14 +208,48 @@ export async function submitGuestRequest(
   return json<{ id: number; public_id: string }>(res);
 }
 
-export async function getMyRequests(hotelSlug: string): Promise<ServiceRequestListItem[]> {
+export async function getMyRequests(
+  hotelSlug: string,
+): Promise<{ results: ServiceRequestListItem[]; count: number }> {
   try {
     const res = await authFetch(url(`/me/requests/?hotel=${encodeURIComponent(hotelSlug)}`));
-    if (!res.ok) return [];
+    if (res.status === 403 && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("guest:session-expired"));
+    }
+    if (!res.ok) return { results: [], count: 0 };
     const data: PaginatedResponse<ServiceRequestListItem> = await res.json();
-    return data.results;
+    return { results: data.results, count: data.count };
   } catch {
-    return [];
+    return { results: [], count: 0 };
+  }
+}
+
+export async function getMyRequestsPaginated(
+  hotelSlug: string,
+  page: number = 1,
+): Promise<{
+  results: ServiceRequestListItem[];
+  count: number;
+  hasNext: boolean;
+  hasPrev: boolean;
+}> {
+  try {
+    const res = await authFetch(
+      url(`/me/requests/?hotel=${encodeURIComponent(hotelSlug)}&page=${page}`),
+    );
+    if (res.status === 403 && typeof window !== "undefined") {
+      window.dispatchEvent(new CustomEvent("guest:session-expired"));
+    }
+    if (!res.ok) return { results: [], count: 0, hasNext: false, hasPrev: false };
+    const data: PaginatedResponse<ServiceRequestListItem> = await res.json();
+    return {
+      results: data.results,
+      count: data.count,
+      hasNext: data.next !== null,
+      hasPrev: data.previous !== null,
+    };
+  } catch {
+    return { results: [], count: 0, hasNext: false, hasPrev: false };
   }
 }
 

@@ -1059,11 +1059,15 @@ src/app/
 │       ├── page.tsx              # Hotel landing page (departments grid). Reads `?qr=` param from URL, stores in state, threads through OTP flow to `verifyOTP()`.
 │       ├── layout.tsx            # Hotel context provider + guest auth check + BrandFontLoader + injectBrandTheme + generateMetadata (per-hotel title, favicon, OG image)
 │       ├── [deptSlug]/
-│       │   └── page.tsx          # Department detail + experience list
+│       │   ├── page.tsx          # Department detail + experience list
+│       │   └── [expId]/
+│       │       └── page.tsx      # Experience detail + gallery + sticky booking bar
 │       ├── verify/
 │       │   └── page.tsx          # Guest OTP flow (phone → code → room number)
-│       └── request/
-│           └── page.tsx          # Request form (modal or page for deep-link)
+│       ├── request/
+│       │   └── page.tsx          # Full-page request form (pre-filled from query params)
+│       └── confirmation/
+│           └── page.tsx          # Post-submission acknowledgement + SLA info
 ├── (dashboard)/
 │   └── dashboard/
 │       ├── layout.tsx            # Auth guard + sidebar + notification bell
@@ -1561,8 +1565,8 @@ Everything else is **new files** — no modifications to existing guides, locati
 34. Department detail + experience list — brand colors/fonts.
 35. Guest OTP verification page (`/h/{hotelSlug}/verify/`) — phone input → OTP code → room number (3-step flow)
 36. Create `guest-auth.ts` (sendOTP, verifyOTP(phone, code, hotelSlug, qrCode?), updateRoom — backend sets httpOnly JWT cookies). `qrCode` threaded from URL `?qr=` param through verify call.
-37. Request form modal (guest_name pre-filled for returning guests, date/time/guests/notes)
-38. Request submission flow (auth check → form → submit → immediate acknowledgement card with SLA)
+37. Request form page (`/h/{slug}/request?dept=X&exp=Y`) — full-page form with pre-filled department/experience, guest_name from profile, `request_type` auto-set (BOOKING/INQUIRY/CUSTOM), date/time/guests/notes. Native mobile inputs.
+38. Request submission + confirmation flow (auth check → full-page form → submit → `/h/{slug}/confirmation` acknowledgement page with SLA + after-hours notice)
 39. Guest footer component — `footer_text`, social icons (Instagram/Facebook/Twitter/WhatsApp), `terms_url`/`privacy_url` links.
 
 #### Phase 3→4 integration tasks (rich text + gallery + status + preview + branding):
