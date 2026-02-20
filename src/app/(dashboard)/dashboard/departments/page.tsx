@@ -108,7 +108,7 @@ export default function DepartmentsPage() {
             <p className="text-xs mt-1">Create one to get started</p>
           </div>
         ) : (
-          <div className="space-y-3">
+          <div className="space-y-4 md:space-y-3">
             <SortableList
               items={departments}
               onReorder={handleReorder}
@@ -172,35 +172,106 @@ function DeptCard({
     );
 
   return (
-    <Card className={dept.status !== "PUBLISHED" ? "opacity-60" : ""}>
-      <CardContent className="flex items-center gap-4 p-4">
-        <div className="flex flex-col items-center gap-0.5 shrink-0">
-          <button
-            type="button"
-            ref={dragHandle.ref}
-            className="cursor-grab touch-none text-muted-foreground hover:text-foreground hidden md:block"
-            {...dragHandle.listeners}
-            {...dragHandle.attributes}
-          >
-            <GripVertical className="size-4" />
-          </button>
-          <button
-            type="button"
-            className="md:hidden text-muted-foreground hover:text-foreground disabled:opacity-30"
-            disabled={!moveActions.onMoveUp}
-            onClick={moveActions.onMoveUp ?? undefined}
-          >
-            <ChevronUp className="size-4" />
-          </button>
-          <button
-            type="button"
-            className="md:hidden text-muted-foreground hover:text-foreground disabled:opacity-30"
-            disabled={!moveActions.onMoveDown}
-            onClick={moveActions.onMoveDown ?? undefined}
-          >
-            <ChevronDown className="size-4" />
-          </button>
-        </div>
+    <Card className={`overflow-hidden py-0 md:py-6 ${dept.status !== "PUBLISHED" ? "opacity-60" : ""}`}>
+      {/* ===== Mobile layout ===== */}
+      <div className="md:hidden">
+        {/* Photo banner */}
+        {dept.photo ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={dept.photo}
+            alt={dept.name}
+            className="h-36 w-full object-cover"
+          />
+        ) : (
+          <div className="flex h-28 items-center justify-center bg-muted text-3xl text-muted-foreground">
+            {dept.icon || dept.name.charAt(0)}
+          </div>
+        )}
+        <CardContent className="p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-1.5">
+                <h3 className="font-semibold">{dept.name}</h3>
+                {statusBadge}
+                {dept.is_ops && <Badge variant="secondary">Ops</Badge>}
+              </div>
+              {dept.description ? (
+                <HtmlContent
+                  html={dept.description}
+                  className="mt-1 text-sm text-muted-foreground line-clamp-2 [&_*]:!m-0 [&_*]:!p-0"
+                />
+              ) : (
+                <p className="mt-1 text-sm text-muted-foreground">No description</p>
+              )}
+            </div>
+            <div className="flex items-center gap-0.5 shrink-0">
+              <Button variant="ghost" size="icon" className="size-8" asChild>
+                <Link href={`/dashboard/departments/${dept.slug}/edit`}>
+                  <Pencil className="size-4" />
+                </Link>
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={deleting}
+                className="text-destructive hover:text-destructive size-8"
+              >
+                {deleting ? <Loader2 className="size-4 animate-spin" /> : <Trash2 className="size-4" />}
+              </Button>
+            </div>
+          </div>
+          <div className="mt-2 flex items-center justify-between">
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
+              <span>{dept.experiences.length} experiences</span>
+              <span>{scheduleStr}</span>
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                className="rounded p-1 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                disabled={!moveActions.onMoveUp}
+                onClick={moveActions.onMoveUp ?? undefined}
+              >
+                <ChevronUp className="size-4" />
+              </button>
+              <button
+                type="button"
+                className="rounded p-1 text-muted-foreground hover:text-foreground disabled:opacity-30"
+                disabled={!moveActions.onMoveDown}
+                onClick={moveActions.onMoveDown ?? undefined}
+              >
+                <ChevronDown className="size-4" />
+              </button>
+            </div>
+          </div>
+          {dept.status === "PUBLISHED" && (!dept.photo || !dept.description || dept.experiences.length === 0) && (
+            <div className="mt-2 flex items-center gap-1 text-xs text-amber-600">
+              <AlertTriangle className="size-3" />
+              <span>
+                Missing: {[
+                  !dept.photo && "photo",
+                  !dept.description && "description",
+                  dept.experiences.length === 0 && "experiences",
+                ].filter(Boolean).join(", ")}
+              </span>
+            </div>
+          )}
+        </CardContent>
+      </div>
+
+      {/* ===== Desktop layout ===== */}
+      <CardContent className="hidden md:flex items-center gap-4 p-4">
+        <button
+          type="button"
+          ref={dragHandle.ref}
+          className="cursor-grab touch-none text-muted-foreground hover:text-foreground shrink-0"
+          {...dragHandle.listeners}
+          {...dragHandle.attributes}
+        >
+          <GripVertical className="size-4" />
+        </button>
         {dept.photo ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -225,9 +296,7 @@ function DeptCard({
               className="text-xs text-muted-foreground line-clamp-2 mt-0.5 [&_*]:!m-0 [&_*]:!p-0"
             />
           ) : (
-            <p className="text-xs text-muted-foreground mt-0.5">
-              No description
-            </p>
+            <p className="text-xs text-muted-foreground mt-0.5">No description</p>
           )}
           <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
             <span>{dept.experiences.length} experiences</span>
@@ -259,14 +328,11 @@ function DeptCard({
             disabled={deleting}
             className="text-destructive hover:text-destructive size-8"
           >
-            {deleting ? (
-              <Loader2 className="size-3.5 animate-spin" />
-            ) : (
-              <Trash2 className="size-3.5" />
-            )}
+            {deleting ? <Loader2 className="size-3.5 animate-spin" /> : <Trash2 className="size-3.5" />}
           </Button>
         </div>
       </CardContent>
+
       <ConfirmDialog
         open={showDeleteConfirm}
         onOpenChange={setShowDeleteConfirm}

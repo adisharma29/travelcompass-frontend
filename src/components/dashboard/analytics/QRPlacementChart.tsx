@@ -44,7 +44,7 @@ export function QRPlacementChart({ data }: QRPlacementChartProps) {
   }));
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>QR Performance by Placement</CardTitle>
         <CardDescription>
@@ -54,19 +54,19 @@ export function QRPlacementChart({ data }: QRPlacementChartProps) {
       <CardContent>
         <ResponsiveContainer
           width="100%"
-          height={Math.max(200, formatted.length * 52)}
+          height={Math.max(180, formatted.length * 52)}
         >
-          <BarChart data={formatted} layout="vertical" margin={{ left: 8 }}>
+          <BarChart data={formatted} layout="vertical" margin={{ left: 0, right: 8 }}>
             <XAxis
               type="number"
               allowDecimals={false}
-              tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
             />
             <YAxis
               type="category"
               dataKey="label"
-              tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
-              width={90}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              width={70}
             />
             <Tooltip
               contentStyle={{

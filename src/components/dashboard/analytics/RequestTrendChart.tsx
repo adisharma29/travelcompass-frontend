@@ -41,27 +41,25 @@ export function RequestTrendChart({ data }: RequestTrendChartProps) {
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Requests Over Time</CardTitle>
         <CardDescription>Total vs confirmed requests</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={data}>
+        <ResponsiveContainer width="100%" height={240}>
+          <LineChart data={data} margin={{ left: -10, right: 8 }}>
             <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
             <XAxis
               dataKey="date"
               tickFormatter={formatDate}
-              className="text-xs"
-              tick={{ fill: "var(--muted-foreground)" }}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
               interval="preserveStartEnd"
             />
             <YAxis
               allowDecimals={false}
-              className="text-xs"
-              tick={{ fill: "var(--muted-foreground)" }}
-              width={40}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              width={35}
             />
             <Tooltip
               labelFormatter={(label) => formatDate(String(label))}

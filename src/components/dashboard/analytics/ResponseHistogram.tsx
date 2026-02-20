@@ -36,22 +36,23 @@ export function ResponseHistogram({ data }: ResponseHistogramProps) {
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Response Time Distribution</CardTitle>
         <CardDescription>Time from request to first acknowledgement</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={260}>
-          <BarChart data={data}>
+        <ResponsiveContainer width="100%" height={220}>
+          <BarChart data={data} margin={{ left: -10, right: 8 }}>
             <XAxis
               dataKey="label"
-              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 10 }}
+              interval={0}
             />
             <YAxis
               allowDecimals={false}
-              tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
-              width={40}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              width={30}
             />
             <Tooltip
               contentStyle={{

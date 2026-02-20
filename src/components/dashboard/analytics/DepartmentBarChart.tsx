@@ -35,24 +35,24 @@ export function DepartmentBarChart({ data }: DepartmentBarChartProps) {
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>By Department</CardTitle>
         <CardDescription>Request volume per department</CardDescription>
       </CardHeader>
       <CardContent>
-        <ResponsiveContainer width="100%" height={Math.max(200, data.length * 48)}>
-          <BarChart data={data} layout="vertical" margin={{ left: 8 }}>
+        <ResponsiveContainer width="100%" height={Math.max(180, data.length * 48)}>
+          <BarChart data={data} layout="vertical" margin={{ left: 0, right: 8 }}>
             <XAxis
               type="number"
               allowDecimals={false}
-              tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
             />
             <YAxis
               type="category"
               dataKey="name"
-              tick={{ fill: "var(--muted-foreground)", fontSize: 12 }}
-              width={100}
+              tick={{ fill: "var(--muted-foreground)", fontSize: 11 }}
+              width={80}
             />
             <Tooltip
               contentStyle={{

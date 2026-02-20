@@ -69,6 +69,13 @@ export default function AnalyticsPage() {
 
       setLoading(true);
       setError(null);
+      setOverview(null);
+      setRequestsOverTime([]);
+      setDepartments([]);
+      setExperiences([]);
+      setResponseTimes(null);
+      setHeatmap([]);
+      setQrPlacements([]);
 
       try {
         // Fetch all endpoints in parallel

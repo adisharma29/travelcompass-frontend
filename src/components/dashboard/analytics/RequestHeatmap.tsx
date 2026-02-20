@@ -43,62 +43,58 @@ export function RequestHeatmap({ data }: RequestHeatmapProps) {
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Request Heatmap</CardTitle>
         <CardDescription>Day of week vs hour of day</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="overflow-x-auto">
-          <div className="min-w-[500px]">
-            {/* Hour labels */}
-            <div className="flex items-center ml-10 mb-1">
-              {HOURS.map((h) => (
-                <div
-                  key={h}
-                  className="flex-1 text-center text-[10px] text-muted-foreground"
-                >
-                  {DISPLAY_HOURS.includes(h)
-                    ? `${h.toString().padStart(2, "0")}`
-                    : ""}
-                </div>
-              ))}
+        {/* Hour labels */}
+        <div className="flex items-center ml-8 sm:ml-10 mb-1">
+          {HOURS.map((h) => (
+            <div
+              key={h}
+              className="flex-1 text-center text-[9px] sm:text-[10px] text-muted-foreground"
+            >
+              {DISPLAY_HOURS.includes(h)
+                ? `${h.toString().padStart(2, "0")}`
+                : ""}
             </div>
+          ))}
+        </div>
 
-            {/* Grid rows */}
-            {DAYS.map((day, dayIdx) => (
-              <div key={day} className="flex items-center gap-1 mb-1">
-                <div className="w-9 text-right text-xs text-muted-foreground pr-1">
-                  {day}
-                </div>
-                <div className="flex flex-1 gap-px">
-                  {HOURS.map((hour) => {
-                    const count = data[dayIdx]?.[hour] ?? 0;
-                    return (
-                      <div
-                        key={hour}
-                        className={`flex-1 aspect-square rounded-sm ${getIntensity(count, max)} transition-colors`}
-                        title={`${day} ${hour}:00 — ${count} request${count !== 1 ? "s" : ""}`}
-                      />
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {/* Legend */}
-            <div className="flex items-center justify-end gap-2 mt-3 text-[10px] text-muted-foreground">
-              <span>Less</span>
-              <div className="flex gap-px">
-                <div className="size-3 rounded-sm bg-muted" />
-                <div className="size-3 rounded-sm bg-chart-1/30" />
-                <div className="size-3 rounded-sm bg-chart-1/50" />
-                <div className="size-3 rounded-sm bg-chart-1/70" />
-                <div className="size-3 rounded-sm bg-chart-1/90" />
-              </div>
-              <span>More</span>
+        {/* Grid rows */}
+        {DAYS.map((day, dayIdx) => (
+          <div key={day} className="flex items-center gap-0.5 sm:gap-1 mb-0.5 sm:mb-1">
+            <div className="w-7 sm:w-9 text-right text-[10px] sm:text-xs text-muted-foreground pr-0.5 sm:pr-1">
+              {day}
+            </div>
+            <div className="flex flex-1 gap-px">
+              {HOURS.map((hour) => {
+                const count = data[dayIdx]?.[hour] ?? 0;
+                return (
+                  <div
+                    key={hour}
+                    className={`flex-1 aspect-square rounded-[1px] sm:rounded-sm ${getIntensity(count, max)} transition-colors`}
+                    title={`${day} ${hour}:00 — ${count} request${count !== 1 ? "s" : ""}`}
+                  />
+                );
+              })}
             </div>
           </div>
+        ))}
+
+        {/* Legend */}
+        <div className="flex items-center justify-end gap-2 mt-3 text-[10px] text-muted-foreground">
+          <span>Less</span>
+          <div className="flex gap-px">
+            <div className="size-3 rounded-sm bg-muted" />
+            <div className="size-3 rounded-sm bg-chart-1/30" />
+            <div className="size-3 rounded-sm bg-chart-1/50" />
+            <div className="size-3 rounded-sm bg-chart-1/70" />
+            <div className="size-3 rounded-sm bg-chart-1/90" />
+          </div>
+          <span>More</span>
         </div>
       </CardContent>
     </Card>

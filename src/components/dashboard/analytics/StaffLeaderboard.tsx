@@ -34,12 +34,12 @@ export function StaffLeaderboard({ data }: StaffLeaderboardProps) {
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader>
         <CardTitle>Staff Leaderboard</CardTitle>
         <CardDescription>Ranked by requests handled</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="overflow-x-auto">
         <Table>
           <TableHeader>
             <TableRow>

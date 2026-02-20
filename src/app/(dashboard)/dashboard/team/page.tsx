@@ -455,36 +455,44 @@ function MemberCard({
 
   const memberName = member.first_name || member.email;
 
+  const initials = `${(member.first_name?.[0] ?? "").toUpperCase()}${(member.last_name?.[0] ?? "").toUpperCase()}` || "?";
+
   return (
     <>
-      <div className={`rounded-lg border p-3 space-y-2 ${!member.is_active ? "opacity-50" : ""}`}>
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="font-medium text-sm">
-              {member.first_name} {member.last_name}
+      <div className={`rounded-xl border overflow-hidden ${!member.is_active ? "opacity-50" : ""}`}>
+        {/* Header: avatar + name + status */}
+        <div className="flex items-center gap-3 p-4 pb-3">
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
+            {initials}
+          </div>
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2">
+              <span className="truncate font-medium">
+                {member.first_name} {member.last_name}
+              </span>
               {isSelf && (
-                <span className="ml-1.5 text-xs text-muted-foreground">(you)</span>
+                <span className="shrink-0 text-xs text-muted-foreground">(you)</span>
               )}
             </div>
-            {member.email && (
-              <div className="text-xs text-muted-foreground">{member.email}</div>
-            )}
-            {member.phone && (
-              <div className="text-xs text-muted-foreground">{member.phone}</div>
-            )}
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
+              {member.email && <span className="truncate">{member.email}</span>}
+              {member.phone && <span>{member.phone}</span>}
+            </div>
           </div>
-          <Badge variant={member.is_active ? "default" : "outline"}>
+          <Badge variant={member.is_active ? "default" : "outline"} className="shrink-0">
             {member.is_active ? "Active" : "Inactive"}
           </Badge>
         </div>
-        <div className="flex items-center gap-2 flex-wrap">
+
+        {/* Footer: role + department + action */}
+        <div className="flex flex-wrap items-center gap-2 border-t bg-muted/30 px-4 py-2.5">
           {canEdit && !isSelf ? (
             <Select
               value={member.role}
               onValueChange={handleRoleChange}
               disabled={updating}
             >
-              <SelectTrigger className="w-[120px] h-7 text-xs">
+              <SelectTrigger className="h-7 w-[120px] text-xs">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -499,7 +507,9 @@ function MemberCard({
             </Badge>
           )}
           {dept && (
-            <span className="text-xs text-muted-foreground">{dept.name}</span>
+            <span className="text-xs text-muted-foreground">
+              {dept.name}
+            </span>
           )}
           {canEdit && !isSelf && (
             <Button
@@ -507,7 +517,7 @@ function MemberCard({
               size="sm"
               onClick={() => setShowToggleConfirm(true)}
               disabled={updating}
-              className="text-xs h-7 ml-auto"
+              className="ml-auto h-7 text-xs"
             >
               {updating ? (
                 <Loader2 className="size-3 animate-spin" />
@@ -519,14 +529,16 @@ function MemberCard({
             </Button>
           )}
         </div>
+
+        {/* Dept picker (when switching to STAFF role) */}
         {showDeptPicker && (
-          <div className="flex items-center gap-2 flex-wrap pt-1 border-t">
+          <div className="flex flex-wrap items-center gap-2 border-t px-4 py-2.5">
             <span className="text-xs text-muted-foreground">Department:</span>
             <Select
               value={pendingStaffDept?.toString() ?? ""}
               onValueChange={(v) => setPendingStaffDept(Number(v))}
             >
-              <SelectTrigger className="w-[160px] h-7 text-xs">
+              <SelectTrigger className="h-7 w-[160px] text-xs">
                 <SelectValue placeholder="Select" />
               </SelectTrigger>
               <SelectContent>

@@ -12,7 +12,7 @@ interface Props {
 
 export function DashboardHeader({ title, children }: Props) {
   return (
-    <header className="flex h-14 items-center gap-2 border-b px-4">
+    <header className="sticky top-0 z-10 flex h-14 items-center gap-2 border-b bg-background px-4">
       <SidebarTrigger />
       <Separator orientation="vertical" className="h-4" />
       <h1 className="text-lg font-semibold">{title}</h1>

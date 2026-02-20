@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { DateRange, DateRangeParams } from "@/lib/analytics-types";
 import {
   Select,
@@ -22,14 +22,21 @@ interface DateRangeSelectorProps {
   onChange: (params: DateRangeParams) => void;
 }
 
+function localDateStr(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
+
 function todayStr(): string {
-  return new Date().toISOString().slice(0, 10);
+  return localDateStr(new Date());
 }
 
 function nDaysAgoStr(n: number): string {
   const d = new Date();
   d.setDate(d.getDate() - n);
-  return d.toISOString().slice(0, 10);
+  return localDateStr(d);
 }
 
 export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
@@ -38,8 +45,17 @@ export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
   const current = isCustom ? "custom" : (value.range ?? "7d");
 
   const [showCustom, setShowCustom] = useState(isCustom);
-  const [startInput, setStartInput] = useState(value.start ?? nDaysAgoStr(7));
+  const [startInput, setStartInput] = useState(value.start ?? nDaysAgoStr(6));
   const [endInput, setEndInput] = useState(value.end ?? todayStr());
+
+  // Sync local state when parent changes value externally
+  useEffect(() => {
+    setShowCustom(isCustom);
+    if (isCustom && value.start && value.end) {
+      setStartInput(value.start);
+      setEndInput(value.end);
+    }
+  }, [isCustom, value.start, value.end]);
 
   function handlePresetChange(v: string) {
     if (v === "custom") {
@@ -50,8 +66,16 @@ export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
     }
   }
 
+  function daysBetween(a: string, b: string): number {
+    const ms = new Date(b).getTime() - new Date(a).getTime();
+    return Math.round(ms / 86_400_000);
+  }
+
+  const rangeValid =
+    !!startInput && !!endInput && startInput <= endInput && daysBetween(startInput, endInput) < 90;
+
   function handleApply() {
-    if (startInput && endInput && startInput <= endInput) {
+    if (rangeValid) {
       onChange({ range: "custom", start: startInput, end: endInput });
     }
   }
@@ -94,10 +118,13 @@ export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
             size="sm"
             variant="secondary"
             onClick={handleApply}
-            disabled={!startInput || !endInput || startInput > endInput}
+            disabled={!rangeValid}
           >
             Apply
           </Button>
+          {startInput && endInput && startInput <= endInput && daysBetween(startInput, endInput) >= 90 && (
+            <span className="text-xs text-destructive">Max 90 days</span>
+          )}
         </>
       )}
     </div>

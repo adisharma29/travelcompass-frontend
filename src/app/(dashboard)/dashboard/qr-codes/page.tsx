@@ -181,11 +181,11 @@ function QRCard({
   }
 
   return (
-    <Card>
+    <Card className="overflow-hidden">
       <CardHeader className="pb-3">
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-base">{qr.label}</CardTitle>
+        <div className="flex items-start justify-between gap-2">
+          <div className="min-w-0">
+            <CardTitle className="text-base truncate">{qr.label}</CardTitle>
             <CardDescription className="mt-1">
               <Badge variant="outline" className="text-[10px]">
                 {qr.placement}
@@ -195,7 +195,7 @@ function QRCard({
               )}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1 text-xs text-muted-foreground shrink-0">
             <Users className="size-3" />
             {qr.stay_count}
           </div>
@@ -208,11 +208,11 @@ function QRCard({
             <img
               src={qr.qr_image}
               alt={`QR code for ${qr.label}`}
-              className="w-40 h-40 rounded border"
+              className="max-w-40 w-full aspect-square rounded border"
             />
           </div>
         )}
-        <div className="flex items-center gap-1 text-xs text-muted-foreground truncate">
+        <div className="flex items-center gap-1 text-xs text-muted-foreground min-w-0">
           <ExternalLink className="size-3 shrink-0" />
           <span className="truncate">{qr.target_url}</span>
         </div>
