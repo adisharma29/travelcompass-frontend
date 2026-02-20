@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { DateRange, DateRangeParams } from "@/lib/analytics-types";
 import {
   Select,
@@ -44,24 +44,18 @@ export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
     value.range === "custom" || (!value.range && !!value.start && !!value.end);
   const current = isCustom ? "custom" : (value.range ?? "7d");
 
-  const [showCustom, setShowCustom] = useState(isCustom);
+  const [localCustomOpen, setLocalCustomOpen] = useState(false);
   const [startInput, setStartInput] = useState(value.start ?? nDaysAgoStr(6));
   const [endInput, setEndInput] = useState(value.end ?? todayStr());
 
-  // Sync local state when parent changes value externally
-  useEffect(() => {
-    setShowCustom(isCustom);
-    if (isCustom && value.start && value.end) {
-      setStartInput(value.start);
-      setEndInput(value.end);
-    }
-  }, [isCustom, value.start, value.end]);
+  // Show custom inputs if user opened them OR parent value is custom
+  const showCustom = localCustomOpen || isCustom;
 
   function handlePresetChange(v: string) {
     if (v === "custom") {
-      setShowCustom(true);
+      setLocalCustomOpen(true);
     } else {
-      setShowCustom(false);
+      setLocalCustomOpen(false);
       onChange({ range: v as DateRange });
     }
   }
@@ -83,7 +77,7 @@ export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
   return (
     <div className="flex flex-wrap items-center gap-2">
       <Select value={current} onValueChange={handlePresetChange}>
-        <SelectTrigger className="w-[160px]">
+        <SelectTrigger className="w-full sm:w-[160px]">
           <SelectValue />
         </SelectTrigger>
         <SelectContent>
@@ -97,13 +91,13 @@ export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
       </Select>
 
       {showCustom && (
-        <>
+        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
           <input
             type="date"
             value={startInput}
             max={endInput || todayStr()}
             onChange={(e) => setStartInput(e.target.value)}
-            className="h-9 rounded-md border bg-background px-2 text-sm"
+            className="h-9 flex-1 min-w-0 rounded-md border bg-background px-2 text-sm"
           />
           <span className="text-sm text-muted-foreground">–</span>
           <input
@@ -112,7 +106,7 @@ export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
             min={startInput}
             max={todayStr()}
             onChange={(e) => setEndInput(e.target.value)}
-            className="h-9 rounded-md border bg-background px-2 text-sm"
+            className="h-9 flex-1 min-w-0 rounded-md border bg-background px-2 text-sm"
           />
           <Button
             size="sm"
@@ -125,7 +119,7 @@ export function DateRangeSelector({ value, onChange }: DateRangeSelectorProps) {
           {startInput && endInput && startInput <= endInput && daysBetween(startInput, endInput) >= 90 && (
             <span className="text-xs text-destructive">Max 90 days</span>
           )}
-        </>
+        </div>
       )}
     </div>
   );

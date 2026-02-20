@@ -16,7 +16,7 @@ export default function ConfirmationPage() {
   return (
     <div className="min-h-dvh flex flex-col">
       <main className="flex-1 flex flex-col items-center justify-center px-5 py-12">
-        <div className="md:p-8 md:rounded-3xl md:border md:border-black/5 md:shadow-sm md:max-w-md md:w-full flex flex-col items-center">
+        <div className="p-4 rounded-2xl border border-black/5 shadow-sm max-w-md w-full md:p-8 md:rounded-3xl flex flex-col items-center">
         {/* Success icon */}
         <div
           className="size-16 rounded-full flex items-center justify-center mb-6"

@@ -68,7 +68,7 @@ export function OTPInput({
   );
 
   return (
-    <div className="flex gap-2 justify-center">
+    <div className="flex gap-1.5 sm:gap-2 justify-center">
       {/* Hidden input for autocomplete="one-time-code" */}
       <input
         type="text"
@@ -91,7 +91,7 @@ export function OTPInput({
           maxLength={1}
           value={digit}
           disabled={disabled}
-          className="size-12 text-center text-lg font-semibold rounded-xl border-2 transition-colors focus:outline-none disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2"
+          className="size-10 sm:size-12 text-center text-base sm:text-lg font-semibold rounded-xl border-2 transition-colors focus:outline-none disabled:opacity-50 focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2"
           style={{
             borderColor: digit
               ? "var(--brand-accent)"

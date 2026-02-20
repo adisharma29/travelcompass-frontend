@@ -196,7 +196,7 @@ export default function RequestsPage() {
           value={filter}
           onValueChange={(v) => setFilter(v as FilterStatus)}
         >
-          <SelectTrigger className="w-[160px] h-8 text-xs">
+          <SelectTrigger className="w-full sm:w-[160px] h-8 text-xs">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
@@ -283,7 +283,7 @@ export default function RequestsPage() {
             )}
             {/* Pagination */}
             {(hasPrev || hasNext) && !loading && (
-              <div className="flex items-center justify-between pt-4 border-t mt-4">
+              <div className="flex flex-wrap items-center justify-between gap-2 pt-4 border-t mt-4">
                 <Button
                   variant="outline"
                   size="sm"
@@ -293,7 +293,7 @@ export default function RequestsPage() {
                   <ChevronLeft className="size-4 mr-1" />
                   Previous
                 </Button>
-                <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground order-last sm:order-none w-full sm:w-auto text-center">
                   Page {page} · {totalCount} total
                 </span>
                 <Button

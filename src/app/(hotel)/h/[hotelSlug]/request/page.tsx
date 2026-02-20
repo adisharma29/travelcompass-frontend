@@ -139,8 +139,8 @@ export default function RequestPage() {
     <>
       <GuestHeader title="Make a Request" backHref={experience ? `/h/${hotel.slug}` : undefined} />
 
-      <main className="flex-1 px-5 py-6 md:py-12 max-w-lg mx-auto w-full">
-        <div className="md:p-8 md:rounded-3xl md:border md:border-black/5 md:shadow-sm">
+      <main className="flex-1 px-5 py-8 md:py-12 max-w-lg mx-auto w-full">
+        <div className="p-4 rounded-2xl border border-black/5 shadow-sm md:p-8 md:rounded-3xl">
         {/* Experience preview card */}
         {experience && (
           <div

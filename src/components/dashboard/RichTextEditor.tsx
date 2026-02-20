@@ -43,7 +43,7 @@ function ToolbarButton({
       disabled={disabled}
       onClick={onClick}
       className={cn(
-        "rounded p-1.5 hover:bg-accent disabled:opacity-40",
+        "rounded p-2 hover:bg-accent disabled:opacity-40",
         active && "bg-accent text-accent-foreground",
       )}
     >
