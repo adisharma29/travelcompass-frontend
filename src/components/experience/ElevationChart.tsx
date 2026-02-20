@@ -9,6 +9,7 @@ interface ElevationData {
   maxElev: number;
   totalGain: number;
   totalLoss: number;
+  color: string;
 }
 
 interface ElevationChartProps {
@@ -19,13 +20,6 @@ export function ElevationChart({ experienceName }: ElevationChartProps) {
   const { mapRef, geojsonRef } = useApp();
   const [data, setData] = useState<ElevationData | null>(null);
 
-  // Derive color from geojson during render (not in effect) to avoid lint warning
-  const geojsonData = geojsonRef.current;
-  const colorFeature = geojsonData?.features.find(
-    (f) => f.properties.name === experienceName && f.geometry.type === "LineString"
-  );
-  const color = colorFeature?.properties.color || "#1D4ED8";
-
   useEffect(() => {
     const map = mapRef.current;
     const geojson = geojsonRef.current;
@@ -35,6 +29,8 @@ export function ElevationChart({ experienceName }: ElevationChartProps) {
       (f) => f.properties.name === experienceName && f.geometry.type === "LineString"
     );
     if (!feature) return;
+
+    const featureColor = feature.properties.color || "#1D4ED8";
 
     const coords = feature.geometry.coordinates as number[][];
 
@@ -83,7 +79,7 @@ export function ElevationChart({ experienceName }: ElevationChartProps) {
         else totalLoss += Math.abs(diff);
       }
 
-      setData({ elevations, minElev, maxElev, totalGain, totalLoss });
+      setData({ elevations, minElev, maxElev, totalGain, totalLoss, color: featureColor });
     }, 1000);
 
     return () => clearTimeout(timer);
@@ -91,7 +87,7 @@ export function ElevationChart({ experienceName }: ElevationChartProps) {
 
   if (!data) return null;
 
-  const { elevations, minElev, maxElev, totalGain, totalLoss } = data;
+  const { elevations, minElev, maxElev, totalGain, totalLoss, color } = data;
   const width = 280;
   const height = 80;
   const padding = 5;
@@ -110,7 +106,7 @@ export function ElevationChart({ experienceName }: ElevationChartProps) {
 
   return (
     <div className="mb-6">
-      <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-accent mb-2.5">
+      <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-accent mb-2.5">
         Elevation Profile
       </div>
       <div className="bg-bg-card rounded-xl p-4 min-h-[120px]">

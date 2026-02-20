@@ -10,7 +10,7 @@ interface ExperienceCardProps {
 export function ExperienceCard({ experience, onClick }: ExperienceCardProps) {
   return (
     <button
-      className="bg-bg-card rounded-[14px] p-4 cursor-pointer transition-[transform,box-shadow] duration-200 border border-accent/10 tap-highlight-none hover:translate-y-[-2px] hover:shadow-[0_4px_16px_rgba(165,96,20,0.12)] hover:border-accent/20 active:scale-[0.99] w-full text-left"
+      className="bg-bg-card rounded-[14px] p-4 cursor-pointer transition-[transform,box-shadow] duration-200 border border-brand-accent/10 tap-highlight-none hover:translate-y-[-2px] hover:shadow-[0_4px_16px_rgba(165,96,20,0.12)] hover:border-brand-accent/20 active:scale-[0.99] w-full text-left"
       onClick={onClick}
     >
       <div className="flex items-start gap-3 mb-2.5">

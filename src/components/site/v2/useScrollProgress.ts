@@ -31,8 +31,8 @@ export function useScrollProgress() {
       "(prefers-reduced-motion: reduce)"
     ).matches;
     if (prefersReduced) {
-      setProgress(0.5);
-      return;
+      const frame = requestAnimationFrame(() => setProgress(0.5));
+      return () => cancelAnimationFrame(frame);
     }
 
     function onScroll() {

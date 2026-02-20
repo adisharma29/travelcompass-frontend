@@ -22,7 +22,7 @@ export function BreakdownSection({ breakdown }: BreakdownSectionProps) {
   return (
     <div className="mt-4">
       <button
-        className={`flex items-center justify-between w-full px-4 py-3.5 bg-gradient-to-br from-[#F5F0E8] to-[#EDE8DD] border border-accent/12 rounded-xl cursor-pointer transition-all duration-200 tap-highlight-none hover:from-[#EDE8DD] hover:to-[#E5E0D5] active:scale-[0.98]`}
+        className={`flex items-center justify-between w-full px-4 py-3.5 bg-gradient-to-br from-[#F5F0E8] to-[#EDE8DD] border border-brand-accent/12 rounded-xl cursor-pointer transition-all duration-200 tap-highlight-none hover:from-[#EDE8DD] hover:to-[#E5E0D5] active:scale-[0.98]`}
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-2.5">
@@ -56,7 +56,7 @@ export function BreakdownSection({ breakdown }: BreakdownSectionProps) {
       <div
         className={`overflow-hidden transition-[max-height,padding] duration-400 ease bg-[#FDFBF7] rounded-b-xl -mt-2 ${
           expanded
-            ? "max-h-[2000px] px-4 pt-5 pb-4 border border-accent/8 border-t-0"
+            ? "max-h-[2000px] px-4 pt-5 pb-4 border border-brand-accent/8 border-t-0"
             : "max-h-0 p-0"
         }`}
       >
@@ -66,7 +66,7 @@ export function BreakdownSection({ breakdown }: BreakdownSectionProps) {
 
           return (
             <div key={key} className="mb-5 last:mb-0">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-accent mb-2.5 pb-1.5 border-b border-accent/10">
+              <div className="text-[11px] font-semibold uppercase tracking-[0.5px] text-brand-accent mb-2.5 pb-1.5 border-b border-brand-accent/10">
                 {getBreakdownLabel(key)}
               </div>
               {Array.isArray(val) ? (

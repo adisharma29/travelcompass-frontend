@@ -1,9 +1,19 @@
 "use client";
 
 import { useState } from "react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function TabBar() {
   const [activeTab, setActiveTab] = useState<"explore" | "stay">("explore");
+  const [showComingSoon, setShowComingSoon] = useState(false);
 
   return (
     <div className="fixed bottom-0 left-0 right-0 z-[200] flex h-14 bg-bg-tab border-t border-text/10 pb-[env(safe-area-inset-bottom,0px)] font-sans lg:w-[420px] lg:right-auto">
@@ -39,9 +49,7 @@ export function TabBar() {
           activeTab === "stay" ? "text-text" : "text-text-secondary"
         }`}
         onClick={() => {
-          setActiveTab("stay");
-          alert("Coming soon!");
-          setActiveTab("explore");
+          setShowComingSoon(true);
         }}
       >
         <div
@@ -64,6 +72,20 @@ export function TabBar() {
         </div>
         <span>Your Stay</span>
       </button>
+
+      <AlertDialog open={showComingSoon} onOpenChange={setShowComingSoon}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Coming Soon</AlertDialogTitle>
+            <AlertDialogDescription>
+              The Your Stay feature is currently under development. Stay tuned!
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction>Got it</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

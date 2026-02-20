@@ -1,0 +1,20 @@
+{
+  "name": "Refuje Concierge Dashboard",
+  "short_name": "Concierge",
+  "start_url": "/dashboard",
+  "display": "standalone",
+  "theme_color": "#434431",
+  "background_color": "#FAFAF8",
+  "icons": [
+    {
+      "src": "/images/site/shared/logo.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/site/shared/logo.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

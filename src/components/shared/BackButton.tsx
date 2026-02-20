@@ -7,11 +7,11 @@ interface BackButtonProps {
 export function BackButton({ onClick }: BackButtonProps) {
   return (
     <button
-      className="flex items-center justify-center w-9 h-9 border-none bg-accent/10 rounded-full cursor-pointer tap-highlight-none shrink-0 active:bg-accent/20"
+      className="flex items-center justify-center w-9 h-9 border-none bg-brand-accent/10 rounded-full cursor-pointer tap-highlight-none shrink-0 active:bg-brand-accent/20"
       onClick={onClick}
     >
       <svg
-        className="w-5 h-5 text-accent"
+        className="w-5 h-5 text-brand-accent"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

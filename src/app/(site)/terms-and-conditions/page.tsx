@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
+import Link from "next/link";
 
 export const metadata: Metadata = {
   title: "Terms & Conditions | Refuje",
@@ -249,12 +250,12 @@ export default function TermsPage() {
           <p>
             If you wish to change or cancel your booking, please refer to our
             separate{" "}
-            <a
+            <Link
               href="/cancellation-policy"
               className="text-[#A56014]"
             >
               Cancellation &amp; Rescheduling Policy
-            </a>
+            </Link>
             , which sets out applicable timelines, refund entitlements, and
             credit options.
           </p>
@@ -441,9 +442,9 @@ export default function TermsPage() {
           <p>
             Your personal data is collected, used, and protected in accordance
             with our{" "}
-            <a href="/privacy-policy" className="text-[#A56014]">
+            <Link href="/privacy-policy" className="text-[#A56014]">
               Privacy Policy
-            </a>
+            </Link>
             , which forms part of these Terms. Please review it carefully to
             understand how we handle your information.
           </p>

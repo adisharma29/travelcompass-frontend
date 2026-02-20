@@ -16,7 +16,7 @@ export function HomeView() {
             <h1 className="font-serif text-[22px] md:text-[26px] text-text-dark leading-tight">
               Field Guide - {destination.name}
             </h1>
-            <p className="text-[13px] text-accent font-medium tracking-[0.4px] mt-1.5 uppercase">
+            <p className="text-[13px] text-brand-accent font-medium tracking-[0.4px] mt-1.5 uppercase">
               curated by Refuje
             </p>
           </div>
