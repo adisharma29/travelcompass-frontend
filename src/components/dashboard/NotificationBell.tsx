@@ -12,7 +12,6 @@ import type { Notification } from "@/lib/concierge-types";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import {
   Popover,
   PopoverContent,
@@ -167,7 +166,7 @@ export function NotificationBell() {
           )}
         </div>
         <Separator />
-        <ScrollArea className="max-h-96">
+        <div className="max-h-80 overflow-y-auto">
           {notifications.length === 0 ? (
             <p className="py-8 text-center text-sm text-muted-foreground">
               {tab === "unread" ? "All caught up!" : "No notifications yet"}
@@ -209,7 +208,7 @@ export function NotificationBell() {
               )}
             </div>
           )}
-        </ScrollArea>
+        </div>
       </PopoverContent>
     </Popover>
   );

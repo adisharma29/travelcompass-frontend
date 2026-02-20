@@ -234,6 +234,54 @@
 - [x] Request form: cancellation guard on experience/department fetch effect
 - [x] Build passes with no errors
 
+## Phase 7: Analytics Dashboard (see ANALYTICS_DASHBOARD_PLAN.md)
+
+### Phase 7.1: Analytics with Existing Data
+- [x] Backend: `concierge/analytics.py` — 6 query functions (overview, requests-over-time, departments, experiences, response-times, heatmap)
+- [x] Backend: shared `_parse_date_range()` helper (supports `?range=7d|30d|90d` and `?start=&end=`, max 90d, hotel timezone)
+- [x] Backend: `_base_qs()` helper with hotel/department/date filtering
+- [x] Backend: hotel-timezone bucketing via `TruncDate`, `ExtractHour`, `ExtractWeekDay` with `zoneinfo`
+- [x] Backend: overview endpoint with trend comparison vs previous period of same length
+- [x] Backend: response-time distribution (5 buckets) + staff leaderboard (by assigned_to)
+- [x] Backend: heatmap 7×24 matrix (Mon=0, Sun=6) with Django ExtractWeekDay conversion
+- [x] Backend: `concierge/analytics_views.py` — 6 API views (`AnalyticsBaseView` with shared date range + dept extraction)
+- [x] Backend: STAFF gets dept-filtered data on all endpoints; STAFF gets 403 on `/departments/` (hotel-wide only)
+- [x] Backend: registered 6 URL patterns under `hotels/<slug>/analytics/`
+- [x] Backend: all imports verified, smoke test with live data passes
+- [x] Frontend: install recharts
+- [x] Frontend: `src/lib/analytics-types.ts` — types for all 6 endpoints
+- [x] Frontend: `src/lib/analytics-api.ts` — typed fetch functions with date range param builder
+- [x] Frontend: `DateRangeSelector` component (7d/30d/90d select dropdown)
+- [x] Frontend: `KPICard` component with trend arrows (green/red coloring, invertTrend for response time)
+- [x] Frontend: `RequestTrendChart` (Recharts line chart, total vs confirmed, gap-filled dates)
+- [x] Frontend: `DepartmentBarChart` (horizontal bar chart, total + confirmed per dept)
+- [x] Frontend: `ExperienceTable` (sortable table with inline bars, conversion % coloring)
+- [x] Frontend: `ResponseHistogram` (vertical bar chart, 5 buckets, color-coded)
+- [x] Frontend: `StaffLeaderboard` (table with handled/avg response/confirmed)
+- [x] Frontend: `RequestHeatmap` (7×24 grid with intensity coloring, hover tooltips, legend)
+- [x] Frontend: Analytics page with Overview + Performance tabs, parallel data fetching, AbortController, slugRef guard
+- [x] Frontend: loading skeletons for both tabs
+- [x] Frontend: "Analytics" nav item added to sidebar (between Dashboard and Requests, visible to all roles)
+- [x] Fix: `get_department_stats` — remove `output_field=FloatField()` causing timedelta cast error; compute avg response in separate query
+- [x] Fix: chart colors — replace `hsl(var(--chart-*))` with `var(--chart-*)` (CSS vars already contain full OKLCH value)
+- [x] Add Legends to Department bar chart and Request trend line chart
+- [x] Backend: `get_qr_placement_stats()` — QR performance by placement (lobby/room/pool/etc.), counts sessions + sessions-with-requests
+- [x] Backend: `AnalyticsQRPlacements` view + URL at `analytics/qr-placements/`
+- [x] Frontend: `QRPlacementChart` component (horizontal bar chart, sessions vs with-requests, legend)
+- [x] Frontend: QR placement chart wired into Overview tab (ADMIN/SUPERADMIN only)
+- [x] Build passes with no errors
+
+### Phase 7.2: Event Tracking + Funnel (not started)
+- [ ] Backend: `EngagementEvent` model + migration
+- [ ] Backend: POST endpoint with compound throttle (hotel+IP+UA)
+- [ ] Frontend: `useTrackEvent()` hook with `sendBeacon` + debounce
+- [ ] Frontend: Funnel tab on analytics page
+
+### Phase 7.3: VIEWER Role + PDF Export (not started)
+- [ ] Backend: VIEWER role + permission hardening
+- [ ] Frontend: DashboardShell VIEWER detection + SSE/push bypass
+- [ ] Frontend: PDF export
+
 ---
 
 ## Notes
