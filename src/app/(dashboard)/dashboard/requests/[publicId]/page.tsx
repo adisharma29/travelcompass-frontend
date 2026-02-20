@@ -9,6 +9,7 @@ import {
   updateRequest,
   addRequestNote,
   takeOwnership,
+  revokeStay,
 } from "@/lib/concierge-api";
 import { useSSERefetch } from "@/context/SSEContext";
 import type {
@@ -53,6 +54,7 @@ import {
   Hand,
   Loader2,
   MessageSquarePlus,
+  UserX,
   XCircle,
 } from "lucide-react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -328,6 +330,13 @@ export default function RequestDetailPage({
             </CardContent>
           </Card>
         )}
+
+        {/* Revoke Stay — always available (session control, not request workflow) */}
+        <RevokeStayButton
+          hotelSlug={hotelSlug}
+          guestStayId={request.guest_stay_id}
+          onRevoked={fetchRequest}
+        />
 
         {/* Activity Timeline */}
         {request.activities.length > 0 && (
@@ -642,6 +651,73 @@ function TakeOwnershipButton({
       )}
       Take Ownership
     </Button>
+  );
+}
+
+function RevokeStayButton({
+  hotelSlug,
+  guestStayId,
+  onRevoked,
+}: {
+  hotelSlug: string;
+  guestStayId: number;
+  onRevoked: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [revoking, setRevoking] = useState(false);
+
+  async function handleRevoke() {
+    setRevoking(true);
+    try {
+      await revokeStay(hotelSlug, guestStayId);
+      setOpen(false);
+      onRevoked();
+      toast.success("Guest stay revoked");
+    } catch (err) {
+      toast.error("Failed to revoke stay", {
+        description: err instanceof Error ? err.message : "Please try again",
+      });
+    } finally {
+      setRevoking(false);
+    }
+  }
+
+  return (
+    <>
+      <Button
+        variant="outline"
+        size="sm"
+        className="text-destructive border-destructive/50 hover:bg-destructive/10"
+        onClick={() => setOpen(true)}
+      >
+        <UserX className="size-3.5 mr-1.5" />
+        Revoke Stay
+      </Button>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Revoke Guest Stay</DialogTitle>
+            <DialogDescription>
+              This will deactivate the guest&apos;s session. They will need to
+              re-verify via OTP.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleRevoke}
+              disabled={revoking}
+            >
+              {revoking && <Loader2 className="size-3 animate-spin mr-1.5" />}
+              Revoke Stay
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
 

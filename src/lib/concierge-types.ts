@@ -232,6 +232,7 @@ export interface ServiceRequest extends ServiceRequestListItem {
   confirmation_reason: string | null;
   assigned_to_name: string | null;
   assigned_to_id: number | null;
+  guest_stay_id: number;
   activities: RequestActivity[];
 }
 

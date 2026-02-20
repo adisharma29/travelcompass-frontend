@@ -27,6 +27,13 @@ export async function generateMetadata({
   const hotel = await fetchHotel(hotelSlug);
   if (!hotel) return { title: "Hotel not found" };
 
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "https://api.refuje.com";
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://refuje.com";
+  const ogImage = hotel.og_image
+    ? hotel.og_image.startsWith("http") ? hotel.og_image : `${apiUrl}${hotel.og_image}`
+    : undefined;
+  const canonicalUrl = `${siteUrl}/h/${hotelSlug}`;
+
   return {
     title: {
       template: `%s | ${hotel.name}`,
@@ -38,13 +45,16 @@ export async function generateMetadata({
     openGraph: {
       title: hotel.name,
       description: hotel.tagline || hotel.description,
-      images: hotel.og_image ? [{ url: hotel.og_image }] : undefined,
+      url: canonicalUrl,
+      siteName: hotel.name,
+      type: "website",
+      images: ogImage ? [{ url: ogImage }] : undefined,
     },
     twitter: {
-      card: hotel.og_image ? "summary_large_image" : "summary",
+      card: ogImage ? "summary_large_image" : "summary",
       title: hotel.name,
       description: hotel.tagline || hotel.description,
-      images: hotel.og_image ? [hotel.og_image] : undefined,
+      images: ogImage ? [ogImage] : undefined,
     },
     other: {
       "theme-color": hotel.primary_color,

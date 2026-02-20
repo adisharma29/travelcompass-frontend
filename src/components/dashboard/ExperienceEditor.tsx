@@ -35,6 +35,7 @@ import {
 import {
   ArrowLeft,
   AlertCircle,
+  ImageIcon,
   Loader2,
   Save,
   Trash2,
@@ -42,6 +43,7 @@ import {
   GripVertical,
   Upload,
 } from "lucide-react";
+import { toast } from "sonner";
 import { RichTextEditor } from "@/components/dashboard/RichTextEditor";
 import { ImageUploadArea } from "@/components/dashboard/ImageUploadArea";
 import { SortableList } from "@/components/dashboard/SortableList";
@@ -109,6 +111,7 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
   // Gallery state (edit mode only)
   const [gallery, setGallery] = useState<ExperienceImage[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [deletingImgId, setDeletingImgId] = useState<number | null>(null);
 
   const draftKey = `exp:${activeHotelSlug}:${deptSlug}:${expId || "new"}`;
   const {
@@ -305,8 +308,10 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
   async function handleGalleryUpload(files: FileList) {
     if (!activeHotelSlug || !expId) return;
     setUploading(true);
-    try {
-      for (const file of Array.from(files)) {
+    const fileArr = Array.from(files);
+    let failed = 0;
+    for (const file of fileArr) {
+      try {
         const fd = new FormData();
         fd.append("image", file);
         const img = await uploadExperienceImage(
@@ -316,14 +321,14 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
           fd
         );
         setGallery((prev) => [...prev, img]);
+      } catch {
+        failed++;
       }
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to upload image"
-      );
-    } finally {
-      setUploading(false);
     }
+    if (failed > 0) {
+      toast.error(`${failed} of ${fileArr.length} images failed to upload`);
+    }
+    setUploading(false);
   }
 
   async function handleGalleryDelete(imgId: number) {
@@ -331,10 +336,12 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
     try {
       await deleteExperienceImage(activeHotelSlug, deptSlug, imgId);
       setGallery((prev) => prev.filter((img) => img.id !== imgId));
+      setDeletingImgId(null);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to delete image"
-      );
+      toast.error("Failed to delete image", {
+        description: err instanceof Error ? err.message : "Please try again",
+      });
+      setDeletingImgId(null);
     }
   }
 
@@ -351,6 +358,7 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
       );
     } catch {
       setGallery(prev);
+      toast.error("Reorder failed", { description: "The original order has been restored." });
     }
   }
 
@@ -573,6 +581,12 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
                   Additional photos shown in the experience detail page. Drag to
                   reorder.
                 </p>
+                {gallery.length === 0 && (
+                  <div className="rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground">
+                    <ImageIcon className="size-8 mx-auto mb-2 opacity-40" />
+                    No gallery images yet — upload to add.
+                  </div>
+                )}
                 {gallery.length > 0 && (
                   <SortableList
                     items={gallery}
@@ -601,7 +615,7 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
                           variant="ghost"
                           size="icon"
                           className="size-7 text-destructive hover:text-destructive"
-                          onClick={() => handleGalleryDelete(img.id)}
+                          onClick={() => setDeletingImgId(img.id)}
                         >
                           <Trash2 className="size-3" />
                         </Button>
@@ -713,6 +727,15 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
       </div>
 
       <ConfirmDialog {...confirmDialogProps} />
+      <ConfirmDialog
+        open={deletingImgId !== null}
+        onOpenChange={(open) => { if (!open) setDeletingImgId(null); }}
+        title="Delete gallery image"
+        description="This image will be permanently removed from the gallery."
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={() => deletingImgId !== null && handleGalleryDelete(deletingImgId)}
+      />
     </div>
   );
 }
