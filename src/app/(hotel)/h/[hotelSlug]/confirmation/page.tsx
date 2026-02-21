@@ -85,13 +85,13 @@ export default function ConfirmationPage() {
           {/* Request ID */}
           {publicId && (
             <div
-              className="flex items-center justify-between p-4 rounded-2xl"
+              className="p-4 rounded-2xl"
               style={{
                 backgroundColor: "color-mix(in oklch, var(--brand-primary) 4%, transparent)",
               }}
             >
               <span
-                className="text-xs"
+                className="text-xs block"
                 style={{
                   color: "color-mix(in oklch, var(--brand-primary) 50%, transparent)",
                 }}
@@ -99,7 +99,7 @@ export default function ConfirmationPage() {
                 Request ID
               </span>
               <span
-                className="text-xs font-mono font-medium"
+                className="text-xs font-mono font-medium block mt-1 break-all"
                 style={{ color: "var(--brand-primary)" }}
               >
                 {publicId}
