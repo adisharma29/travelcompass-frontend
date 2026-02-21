@@ -64,8 +64,19 @@ export interface DeptStatusResult {
 }
 
 /**
+ * Get the previous day's name from WEEKDAY_KEYS.
+ */
+function getYesterdayName(dayOfWeek: string): string {
+  const idx = WEEKDAY_KEYS.indexOf(dayOfWeek as (typeof WEEKDAY_KEYS)[number]);
+  return WEEKDAY_KEYS[(idx + 6) % 7];
+}
+
+/**
  * Get the current open/closed status of a department based on its schedule.
  * Returns a human-readable label and boolean.
+ *
+ * Handles overnight windows (e.g. ["22:00", "02:00"]) that span past midnight,
+ * matching the backend's is_department_after_hours() behavior.
  */
 export function getDeptStatus(schedule: DepartmentSchedule): DeptStatusResult {
   if (!schedule || (!schedule.default?.length && !schedule.overrides)) {
@@ -75,34 +86,51 @@ export function getDeptStatus(schedule: DepartmentSchedule): DeptStatusResult {
   const tz = schedule.timezone || "UTC";
   const { hours, minutes, dayOfWeek } = nowInTimezone(tz);
   const currentMinutes = hours * 60 + minutes;
-  const slots = getSlotsForDay(schedule, dayOfWeek);
+  const todaySlots = getSlotsForDay(schedule, dayOfWeek);
 
-  if (!slots.length) {
-    return { label: "Closed today", isOpen: false };
-  }
-
-  for (const [open, close] of slots) {
+  // 1. Check today's windows (handles same-day and overnight start)
+  for (const [open, close] of todaySlots) {
     const openMin = parseTimeToMinutes(open);
     const closeMin = parseTimeToMinutes(close);
 
-    if (currentMinutes >= openMin && currentMinutes < closeMin) {
-      // Currently open — show when it closes
-      return {
-        label: `Open · Closes ${formatTime(close)}`,
-        isOpen: true,
-      };
+    if (openMin <= closeMin) {
+      // Same-day window, e.g. ["09:00", "17:00"]
+      if (currentMinutes >= openMin && currentMinutes <= closeMin) {
+        return { label: `Open · Closes ${formatTime(close)}`, isOpen: true };
+      }
+    } else {
+      // Overnight window, e.g. ["22:00", "02:00"]
+      // Before-midnight portion: open from openMin onward
+      if (currentMinutes >= openMin) {
+        return { label: `Open · Closes ${formatTime(close)}`, isOpen: true };
+      }
     }
+  }
 
+  // 2. Check yesterday's overnight windows that extend past midnight
+  const yesterdaySlots = getSlotsForDay(schedule, getYesterdayName(dayOfWeek));
+  for (const [open, close] of yesterdaySlots) {
+    const openMin = parseTimeToMinutes(open);
+    const closeMin = parseTimeToMinutes(close);
+
+    if (openMin > closeMin && currentMinutes <= closeMin) {
+      // After-midnight portion of yesterday's overnight window
+      return { label: `Open · Closes ${formatTime(close)}`, isOpen: true };
+    }
+  }
+
+  // 3. Not open — find next opening today
+  for (const [open] of todaySlots) {
+    const openMin = parseTimeToMinutes(open);
     if (currentMinutes < openMin) {
-      // Not yet open — show when it opens
-      return {
-        label: `Opens ${formatTime(open)}`,
-        isOpen: false,
-      };
+      return { label: `Opens ${formatTime(open)}`, isOpen: false };
     }
   }
 
   // Past all slots for today
+  if (!todaySlots.length) {
+    return { label: "Closed today", isOpen: false };
+  }
   return { label: "Closed today", isOpen: false };
 }
 
