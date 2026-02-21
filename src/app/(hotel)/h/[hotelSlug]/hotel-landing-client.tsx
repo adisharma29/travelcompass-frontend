@@ -50,7 +50,7 @@ export function HotelLandingClient({
   // Coalesced refetch — concurrent calls are merged; a trailing request is queued
   const fetchingRef = useRef(false);
   const pendingRef = useRef(false);
-  const refetchRef = useRef<() => void>();
+  const refetchRef = useRef<(() => void) | null>(null);
   const refetchFeaturedEvents = useCallback(() => {
     if (fetchingRef.current) {
       pendingRef.current = true;
@@ -295,4 +295,3 @@ export function HotelLandingClient({
     </>
   );
 }
-
