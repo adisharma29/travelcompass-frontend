@@ -1,20 +1,22 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type {
   Department,
   Hotel,
+  HotelEventPublic,
   ServiceRequestListItem,
 } from "@/lib/concierge-types";
 import { DepartmentGrid } from "@/components/guest/DepartmentGrid";
 import { GuestFooter } from "@/components/guest/GuestFooter";
 import { SafeHtml } from "@/components/guest/SafeHtml";
 import { RequestCard } from "@/components/guest/RequestCard";
+import { FeaturedEventCard } from "@/components/guest/FeaturedEventCard";
 import { useGuest } from "@/context/GuestContext";
-import { getMyRequests } from "@/lib/guest-auth";
+import { getMyRequests, getPublicEvents } from "@/lib/guest-auth";
 import { logout } from "@/lib/auth";
 import { User, LogOut, ChevronDown, ShieldCheck } from "lucide-react";
 import {
@@ -35,6 +37,7 @@ export function HotelLandingClient({
   const { isAuthenticated, isVerified, guestUser, guestStay, setAuthState } = useGuest();
   const [requests, setRequests] = useState<ServiceRequestListItem[]>([]);
   const [requestCount, setRequestCount] = useState(0);
+  const [featuredEvents, setFeaturedEvents] = useState<HotelEventPublic[]>([]);
 
   useEffect(() => {
     if (!isAuthenticated) return;
@@ -43,6 +46,36 @@ export function HotelLandingClient({
       setRequestCount(count);
     }).catch(() => {});
   }, [isAuthenticated, hotel.slug]);
+
+  // Coalesced refetch — concurrent calls are merged; a trailing request is queued
+  const fetchingRef = useRef(false);
+  const pendingRef = useRef(false);
+  const refetchRef = useRef<() => void>();
+  const refetchFeaturedEvents = useCallback(() => {
+    if (fetchingRef.current) {
+      pendingRef.current = true;
+      return;
+    }
+    fetchingRef.current = true;
+    getPublicEvents(hotel.slug, { featured: true })
+      .then(setFeaturedEvents)
+      .catch(() => {})
+      .finally(() => {
+        fetchingRef.current = false;
+        if (pendingRef.current) {
+          pendingRef.current = false;
+          refetchRef.current?.();
+        }
+      });
+  }, [hotel.slug]);
+
+  useEffect(() => {
+    refetchRef.current = refetchFeaturedEvents;
+  }, [refetchFeaturedEvents]);
+
+  useEffect(() => {
+    refetchFeaturedEvents();
+  }, [refetchFeaturedEvents]);
 
   const guestDisplayName =
     guestUser?.first_name || guestUser?.phone || null;
@@ -192,6 +225,53 @@ export function HotelLandingClient({
                 View all requests ({requestCount})
               </Link>
             )}
+          </section>
+        )}
+
+        {/* Featured Events — snap carousel on mobile, grid on sm+ */}
+        {featuredEvents.length > 0 && (
+          <section className="pb-4">
+            <div className="flex items-baseline justify-between mb-3 px-5">
+              <h2
+                className="text-lg font-semibold"
+                style={{
+                  fontFamily: "var(--brand-heading-font)",
+                  color: "var(--brand-primary)",
+                }}
+              >
+                Featured Events
+              </h2>
+              <Link
+                href={`/h/${hotel.slug}/events`}
+                className="text-xs font-medium"
+                style={{ color: "var(--brand-accent, var(--brand-primary))" }}
+              >
+                View all
+              </Link>
+            </div>
+            {/* Mobile: horizontal snap-scroll showing ~1.1 cards */}
+            <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scroll-pl-5 px-5 pb-2 sm:hidden no-scrollbar">
+              {featuredEvents.slice(0, 3).map((event) => (
+                <div key={event.id} className="w-[85%] shrink-0 snap-start">
+                  <FeaturedEventCard
+                    event={event}
+                    hotelSlug={hotel.slug}
+                    onOccurrenceExpired={refetchFeaturedEvents}
+                  />
+                </div>
+              ))}
+            </div>
+            {/* sm+: responsive grid */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4 px-5">
+              {featuredEvents.slice(0, 3).map((event) => (
+                <FeaturedEventCard
+                  key={event.id}
+                  event={event}
+                  hotelSlug={hotel.slug}
+                  onOccurrenceExpired={refetchFeaturedEvents}
+                />
+              ))}
+            </div>
           </section>
         )}
 

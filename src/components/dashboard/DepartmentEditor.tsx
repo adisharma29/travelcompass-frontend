@@ -96,6 +96,7 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
     restoreDraft,
     discardDraft,
     clearDraft,
+    setBaseline,
     lastSaved: draftLastSaved,
   } = useLocalDraft<DeptFormData>(draftKey, EMPTY_FORM);
 
@@ -141,8 +142,9 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
         setServerData(data);
         setExistingPhotoUrl(dept.photo);
         setExistingIconUrl(dept.icon || null);
-        // Only set form if no draft to restore
-        if (!hasDraft) {
+        // Mark server data as baseline so auto-save doesn't treat it as a draft
+        const cleared = setBaseline(data);
+        if (!hasDraft || cleared) {
           setForm(data);
         }
       } catch {

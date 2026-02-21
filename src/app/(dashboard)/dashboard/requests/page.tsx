@@ -370,6 +370,11 @@ function RequestRow({
               {req.experience_name}
             </div>
           )}
+          {req.event_name && (
+            <div className="text-xs text-muted-foreground">
+              Event: {req.event_name}
+            </div>
+          )}
         </TableCell>
         <TableCell className="text-xs text-muted-foreground">
           <div>{req.guest_date ?? "—"}</div>
@@ -453,6 +458,11 @@ function MobileRequestCard({
               <span className="text-muted-foreground font-normal"> — {req.experience_name}</span>
             )}
           </div>
+          {req.event_name && (
+            <div className="text-xs text-muted-foreground">
+              Event: {req.event_name}
+            </div>
+          )}
           <div className="text-xs text-muted-foreground mt-0.5">
             {req.guest_name}
             {req.room_number && ` · Room ${req.room_number}`}

@@ -5,8 +5,8 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useGuest } from "@/context/GuestContext";
 import { GuestHeader } from "@/components/guest/GuestHeader";
 import { GuestStepper } from "@/components/guest/GuestStepper";
-import { submitGuestRequest, getPublicExperience, getPublicDepartment } from "@/lib/guest-auth";
-import type { Experience, RequestType } from "@/lib/concierge-types";
+import { submitGuestRequest, getPublicExperience, getPublicDepartment, getPublicEvent } from "@/lib/guest-auth";
+import type { Experience, HotelEventPublic, RequestType } from "@/lib/concierge-types";
 import { Loader2 } from "lucide-react";
 
 export default function RequestPage() {
@@ -16,6 +16,8 @@ export default function RequestPage() {
 
   const deptSlug = searchParams.get("dept");
   const expSlug = searchParams.get("exp");
+  const eventSlug = searchParams.get("event");
+  const occurrenceDate = searchParams.get("occurrence_date");
   const VALID_REQUEST_TYPES: RequestType[] = ["BOOKING", "INQUIRY", "CUSTOM"];
   const rawType = searchParams.get("type");
   const requestType: RequestType =
@@ -24,6 +26,7 @@ export default function RequestPage() {
       : "BOOKING";
 
   const [experience, setExperience] = useState<Experience | null>(null);
+  const [event, setEvent] = useState<HotelEventPublic | null>(null);
   const [departmentId, setDepartmentId] = useState<number | null>(null);
   const [guestName, setGuestName] = useState("");
   const [guestDate, setGuestDate] = useState("");
@@ -49,10 +52,28 @@ export default function RequestPage() {
     }
   }, [guestUser]);
 
-  // Fetch experience and/or department
+  // Fetch experience, event, and/or department
   useEffect(() => {
     let cancelled = false;
     (async () => {
+      // Fetch event if slug provided
+      if (eventSlug) {
+        try {
+          const ev = await getPublicEvent(hotel.slug, eventSlug);
+          if (!cancelled) {
+            setEvent(ev);
+            // Use event's routing department if no dept param
+            if (!deptSlug && ev.routing_department_slug) {
+              try {
+                const dept = await getPublicDepartment(hotel.slug, ev.routing_department_slug);
+                if (!cancelled) setDepartmentId(dept.id);
+              } catch { /* ignore */ }
+            }
+          }
+        } catch {
+          // Event not found — continue without it
+        }
+      }
       if (expSlug && deptSlug) {
         try {
           const exp = await getPublicExperience(hotel.slug, deptSlug, expSlug);
@@ -71,7 +92,7 @@ export default function RequestPage() {
       }
     })();
     return () => { cancelled = true; };
-  }, [expSlug, deptSlug, hotel.slug]);
+  }, [expSlug, deptSlug, eventSlug, hotel.slug]);
 
   // Today's date for min attribute
   const today = new Date().toISOString().split("T")[0];
@@ -81,8 +102,9 @@ export default function RequestPage() {
       setError("Please enter your name");
       return;
     }
-    const deptIdNum = departmentId;
-    if (!deptIdNum) {
+    // Department is required for non-event requests; for event requests
+    // the backend resolves it via fallback chain
+    if (!event && !departmentId) {
       setError("No department selected. Please go back and try again.");
       return;
     }
@@ -90,8 +112,10 @@ export default function RequestPage() {
     setLoading(true);
     try {
       const res = await submitGuestRequest(hotel.slug, {
-        department: deptIdNum,
+        department: departmentId || undefined,
         experience: experience?.id,
+        event: event?.id,
+        occurrence_date: occurrenceDate || undefined,
         request_type: requestType,
         guest_name: guestName.trim(),
         guest_date: guestDate || undefined,
@@ -103,6 +127,7 @@ export default function RequestPage() {
       const params = new URLSearchParams({
         id: res.public_id,
         ...(experience ? { exp: experience.name } : {}),
+        ...(event ? { event: event.name } : {}),
       });
       router.push(`/h/${hotel.slug}/confirmation?${params.toString()}`);
     } catch (err) {
@@ -141,8 +166,37 @@ export default function RequestPage() {
 
       <main className="flex-1 px-5 py-8 md:py-12 max-w-lg mx-auto w-full">
         <div className="p-4 rounded-2xl border border-black/5 shadow-sm md:p-8 md:rounded-3xl overflow-hidden">
+        {/* Event preview card */}
+        {event && (
+          <div
+            className="p-4 rounded-2xl mb-6"
+            style={{
+              backgroundColor: "color-mix(in oklch, var(--brand-accent) 6%, transparent)",
+            }}
+          >
+            <h3
+              className="text-sm font-semibold mb-1"
+              style={{
+                fontFamily: "var(--brand-heading-font)",
+                color: "var(--brand-primary)",
+              }}
+            >
+              {event.name}
+            </h3>
+            <p
+              className="text-xs"
+              style={{
+                color: "color-mix(in oklch, var(--brand-primary) 50%, transparent)",
+              }}
+            >
+              {event.price_display}
+              {event.category && ` · ${event.category.charAt(0) + event.category.slice(1).toLowerCase()}`}
+            </p>
+          </div>
+        )}
+
         {/* Experience preview card */}
-        {experience && (
+        {experience && !event && (
           <div
             className="p-4 rounded-2xl mb-6"
             style={{

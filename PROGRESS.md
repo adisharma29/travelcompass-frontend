@@ -271,6 +271,41 @@
 - [x] Frontend: QR placement chart wired into Overview tab (ADMIN/SUPERADMIN only)
 - [x] Build passes with no errors
 
+## Events & Special Offers (see EVENTS_PLAN.md)
+
+### Backend
+- [x] Event model + ServiceRequest FK + migration
+- [x] EventSerializer + EventPublicSerializer + request serializer updates
+- [x] EventPublicList/Detail, EventAdminViewSet, EventBulkReorder views + URL patterns
+- [x] Split permissions (STAFF can list/view, ADMIN+ can CUD)
+- [x] SSE payload: event_id + event_name on publish_request_event()
+- [x] expire_events_task Celery beat task (hourly, one-time + recurring with hotel timezone)
+
+### Frontend — Types & API
+- [x] RecurrenceRule, HotelEvent, HotelEventPublic types in concierge-types.ts
+- [x] event_name on ServiceRequestListItem, event_id/occurrence_date on ServiceRequest, event fields on SSERequestEvent
+- [x] Admin API: getEvents, getEvent, createEvent, updateEvent, deleteEvent, reorderEvents
+- [x] Guest API: getPublicEvents, getPublicEvent + GuestRequestPayload event/occurrence_date fields
+
+### Frontend — Admin Dashboard
+- [x] "Events" nav item in sidebar (CalendarDays icon, minRole: STAFF)
+- [x] Events list page with filter tabs (All/Published/Draft/Expired), SortableList drag reorder
+- [x] EventEditor form (basic info, rich text, scheduling, recurrence, routing, images, highlights, visibility)
+- [x] Draft system (useLocalDraft) + unsaved changes protection
+- [x] Event info displayed in admin request detail + request list pages
+
+### Frontend — Guest Pages
+- [x] EventDateLabel component (smart date formatter: today/tomorrow/this week/recurring)
+- [x] EventCard component (branded, with photo, date label, featured badge, CTA)
+- [x] Events list page (/h/[hotelSlug]/events/) with filter tabs (Upcoming/Featured/All)
+- [x] Event detail page (/h/[hotelSlug]/events/[eventSlug]/) with hero image, highlights, booking card
+- [x] Featured events section on hotel landing page (client-side fetch, max 3 events)
+- [x] Request form: event query param support, event preview card, event ID in payload
+- [x] Confirmation page: event name display
+- [x] Build + lint pass with no errors
+
+---
+
 ### Phase 7.2: Event Tracking + Funnel (not started)
 - [ ] Backend: `EngagementEvent` model + migration
 - [ ] Backend: POST endpoint with compound throttle (hotel+IP+UA)

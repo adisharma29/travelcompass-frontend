@@ -6,6 +6,7 @@ import type {
   Experience,
   GuestStay,
   Hotel,
+  HotelEventPublic,
   RequestType,
   ServiceRequestListItem,
 } from "./concierge-types";
@@ -93,6 +94,33 @@ export async function getPublicExperience(
     next: { revalidate: 60 },
   } as RequestInit);
   return json<Experience>(res);
+}
+
+export async function getPublicEvents(
+  hotelSlug: string,
+  params?: { featured?: boolean; all?: boolean },
+): Promise<HotelEventPublic[]> {
+  const qs = new URLSearchParams();
+  if (params?.featured) qs.set("featured", "true");
+  if (params?.all) qs.set("all", "true");
+  const qsStr = qs.toString() ? `?${qs.toString()}` : "";
+  const res = await fetch(serverUrl(`/hotels/${hotelSlug}/events/${qsStr}`), {
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  } as RequestInit);
+  const data = await json<PaginatedResponse<HotelEventPublic> | HotelEventPublic[]>(res);
+  return Array.isArray(data) ? data : data.results;
+}
+
+export async function getPublicEvent(
+  hotelSlug: string,
+  eventSlug: string,
+): Promise<HotelEventPublic> {
+  const res = await fetch(serverUrl(`/hotels/${hotelSlug}/events/${eventSlug}/`), {
+    headers: { Accept: "application/json" },
+    cache: "no-store",
+  } as RequestInit);
+  return json<HotelEventPublic>(res);
 }
 
 // ----- OTP flow -----
@@ -186,8 +214,10 @@ async function guestMutationFetch(
 // ----- Guest actions (auth required) -----
 
 export interface GuestRequestPayload {
-  department: number;
+  department?: number;
   experience?: number;
+  event?: number;
+  occurrence_date?: string;
   request_type: RequestType;
   guest_name: string;
   guest_date?: string;
