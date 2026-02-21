@@ -140,7 +140,7 @@ export default function RequestPage() {
       <GuestHeader title="Make a Request" backHref={experience ? `/h/${hotel.slug}` : undefined} />
 
       <main className="flex-1 px-5 py-8 md:py-12 max-w-lg mx-auto w-full">
-        <div className="p-4 rounded-2xl border border-black/5 shadow-sm md:p-8 md:rounded-3xl">
+        <div className="p-4 rounded-2xl border border-black/5 shadow-sm md:p-8 md:rounded-3xl overflow-hidden">
         {/* Experience preview card */}
         {experience && (
           <div
@@ -203,7 +203,7 @@ export default function RequestPage() {
                 value={guestDate}
                 onChange={(e) => setGuestDate(e.target.value)}
                 min={today}
-                className="w-full px-4 py-3 rounded-xl border text-sm"
+                className="w-full px-4 py-3 rounded-xl border text-sm appearance-none min-w-0"
                 style={inputStyle}
               />
             </div>
@@ -222,7 +222,7 @@ export default function RequestPage() {
                 type="time"
                 value={guestTime}
                 onChange={(e) => setGuestTime(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border text-sm"
+                className="w-full px-4 py-3 rounded-xl border text-sm appearance-none min-w-0"
                 style={inputStyle}
               />
             </div>
