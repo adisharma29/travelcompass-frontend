@@ -120,7 +120,18 @@ export function HotelLandingClient({
 
       <main className="flex-1 max-w-6xl mx-auto w-full">
         {/* Hotel intro — name + photo + description */}
-        <section className="px-5 pt-6 pb-4 flex gap-5 items-start">
+        <section className="px-5 pt-6 pb-4 flex flex-col sm:flex-row-reverse gap-4 sm:gap-5 sm:items-start">
+          {hotel.cover_image && (
+            <div className="relative w-full h-40 sm:shrink-0 sm:w-32 sm:h-32 rounded-xl overflow-hidden">
+              <Image
+                src={hotel.cover_image}
+                alt=""
+                fill
+                sizes="(max-width: 640px) 100vw, 128px"
+                className="object-cover"
+              />
+            </div>
+          )}
           <div className="flex-1 min-w-0">
             <h1
               className="text-xl font-bold leading-tight"
@@ -153,17 +164,6 @@ export function HotelLandingClient({
               />
             )}
           </div>
-          {hotel.cover_image && (
-            <div className="relative shrink-0 w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden">
-              <Image
-                src={hotel.cover_image}
-                alt=""
-                fill
-                sizes="128px"
-                className="object-cover"
-              />
-            </div>
-          )}
         </section>
 
         {/* Your Requests — only when authenticated and has requests */}

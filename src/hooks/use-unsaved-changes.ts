@@ -134,7 +134,10 @@ export function useUnsavedChanges(isDirty: boolean) {
   // 4. Guard for programmatic navigation
   const guardNavigation = useCallback(
     (navigate: () => void): boolean => {
-      if (!isDirty) return true;
+      if (!isDirty) {
+        navigate();
+        return true;
+      }
       pendingNavigation.current = navigate;
       setShowDialog(true);
       return false;
