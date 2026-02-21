@@ -121,6 +121,7 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
     restoreDraft,
     discardDraft,
     clearDraft,
+    setBaseline,
     lastSaved: draftLastSaved,
   } = useLocalDraft<ExpFormData>(draftKey, EMPTY_FORM);
 
@@ -191,13 +192,17 @@ export function ExperienceEditor({ deptSlug, expId }: ExperienceEditorProps) {
               (a, b) => a.display_order - b.display_order
             )
           );
-          if (!hasDraft) {
+          // Mark server data as baseline so auto-save doesn't treat it as a draft
+          const cleared = setBaseline(data);
+          if (!hasDraft || cleared) {
             setForm(data);
           }
         } else {
           // Create mode — pre-select department
-          if (!hasDraft) {
-            setForm({ ...EMPTY_FORM, department: dept.id });
+          const createData = { ...EMPTY_FORM, department: dept.id };
+          const cleared = setBaseline(createData);
+          if (!hasDraft || cleared) {
+            setForm(createData);
           }
         }
       } catch {

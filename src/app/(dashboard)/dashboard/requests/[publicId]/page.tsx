@@ -236,6 +236,11 @@ export default function RequestDetailPage({
             <div>
               <span className="font-medium text-foreground">{request.department_name}</span>
               {request.experience_name && ` — ${request.experience_name}`}
+              {request.event_name && (
+                <Badge variant="outline" className="ml-2 text-xs align-middle">
+                  Event: {request.event_name}
+                </Badge>
+              )}
             </div>
             <div>
               {request.guest_name}
@@ -260,6 +265,9 @@ export default function RequestDetailPage({
               <DetailField label="Guests" value={request.guest_count?.toString() ?? "—"} />
               <DetailField label="Date" value={request.guest_date ?? "—"} />
               <DetailField label="Time" value={request.guest_time ?? "—"} />
+              {request.occurrence_date && (
+                <DetailField label="Event Date" value={request.occurrence_date} />
+              )}
               <DetailField
                 label="Created"
                 value={formatDateTime(request.created_at)}

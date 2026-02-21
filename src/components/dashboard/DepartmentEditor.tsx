@@ -34,7 +34,16 @@ import { ConfirmDialog } from "@/components/dashboard/ConfirmDialog";
 import { useUnsavedChanges } from "@/hooks/use-unsaved-changes";
 import { useLocalDraft } from "@/hooks/use-local-draft";
 
-const DAYS = ["MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"] as const;
+/** Canonical lowercase full names (match backend strftime('%A').lower() + schedule-utils WEEKDAY_KEYS). */
+const DAYS = [
+  { key: "monday", label: "MON" },
+  { key: "tuesday", label: "TUE" },
+  { key: "wednesday", label: "WED" },
+  { key: "thursday", label: "THU" },
+  { key: "friday", label: "FRI" },
+  { key: "saturday", label: "SAT" },
+  { key: "sunday", label: "SUN" },
+] as const;
 
 const DEFAULT_SCHEDULE: DepartmentSchedule = {
   timezone: "Asia/Kolkata",
@@ -87,6 +96,7 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
     restoreDraft,
     discardDraft,
     clearDraft,
+    setBaseline,
     lastSaved: draftLastSaved,
   } = useLocalDraft<DeptFormData>(draftKey, EMPTY_FORM);
 
@@ -132,8 +142,9 @@ export function DepartmentEditor({ deptSlug }: DepartmentEditorProps) {
         setServerData(data);
         setExistingPhotoUrl(dept.photo);
         setExistingIconUrl(dept.icon || null);
-        // Only set form if no draft to restore
-        if (!hasDraft) {
+        // Mark server data as baseline so auto-save doesn't treat it as a draft
+        const cleared = setBaseline(data);
+        if (!hasDraft || cleared) {
           setForm(data);
         }
       } catch {
@@ -471,18 +482,18 @@ function ScheduleEditor({
         <Label className="text-xs text-muted-foreground">Day Overrides</Label>
         <div className="flex flex-wrap gap-2">
           {DAYS.map((day) => {
-            const override = schedule.overrides?.[day];
+            const override = schedule.overrides?.[day.key];
             const slot = override?.[0];
             return (
-              <div key={day} className="flex items-center gap-1.5">
+              <div key={day.key} className="flex items-center gap-1.5">
                 <Button
                   type="button"
                   variant={override ? "default" : "outline"}
                   size="sm"
                   className="w-14 text-xs"
-                  onClick={() => toggleDayOverride(day)}
+                  onClick={() => toggleDayOverride(day.key)}
                 >
-                  {day}
+                  {day.label}
                 </Button>
                 {override && slot && (
                   <>
@@ -490,7 +501,7 @@ function ScheduleEditor({
                       type="time"
                       value={slot[0]}
                       onChange={(e) =>
-                        setDayHours(day, e.target.value, slot[1])
+                        setDayHours(day.key, e.target.value, slot[1])
                       }
                       className="w-auto h-8 text-xs"
                     />
@@ -501,7 +512,7 @@ function ScheduleEditor({
                       type="time"
                       value={slot[1]}
                       onChange={(e) =>
-                        setDayHours(day, slot[0], e.target.value)
+                        setDayHours(day.key, slot[0], e.target.value)
                       }
                       className="w-auto h-8 text-xs"
                     />

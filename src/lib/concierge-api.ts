@@ -7,6 +7,7 @@ import type {
   Experience,
   ExperienceImage,
   Hotel,
+  HotelEvent,
   HotelMembership,
   HotelSettings,
   Notification,
@@ -314,6 +315,73 @@ export async function reorderExperiences(
 ): Promise<void> {
   const res = await authFetch(
     url(`/hotels/${hotelSlug}/admin/departments/${deptSlug}/experiences/reorder/`),
+    { method: "PATCH", body: JSON.stringify({ order }) },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+// ----- Events -----
+
+export async function getEvents(
+  hotelSlug: string,
+  status?: string,
+): Promise<HotelEvent[]> {
+  const qs = status ? `?status=${encodeURIComponent(status)}` : "";
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/events/${qs}`));
+  const data = await json<HotelEvent[] | { results: HotelEvent[] }>(res);
+  return Array.isArray(data) ? data : data.results;
+}
+
+export async function getEvent(
+  hotelSlug: string,
+  id: number,
+): Promise<HotelEvent> {
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/events/${id}/`));
+  return json<HotelEvent>(res);
+}
+
+export async function createEvent(
+  hotelSlug: string,
+  data: FormData | Record<string, unknown>,
+): Promise<HotelEvent> {
+  const isFormData = data instanceof FormData;
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/events/`), {
+    method: "POST",
+    body: isFormData ? data : JSON.stringify(data),
+  });
+  return json<HotelEvent>(res);
+}
+
+export async function updateEvent(
+  hotelSlug: string,
+  id: number,
+  data: FormData | Record<string, unknown>,
+): Promise<HotelEvent> {
+  const isFormData = data instanceof FormData;
+  const res = await authFetch(url(`/hotels/${hotelSlug}/admin/events/${id}/`), {
+    method: "PATCH",
+    body: isFormData ? data : JSON.stringify(data),
+  });
+  return json<HotelEvent>(res);
+}
+
+export async function deleteEvent(
+  hotelSlug: string,
+  id: number,
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/events/${id}/`),
+    { method: "DELETE" },
+  );
+  if (!res.ok) throw new ApiError(res.status, await res.text());
+}
+
+export async function reorderEvents(
+  hotelSlug: string,
+  order: number[],
+): Promise<void> {
+  const res = await authFetch(
+    url(`/hotels/${hotelSlug}/admin/events/reorder/`),
     { method: "PATCH", body: JSON.stringify({ order }) },
   );
   if (!res.ok) throw new ApiError(res.status, await res.text());

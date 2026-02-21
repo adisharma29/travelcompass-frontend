@@ -12,6 +12,7 @@ export default function ConfirmationPage() {
 
   const publicId = searchParams.get("id") ?? "";
   const expName = searchParams.get("exp") ?? null;
+  const eventName = searchParams.get("event") ?? null;
 
   return (
     <div className="min-h-dvh flex flex-col">
@@ -46,9 +47,11 @@ export default function ConfirmationPage() {
             color: "color-mix(in oklch, var(--brand-primary) 60%, transparent)",
           }}
         >
-          {expName
-            ? `Your request for "${expName}" has been sent to the hotel team.`
-            : "Your request has been sent to the hotel team."}
+          {eventName
+            ? `Your request for the event "${eventName}" has been sent to the hotel team.`
+            : expName
+              ? `Your request for "${expName}" has been sent to the hotel team.`
+              : "Your request has been sent to the hotel team."}
         </p>
 
         {/* Info cards */}

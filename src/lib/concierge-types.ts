@@ -194,6 +194,66 @@ export interface Experience {
   updated_at: string;
 }
 
+export interface RecurrenceRule {
+  freq: "daily" | "weekly" | "monthly";
+  interval?: number;
+  days?: string[];  // ["MON", "SAT"]
+  until?: string;   // ISO date "YYYY-MM-DD"
+}
+
+export interface HotelEvent {
+  id: number;
+  hotel: number;
+  experience: number | null;
+  department: number | null;
+  name: string;
+  slug: string;
+  description: string;
+  photo: string | null;
+  cover_image: string | null;
+  price_display: string;
+  highlights: string[];
+  category: ExperienceCategory;
+  event_start: string;
+  event_end: string | null;
+  is_all_day: boolean;
+  is_recurring: boolean;
+  recurrence_rule: RecurrenceRule | null;
+  is_featured: boolean;
+  status: ContentStatus;
+  is_active: boolean;
+  published_at: string | null;
+  auto_expire: boolean;
+  display_order: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface HotelEventPublic {
+  id: number;
+  name: string;
+  slug: string;
+  description: string;
+  photo: string | null;
+  cover_image: string | null;
+  price_display: string;
+  highlights: string[];
+  category: ExperienceCategory;
+  event_start: string;
+  event_end: string | null;
+  is_all_day: boolean;
+  is_recurring: boolean;
+  recurrence_rule: RecurrenceRule | null;
+  is_featured: boolean;
+  next_occurrence: string | null;
+  department: number | null;
+  routing_department_slug: string | null;
+  routing_department_name: string | null;
+  experience_name: string | null;
+  experience_slug: string | null;
+  experience_department_slug: string | null;
+}
+
 export interface GuestStay {
   id: number;
   hotel: number;
@@ -213,6 +273,7 @@ export interface ServiceRequestListItem {
   room_number: string;
   department_name: string;
   experience_name: string | null;
+  event_name: string | null;
   guest_notes: string;
   guest_date: string | null;
   guest_time: string | null;
@@ -228,6 +289,8 @@ export interface ServiceRequestListItem {
 export interface ServiceRequest extends ServiceRequestListItem {
   experience: Experience | null;
   department: Department;
+  event_id: number | null;
+  occurrence_date: string | null;
   staff_notes: string;
   confirmation_reason: string | null;
   assigned_to_name: string | null;
@@ -355,4 +418,6 @@ export interface SSERequestEvent {
   status: RequestStatus;
   department_id: number;
   updated_at: string;
+  event_id: number | null;
+  event_name: string | null;
 }

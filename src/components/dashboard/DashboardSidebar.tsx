@@ -8,6 +8,7 @@ import {
   Inbox,
   Building2,
   Sparkles,
+  CalendarDays,
   Users,
   QrCode,
   Settings,
@@ -60,6 +61,12 @@ const NAV_ITEMS: NavItem[] = [
     href: "/dashboard/experiences",
     icon: Sparkles,
     minRole: "ADMIN",
+  },
+  {
+    label: "Events",
+    href: "/dashboard/events",
+    icon: CalendarDays,
+    minRole: "STAFF",
   },
   {
     label: "Team",
