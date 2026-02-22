@@ -155,7 +155,19 @@ export default function SettingsPage() {
             <CheckCircle2 className="size-3.5" /> Saved
           </span>
         )}
-        <Button size="sm" disabled={!dirty || saving} onClick={handleSave}>
+        <Button
+          size="sm"
+          disabled={
+            !dirty ||
+            saving ||
+            (form
+              ? form.default_booking_opens_hours > 0 &&
+                form.default_booking_closes_hours > 0 &&
+                form.default_booking_opens_hours < form.default_booking_closes_hours
+              : false)
+          }
+          onClick={handleSave}
+        >
           {saving ? <Loader2 className="size-4 animate-spin" /> : <Save className="size-4" />}
           <span className="ml-1.5">Save</span>
         </Button>
@@ -378,6 +390,71 @@ export default function SettingsPage() {
                     IANA timezone (e.g. Asia/Kolkata, Europe/London)
                   </p>
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Booking Defaults */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Booking Defaults</CardTitle>
+                <CardDescription>
+                  Default booking window for events. Individual events can override these.
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="booking-opens-default">Default booking opens</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="booking-opens-default"
+                        type="number"
+                        min={0}
+                        value={form.default_booking_opens_hours}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            default_booking_opens_hours: Number(e.target.value) || 0,
+                          })
+                        }
+                        className="w-24"
+                      />
+                      <span className="text-sm text-muted-foreground">hours</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      0 = bookings always open
+                    </p>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="booking-closes-default">Default booking closes</Label>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        id="booking-closes-default"
+                        type="number"
+                        min={0}
+                        value={form.default_booking_closes_hours}
+                        onChange={(e) =>
+                          setForm({
+                            ...form,
+                            default_booking_closes_hours: Number(e.target.value) || 0,
+                          })
+                        }
+                        className="w-24"
+                      />
+                      <span className="text-sm text-muted-foreground">hours</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      0 = no cutoff (accept until event starts)
+                    </p>
+                  </div>
+                </div>
+                {form.default_booking_opens_hours > 0 &&
+                  form.default_booking_closes_hours > 0 &&
+                  form.default_booking_opens_hours < form.default_booking_closes_hours && (
+                    <p className="text-sm text-destructive">
+                      Opens must be greater than or equal to closes.
+                    </p>
+                  )}
               </CardContent>
             </Card>
 

@@ -77,6 +77,8 @@ interface EventFormData {
   recurrence_interval: number;
   recurrence_days: string[];
   recurrence_until: string;
+  booking_opens_hours: string;
+  booking_closes_hours: string;
   department: number | null;
   experience: number | null;
   is_featured: boolean;
@@ -98,6 +100,8 @@ const EMPTY_FORM: EventFormData = {
   recurrence_interval: 1,
   recurrence_days: [],
   recurrence_until: "",
+  booking_opens_hours: "",
+  booking_closes_hours: "",
   department: null,
   experience: null,
   is_featured: false,
@@ -187,6 +191,8 @@ export function EventEditor({ eventId }: EventEditorProps) {
       form.recurrence_freq !== serverData.recurrence_freq ||
       form.recurrence_interval !== serverData.recurrence_interval ||
       form.recurrence_until !== serverData.recurrence_until ||
+      form.booking_opens_hours !== serverData.booking_opens_hours ||
+      form.booking_closes_hours !== serverData.booking_closes_hours ||
       form.department !== serverData.department ||
       form.experience !== serverData.experience ||
       form.is_featured !== serverData.is_featured ||
@@ -242,6 +248,8 @@ export function EventEditor({ eventId }: EventEditorProps) {
             recurrence_interval: rule?.interval ?? 1,
             recurrence_days: rule?.days ?? [],
             recurrence_until: rule?.until ?? "",
+            booking_opens_hours: evt.booking_opens_hours != null ? String(evt.booking_opens_hours) : "",
+            booking_closes_hours: evt.booking_closes_hours != null ? String(evt.booking_closes_hours) : "",
             department: evt.department,
             experience: evt.experience,
             is_featured: evt.is_featured,
@@ -290,6 +298,8 @@ export function EventEditor({ eventId }: EventEditorProps) {
       } else {
         fd.append("recurrence_rule", JSON.stringify(null));
       }
+      fd.append("booking_opens_hours", form.booking_opens_hours);
+      fd.append("booking_closes_hours", form.booking_closes_hours);
       if (form.department) fd.append("department", String(form.department));
       else fd.append("department", "");
       if (form.experience) fd.append("experience", String(form.experience));
@@ -315,6 +325,8 @@ export function EventEditor({ eventId }: EventEditorProps) {
       is_all_day: form.is_all_day,
       is_recurring: form.is_recurring,
       recurrence_rule: form.is_recurring ? buildRecurrenceRule() : null,
+      booking_opens_hours: form.booking_opens_hours !== "" ? Number(form.booking_opens_hours) : null,
+      booking_closes_hours: form.booking_closes_hours !== "" ? Number(form.booking_closes_hours) : null,
       department: form.department,
       experience: form.experience,
       is_featured: form.is_featured,
@@ -426,7 +438,17 @@ export function EventEditor({ eventId }: EventEditorProps) {
         title={isEdit ? "Edit Event" : "New Event"}
         onBack={handleBack}
         saving={saving}
-        canSave={!!form.name.trim() && !!form.event_start}
+        canSave={
+          !!form.name.trim() &&
+          !!form.event_start &&
+          !(
+            form.booking_opens_hours !== "" &&
+            form.booking_closes_hours !== "" &&
+            Number(form.booking_opens_hours) > 0 &&
+            Number(form.booking_closes_hours) > 0 &&
+            Number(form.booking_opens_hours) < Number(form.booking_closes_hours)
+          )
+        }
         onSave={handleSave}
         draftLastSaved={draftLastSaved}
         missingFields={[
@@ -702,6 +724,106 @@ export function EventEditor({ eventId }: EventEditorProps) {
                 </div>
               </div>
             )}
+          </CardContent>
+        </Card>
+
+        {/* Booking Window */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Booking Window</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="booking-opens">Bookings open</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="booking-opens"
+                    type="number"
+                    min={0}
+                    max={8760}
+                    value={form.booking_opens_hours}
+                    onChange={(e) =>
+                      setForm({ ...form, booking_opens_hours: e.target.value })
+                    }
+                    placeholder="Hotel default"
+                    className="w-24"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    hours before start
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Leave blank to use hotel default. 0 = always open.
+                </p>
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="booking-closes">Bookings close</Label>
+                <div className="flex items-center gap-2">
+                  <Input
+                    id="booking-closes"
+                    type="number"
+                    min={0}
+                    max={720}
+                    value={form.booking_closes_hours}
+                    onChange={(e) =>
+                      setForm({ ...form, booking_closes_hours: e.target.value })
+                    }
+                    placeholder="Hotel default"
+                    className="w-24"
+                  />
+                  <span className="text-sm text-muted-foreground">
+                    hours before start
+                  </span>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Leave blank to use hotel default. 0 = no cutoff.
+                </p>
+              </div>
+            </div>
+            {form.booking_opens_hours !== "" &&
+              form.booking_closes_hours !== "" &&
+              Number(form.booking_opens_hours) > 0 &&
+              Number(form.booking_closes_hours) > 0 &&
+              Number(form.booking_opens_hours) < Number(form.booking_closes_hours) && (
+                <Alert variant="destructive">
+                  <AlertCircle className="size-4" />
+                  <AlertDescription>
+                    Opens must be greater than or equal to closes (e.g. opens
+                    48h before, closes 2h before).
+                  </AlertDescription>
+                </Alert>
+              )}
+            {form.booking_opens_hours !== "" &&
+              form.booking_closes_hours !== "" &&
+              Number(form.booking_opens_hours) > 0 &&
+              Number(form.booking_closes_hours) >= 0 &&
+              form.event_start &&
+              (() => {
+                const opens = Number(form.booking_opens_hours);
+                const closes = Number(form.booking_closes_hours);
+                if (opens > 0 && closes >= 0 && opens >= closes) {
+                  const start = new Date(form.event_start);
+                  if (!isNaN(start.getTime())) {
+                    const opensAt = new Date(start.getTime() - opens * 3600000);
+                    const closesAt = new Date(start.getTime() - closes * 3600000);
+                    const fmt = (d: Date) =>
+                      d.toLocaleString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                        hour: "numeric",
+                        minute: "2-digit",
+                      });
+                    return (
+                      <p className="text-xs text-muted-foreground">
+                        Bookings accepted from {fmt(opensAt)} until{" "}
+                        {fmt(closesAt)}
+                      </p>
+                    );
+                  }
+                }
+                return null;
+              })()}
           </CardContent>
         </Card>
 

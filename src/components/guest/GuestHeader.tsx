@@ -29,7 +29,7 @@ export function GuestHeader({
           <button
             type="button"
             onClick={() => (backHref ? router.push(backHref) : router.back())}
-            className="flex items-center justify-center size-8 -ml-1 rounded-full transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2"
+            className="flex items-center justify-center size-11 -ml-2 rounded-full transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2"
             style={{ color: "var(--brand-primary)" }}
             aria-label="Go back"
           >
@@ -88,7 +88,7 @@ export function GuestHeader({
               <button
                 type="button"
                 onClick={() => (backHref ? router.push(backHref) : router.back())}
-                className="flex items-center justify-center size-8 -ml-1 rounded-full transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2"
+                className="flex items-center justify-center size-11 -ml-2 rounded-full transition-colors active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-accent)] focus-visible:ring-offset-2"
                 style={{ color: "var(--brand-primary)" }}
                 aria-label="Go back"
               >

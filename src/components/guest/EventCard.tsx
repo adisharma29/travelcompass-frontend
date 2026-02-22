@@ -8,6 +8,7 @@ import type { HotelEventPublic } from "@/lib/concierge-types";
 import { EventDateLabel } from "./EventDateLabel";
 import { useGuest } from "@/context/GuestContext";
 import { useHasExpired } from "@/hooks/use-has-expired";
+import { useBookingWindowState } from "@/hooks/use-booking-window-state";
 
 const CTA_LABELS: Record<string, string> = {
   DINING: "Book",
@@ -30,15 +31,24 @@ export function EventCard({
 }) {
   const router = useRouter();
   const { guardedNavigate, hotel } = useGuest();
-  const ctaLabel = CTA_LABELS[event.category] ?? "Book";
+  const defaultCtaLabel = CTA_LABELS[event.category] ?? "Book";
 
   // Auto-disable CTA when event_end or next_occurrence passes (even on long-lived pages)
   const endExpired = useHasExpired(!event.is_recurring ? event.event_end : null);
   const occurrenceExpired = useHasExpired(event.is_recurring ? event.next_occurrence : null);
+  const { state: windowState } = useBookingWindowState(event);
   const canBook =
     !!event.routing_department_slug &&
     !endExpired &&
-    (!event.is_recurring || (!!event.next_occurrence && !occurrenceExpired));
+    (!event.is_recurring || (!!event.next_occurrence && !occurrenceExpired)) &&
+    windowState === "bookable";
+
+  const ctaLabel =
+    windowState === "not_yet_open"
+      ? "Not Yet Open"
+      : windowState === "closed"
+        ? "Closed"
+        : defaultCtaLabel;
 
   // Re-fetch data when a recurring occurrence passes so next_occurrence updates
   useEffect(() => {
@@ -165,7 +175,7 @@ export function EventCard({
             color: "var(--brand-secondary)",
           }}
         >
-          {canBook ? ctaLabel : "Unavailable"}
+          {canBook ? defaultCtaLabel : ctaLabel === defaultCtaLabel ? "Unavailable" : ctaLabel}
         </button>
       </div>
     </div>

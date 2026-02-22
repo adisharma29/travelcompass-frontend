@@ -304,6 +304,37 @@
 - [x] Confirmation page: event name display
 - [x] Build + lint pass with no errors
 
+## Booking Window (see BOOKING_WINDOW_PLAN.md)
+
+### Backend
+- [x] Hotel model: default_booking_opens_hours, default_booking_closes_hours fields
+- [x] Event model: booking_opens_hours, booking_closes_hours fields (nullable, inherit from hotel)
+- [x] Event model: get_effective_booking_opens/closes_hours(), get_booking_window_for(), is_bookable_for(), resolve_target_datetime() methods
+- [x] Event model: clean() cross-field validation (opens >= closes)
+- [x] Migration 0015_booking_window
+- [x] EventSerializer: booking window fields + upper-bound + cross-field validation
+- [x] EventPublicSerializer: computed booking_opens_at, booking_closes_at, is_bookable fields
+- [x] ServiceRequestCreateSerializer: booking window enforcement with hotel-timezone error messages
+- [x] HotelSettingsSerializer: default booking window fields + cross-field validation
+- [x] EventPublicList/Detail views: explicit select_related("hotel") for N+1 prevention
+
+### Frontend — Types & API
+- [x] HotelEvent: booking_opens_hours, booking_closes_hours
+- [x] HotelEventPublic: booking_opens_at, booking_closes_at, is_bookable
+- [x] Hotel/HotelSettings: default_booking_opens_hours, default_booking_closes_hours
+
+### Frontend — Admin
+- [x] EventEditor: "Booking Window" card with opens/closes inputs, cross-field error, preview line
+- [x] EventEditor: canSave blocks when opens < closes
+- [x] Settings page: "Booking Defaults" card with hotel-level opens/closes inputs + cross-field error
+
+### Frontend — Guest
+- [x] useBookingWindowState hook: auto-refresh timers at open/close boundaries, 4 states
+- [x] EventCard: canBook gated by windowState === "bookable", labels: "Not Yet Open" / "Closed"
+- [x] FeaturedEventCard: same booking window integration
+- [x] Event detail page: booking window status message ("Bookings open {date}" / "Bookings have closed")
+- [x] Build + lint pass with no errors
+
 ---
 
 ### Phase 7.2: Event Tracking + Funnel (not started)

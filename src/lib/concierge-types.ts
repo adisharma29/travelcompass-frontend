@@ -100,6 +100,9 @@ export interface Hotel {
   facebook_url: string;
   twitter_url: string;
   whatsapp_number: string;
+  // Booking window defaults (only present on admin/settings endpoints, not public)
+  default_booking_opens_hours?: number;
+  default_booking_closes_hours?: number;
   // Footer & Legal
   footer_text: string;
   terms_url: string;
@@ -119,6 +122,9 @@ export interface HotelSettings {
   require_frontdesk_kiosk: boolean;
   escalation_tier_minutes: number[] | null;
   settings_configured: boolean;
+  // Booking window defaults
+  default_booking_opens_hours: number;
+  default_booking_closes_hours: number;
   // Brand
   primary_color: string;
   secondary_color: string;
@@ -223,6 +229,8 @@ export interface HotelEvent {
   status: ContentStatus;
   is_active: boolean;
   published_at: string | null;
+  booking_opens_hours: number | null;
+  booking_closes_hours: number | null;
   auto_expire: boolean;
   display_order: number;
   created_at: string;
@@ -246,6 +254,9 @@ export interface HotelEventPublic {
   recurrence_rule: RecurrenceRule | null;
   is_featured: boolean;
   next_occurrence: string | null;
+  booking_opens_at: string | null;
+  booking_closes_at: string | null;
+  is_bookable: boolean;
   department: number | null;
   routing_department_slug: string | null;
   routing_department_name: string | null;

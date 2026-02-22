@@ -11,6 +11,7 @@ import { EventDateLabel } from "@/components/guest/EventDateLabel";
 import { SafeHtml } from "@/components/guest/SafeHtml";
 import { useGuest } from "@/context/GuestContext";
 import { useHasExpired } from "@/hooks/use-has-expired";
+import { useBookingWindowState } from "@/hooks/use-booking-window-state";
 import { CalendarDays, Star } from "lucide-react";
 
 const CTA_LABELS: Record<string, string> = {
@@ -31,15 +32,24 @@ export function EventDetailClient({
 }) {
   const router = useRouter();
   const { guardedNavigate, hotel } = useGuest();
-  const ctaLabel = CTA_LABELS[event.category] ?? "Book Now";
+  const defaultCtaLabel = CTA_LABELS[event.category] ?? "Book Now";
 
   // Auto-disable CTA when event_end or next_occurrence passes (even on long-lived pages)
   const endExpired = useHasExpired(!event.is_recurring ? event.event_end : null);
   const occurrenceExpired = useHasExpired(event.is_recurring ? event.next_occurrence : null);
+  const { state: windowState, opensAt } = useBookingWindowState(event);
   const canBook =
     !!event.routing_department_slug &&
     !endExpired &&
-    (!event.is_recurring || (!!event.next_occurrence && !occurrenceExpired));
+    (!event.is_recurring || (!!event.next_occurrence && !occurrenceExpired)) &&
+    windowState === "bookable";
+
+  const ctaLabel =
+    windowState === "not_yet_open"
+      ? "Not Yet Open"
+      : windowState === "closed"
+        ? "Closed"
+        : defaultCtaLabel;
 
   // For recurring events, when the current occurrence passes, re-fetch server data
   // so next_occurrence updates and the CTA re-enables for the next date
@@ -132,6 +142,36 @@ export function EventDetailClient({
       </span>
     </div>
   );
+
+  const bookingWindowMessage = (() => {
+    if (windowState === "not_yet_open" && opensAt) {
+      const fmt = opensAt.toLocaleString(undefined, {
+        month: "short",
+        day: "numeric",
+        hour: "numeric",
+        minute: "2-digit",
+        timeZone: hotel.timezone || undefined,
+      });
+      return `Bookings open ${fmt}`;
+    }
+    if (windowState === "closed") {
+      return "Bookings have closed";
+    }
+    return null;
+  })();
+
+  const bookingWindowSection = bookingWindowMessage ? (
+    <div className="px-5 py-3 md:px-0">
+      <p
+        className="text-xs font-medium"
+        style={{
+          color: "color-mix(in oklch, var(--brand-accent) 80%, var(--brand-primary))",
+        }}
+      >
+        {bookingWindowMessage}
+      </p>
+    </div>
+  ) : null;
 
   const descriptionSection = event.description ? (
     <div className="px-5 py-4 border-t border-black/5 md:px-0">
@@ -243,6 +283,7 @@ export function EventDetailClient({
             <div className="md:hidden">
               {titleSection}
               {dateSection}
+              {bookingWindowSection}
               {descriptionSection}
               {highlightsSection}
               {linkedExpSection}
@@ -253,6 +294,7 @@ export function EventDetailClient({
           <div className="hidden md:block">
             {titleSection}
             {dateSection}
+            {bookingWindowSection}
             {descriptionSection}
             {highlightsSection}
             {linkedExpSection}
@@ -284,7 +326,7 @@ export function EventDetailClient({
                   minHeight: "44px",
                 }}
               >
-                {canBook ? ctaLabel : "Unavailable"}
+                {canBook ? defaultCtaLabel : ctaLabel === defaultCtaLabel ? "Unavailable" : ctaLabel}
               </button>
             </div>
           </div>
@@ -320,7 +362,7 @@ export function EventDetailClient({
               minHeight: "44px",
             }}
           >
-            {canBook ? ctaLabel : "Unavailable"}
+            {canBook ? defaultCtaLabel : ctaLabel === defaultCtaLabel ? "Unavailable" : ctaLabel}
           </button>
         </div>
       </div>
